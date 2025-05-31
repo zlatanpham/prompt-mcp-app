@@ -27,7 +27,7 @@ import DashboardLayout from "@/components/dashboard-layout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import Prompt from "./_components/prompt";
+import Tool from "./_components/tool";
 
 const projectFormSchema = z.object({
   name: z.string().min(1, "Project name is required"),
@@ -166,7 +166,7 @@ export default function ProjectDetailPage() {
           <div className="grid grid-cols-3">
             <div className="col-span-2"></div>
             <div className="col-span-1 space-y-4">
-              <Prompt />
+              <Tool />
             </div>
           </div>
         </>

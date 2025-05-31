@@ -24,77 +24,75 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { Prompt } from "@prisma/client";
+import type { Tool } from "@prisma/client";
 
-import ManualPromptDialog, {
-  type ManualPromptFormValues,
-} from "./manual-prompt-dialog";
-import PromptCard from "./prompt-card";
+import ManualToolDialog, {
+  type ManualToolFormValues,
+} from "./manual-tool-dialog";
+import ToolCard from "./tool-card";
 
-export default function Prompt() {
+export default function ToolComponent() {
   const params = useParams();
   const projectId = params.projectId as string | undefined;
 
-  const [selectedPromptId, setSelectedPromptId] = useState<string | null>(null);
+  const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Fetch prompts for the agent
+  // Fetch tools for the agent
   const {
-    data: prompts,
+    data: tools,
     refetch,
-    isLoading: isLoadingPrompts,
-  } = api.prompt.getByAgentId.useQuery(
+    isLoading: isLoadingTools,
+  } = api.tool.getByAgentId.useQuery(
     { project_id: projectId! },
     { enabled: !!projectId },
   );
 
-  const isLoading = isLoadingPrompts;
+  const isLoading = isLoadingTools;
 
-  // Fetch single prompt for editing
-  const { data: prompt } = api.prompt.getById.useQuery(
-    { id: selectedPromptId ?? "" },
-    { enabled: !!selectedPromptId },
+  // Fetch single tool for editing
+  const { data: tool } = api.tool.getById.useQuery(
+    { id: selectedToolId ?? "" },
+    { enabled: !!selectedToolId },
   );
 
   // Mutations
-  const createPrompt = api.prompt.create.useMutation({
+  const createTool = api.tool.create.useMutation({
     onSuccess: () => {
-      console.log("Prompt created");
+      console.log("Tool created");
       refetch();
       setIsDialogOpen(false);
     },
   });
 
-  const updatePrompt = api.prompt.update.useMutation({
+  const updateTool = api.tool.update.useMutation({
     onSuccess: () => {
       refetch();
       setIsDialogOpen(false);
-      setSelectedPromptId(null);
+      setSelectedToolId(null);
     },
   });
 
-  const deletePrompt = api.prompt.delete.useMutation({
+  const deleteTool = api.tool.delete.useMutation({
     onSuccess: () => {
       refetch();
-      setSelectedPromptId(null);
+      setSelectedToolId(null);
     },
   });
 
   // Handlers
-  const onSubmit = async (data: ManualPromptFormValues) => {
-    if (selectedPromptId) {
-      updatePrompt.mutate({
-        id: selectedPromptId,
-        tool_name: data.tool_name,
+  const onSubmit = async (data: ManualToolFormValues) => {
+    if (selectedToolId) {
+      updateTool.mutate({
+        id: selectedToolId,
         name: data.name,
         description: data.description,
         content: data.content,
       });
     } else {
-      createPrompt.mutate({
+      createTool.mutate({
         project_id: projectId!,
         name: data.name,
-        tool_name: data.tool_name,
         description: data.description,
         content: data.content,
       });
@@ -102,13 +100,13 @@ export default function Prompt() {
   };
 
   const onEdit = (id: string) => {
-    setSelectedPromptId(id);
+    setSelectedToolId(id);
     setIsDialogOpen(true);
   };
 
   const onDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this prompt?")) {
-      deletePrompt.mutate({ id: id });
+    if (window.confirm("Are you sure you want to delete this tool?")) {
+      deleteTool.mutate({ id: id });
     }
   };
 
@@ -116,7 +114,7 @@ export default function Prompt() {
     <div className="rounded-lg border bg-gray-50 p-4">
       <div className="mb-4 flex items-center justify-between">
         <h4 className="flex items-center gap-1 text-lg font-semibold">
-          Project prompts{" "}
+          Project tools{" "}
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -124,8 +122,8 @@ export default function Prompt() {
               </TooltipTrigger>
               <TooltipContent>
                 <p>
-                  Project prompts provide context for the AI writer
-                  <br /> or to generate prompts
+                  Project tools provide context for the AI writer
+                  <br /> or to generate tools
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -140,7 +138,7 @@ export default function Prompt() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuItem
               onSelect={() => {
-                setSelectedPromptId(null);
+                setSelectedToolId(null);
                 setIsDialogOpen(true);
               }}
             >
@@ -149,31 +147,31 @@ export default function Prompt() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <ManualPromptDialog
+        <ManualToolDialog
           isOpen={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSubmit={onSubmit}
-          selectedPromptId={selectedPromptId}
-          prompt={prompt ?? null ?? undefined}
-          isSubmitting={createPrompt.isPending || updatePrompt.isPending}
+          selectedToolId={selectedToolId}
+          tool={tool ?? null ?? undefined}
+          isSubmitting={createTool.isPending || updateTool.isPending}
         />
       </div>
 
-      {prompts && prompts.length > 0 ? (
+      {tools && tools.length > 0 ? (
         <div className="grid grid-cols-3 gap-3">
-          {prompts.map((prompt) => (
-            <PromptCard
-              key={prompt.id}
-              prompt={prompt}
-              onEdit={() => onEdit(prompt.id)}
-              onDelete={() => onDelete(prompt.id)}
+          {tools.map((tool) => (
+            <ToolCard
+              key={tool.id}
+              tool={tool}
+              onEdit={() => onEdit(tool.id as string)}
+              onDelete={() => onDelete(tool.id as string)}
             />
           ))}
         </div>
       ) : (
         <div className="flex w-full flex-col items-center justify-center space-y-2 py-5">
           <HardDriveUpload className="text-muted-foreground" />
-          <p className="text-muted-foreground text-sm">No prompts found.</p>
+          <p className="text-muted-foreground text-sm">No tools found.</p>
         </div>
       )}
     </div>

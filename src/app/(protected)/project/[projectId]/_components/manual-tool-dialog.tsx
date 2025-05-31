@@ -21,64 +21,61 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { Prompt } from "@prisma/client";
+import type { Tool } from "@prisma/client";
 
-const manualPromptFormSchema = z.object({
-  name: z.string().min(1, "Prompt name is required"),
-  tool_name: z.string().min(1, "Tool name is required"),
+const manualToolFormSchema = z.object({
+  name: z.string().min(1, "Tool name is required"),
   description: z.string().optional(),
   content: z.string().min(1, "Content is required"),
 });
 
-export type ManualPromptFormValues = z.infer<typeof manualPromptFormSchema>;
+export type ManualToolFormValues = z.infer<typeof manualToolFormSchema>;
 
 interface Props {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSubmit: (values: ManualPromptFormValues) => void;
-  selectedPromptId: string | null;
-  prompt?: Prompt | null;
+  onSubmit: (values: ManualToolFormValues) => void;
+  selectedToolId: string | null;
+  tool?: Tool | null;
   isSubmitting: boolean;
 }
 
-const ManualPromptDialog = (props: Props) => {
+const ManualToolDialog = (props: Props) => {
   const {
     isOpen,
     onOpenChange,
     onSubmit: onSubmitProp,
-    selectedPromptId,
-    prompt,
+    selectedToolId,
+    tool,
     isSubmitting,
   } = props;
 
-  const form = useForm<ManualPromptFormValues>({
-    resolver: zodResolver(manualPromptFormSchema),
+  const form = useForm<ManualToolFormValues>({
+    resolver: zodResolver(manualToolFormSchema),
     defaultValues: {
       name: "",
       content: "",
     },
   });
 
-  // Reset form when prompt changes
+  // Reset form when tool changes
   useEffect(() => {
-    if (prompt) {
+    if (tool) {
       form.reset({
-        name: prompt.name,
-        tool_name: prompt.tool_name,
-        description: prompt.description ?? "",
-        content: prompt.content,
+        name: tool.name,
+        description: tool.description ?? "",
+        content: tool.content,
       });
     } else {
       form.reset({
         name: "",
-        tool_name: "",
         description: "",
         content: "",
       });
     }
-  }, [prompt, form]);
+  }, [tool, form]);
 
-  function onSubmit(values: ManualPromptFormValues) {
+  function onSubmit(values: ManualToolFormValues) {
     onSubmitProp(values);
   }
 
@@ -91,9 +88,7 @@ const ManualPromptDialog = (props: Props) => {
     <Dialog open={isOpen} onOpenChange={onDialogClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>
-            {selectedPromptId ? "Edit Prompt" : "New Prompt"}
-          </DialogTitle>
+          <DialogTitle>{selectedToolId ? "Edit Tool" : "New Tool"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -107,19 +102,6 @@ const ManualPromptDialog = (props: Props) => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Prompt name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="tool_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Tool name</FormLabel>
                   <FormControl>
                     <Input placeholder="Tool name" {...field} />
                   </FormControl>
@@ -135,7 +117,7 @@ const ManualPromptDialog = (props: Props) => {
                   <FormLabel>Description (Optional)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Briefly describe the prompt..."
+                      placeholder="Briefly describe the tool..."
                       className="min-h-20"
                       rows={3}
                       {...field}
@@ -165,7 +147,7 @@ const ManualPromptDialog = (props: Props) => {
             />
             <div className="flex justify-end space-x-2">
               <Button type="submit" variant="default" disabled={isSubmitting}>
-                {selectedPromptId ? "Update" : "Create"}
+                {selectedToolId ? "Update" : "Create"}
               </Button>
               <Button type="button" variant="secondary" onClick={onDialogClose}>
                 Cancel
@@ -178,4 +160,4 @@ const ManualPromptDialog = (props: Props) => {
   );
 };
 
-export default ManualPromptDialog;
+export default ManualToolDialog;

@@ -2,15 +2,15 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
 
-export const promptRouter = createTRPCRouter({
+export const toolRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
         project_id: z.string().uuid(),
         name: z.string().min(1),
-        tool_name: z.string().min(1),
         description: z.string().optional(),
         content: z.string().min(1),
+        args: z.record(z.any()).optional(), // Assuming args is a generic JSON object
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -20,16 +20,16 @@ export const promptRouter = createTRPCRouter({
       }
       // Optionally, verify user has access to the project here
 
-      const prompt = await db.prompt.create({
+      const tool = await db.tool.create({
         data: {
           project_id: input.project_id,
           name: input.name,
-          tool_name: input.tool_name,
           description: input.description,
           content: input.content,
+          args: input.args,
         },
       });
-      return prompt;
+      return tool;
     }),
 
   getById: protectedProcedure
@@ -43,12 +43,12 @@ export const promptRouter = createTRPCRouter({
       if (!userId) {
         throw new Error("Unauthorized");
       }
-      // Optionally, verify user has access to the prompt/agent here
+      // Optionally, verify user has access to the tool/agent here
 
-      const prompt = await db.prompt.findUnique({
+      const tool = await db.tool.findUnique({
         where: { id: input.id },
       });
-      return prompt;
+      return tool;
     }),
 
   getByAgentId: protectedProcedure
@@ -64,11 +64,11 @@ export const promptRouter = createTRPCRouter({
       }
       // Optionally, verify user has access to the agent here
 
-      const prompts = await db.prompt.findMany({
+      const tools = await db.tool.findMany({
         where: { project_id: input.project_id, deletedAt: null },
         orderBy: { updated_at: "desc" },
       });
-      return prompts;
+      return tools;
     }),
 
   update: protectedProcedure
@@ -76,9 +76,9 @@ export const promptRouter = createTRPCRouter({
       z.object({
         id: z.string().uuid(),
         name: z.string().min(1).optional(),
-        tool_name: z.string().min(1).optional(),
         description: z.string().optional(),
         content: z.string().min(1).optional(),
+        args: z.record(z.any()).optional(), // Assuming args is a generic JSON object
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -86,12 +86,13 @@ export const promptRouter = createTRPCRouter({
       if (!userId) {
         throw new Error("Unauthorized");
       }
-      // Optionally, verify user has access to the prompt/agent here
+      // Optionally, verify user has access to the tool/agent here
 
       const dataToUpdate: {
         name?: string;
         description?: string;
         content?: string;
+        args?: object; // Use object for Json type
         updated_at: Date;
       } = {
         updated_at: new Date(),
@@ -105,12 +106,15 @@ export const promptRouter = createTRPCRouter({
       if (input.content !== undefined) {
         dataToUpdate.content = input.content;
       }
+      if (input.args !== undefined) {
+        dataToUpdate.args = input.args;
+      }
 
-      const prompt = await db.prompt.update({
+      const tool = await db.tool.update({
         where: { id: input.id },
         data: dataToUpdate,
       });
-      return prompt;
+      return tool;
     }),
 
   delete: protectedProcedure
@@ -124,9 +128,9 @@ export const promptRouter = createTRPCRouter({
       if (!userId) {
         throw new Error("Unauthorized");
       }
-      // Optionally, verify user has access to the prompt/agent here
+      // Optionally, verify user has access to the tool/agent here
 
-      await db.prompt.update({
+      await db.tool.update({
         where: { id: input.id },
         data: {
           deletedAt: new Date(),

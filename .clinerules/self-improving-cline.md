@@ -26,3 +26,4 @@ globs: ["*"]
 
 - No `.clinerules` were active.
 - The task was very simple and involved no feedback.
+- When a user instruction directly conflicts with resolving critical technical issues, a rule should be added to prompt for clarification from the user.

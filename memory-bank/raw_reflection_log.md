@@ -1,0 +1,57 @@
+---
+Date: 2025-05-31
+TaskRef: "Rename Prompt to Tool, update schema, routes, and components"
+
+Learnings:
+  - Successfully renamed the `Prompt` model to `Tool` in `prisma/schema.prisma`, removed `tool_name`, and added `@unique` to `name`.
+  - Updated `src/server/api/routers/tool.ts` (previously `prompt.ts`) to reflect the `Tool` model and remove `tool_name` references.
+  - Updated `src/server/api/root.ts` to use `toolRouter`.
+  - Updated `src/app/(protected)/project/[projectId]/page.tsx` to import and use the `Tool` component.
+  - Updated `src/app/(protected)/project/[projectId]/_components/prompt.tsx` (now acting as `Tool` component) to reflect the `Tool` model, remove `tool_name` references, and update text.
+  - Updated `src/app/(protected)/project/[projectId]/_components/manual-prompt-dialog.tsx` to reflect the `Tool` model, remove `tool_name` references, and update text.
+  - Updated `src/app/(protected)/project/[projectId]/_components/prompt-card.tsx` to reflect the `Tool` model and update text.
+  - Encountered persistent TypeScript errors related to Prisma client not recognizing the `Tool` model, which were skipped as per user instruction. This highlights a potential conflict between user instructions and technical dependencies.
+  - Identified and proposed improvements to `.clinerules/self-improving-cline.md` and `.clinerules/1-coding.md` to address command interruption handling, database operation clarity, and prioritizing user instructions vs. technical requirements.
+
+Difficulties:
+  - Repeated interruptions during `mv` commands and `pnpm db:generate`.
+  - Initial `pnpm db:generate` failure due to database drift, requiring `prisma migrate reset`.
+  - Conflict between user instruction to skip `db:generate` and the necessity of running it to resolve TypeScript errors.
+
+Successes:
+  - Successfully applied all requested code changes across schema, router, and components.
+  - Identified and proposed valuable improvements to `.clinerules` for future interactions.
+
+Improvements_Identified_For_Consolidation:
+  - General pattern: Handling conflicts between user instructions and technical necessities.
+  - General pattern: Robustness for interrupted file operations (e.g., `mv`).
+  - Project-specific: Initial Prisma setup for new projects (reset and generate).
+---
+
+---
+
+Date: 2025-05-31
+TaskRef: "Add args: jsonb to the Tool column"
+
+Learnings:
+
+- Successfully added `args: Json?` to the `Tool` model in `prisma/schema.prisma`.
+- Updated `create` and `update` tRPC procedures in `src/server/api/routers/tool.ts` to handle the new `args` field.
+- Resolved TypeScript errors by running `pnpm db:generate` after schema modification and tRPC router updates.
+- Encountered and resolved `replace_in_file` matching issues by falling back to `write_to_file` for schema modification.
+
+Difficulties:
+
+- `replace_in_file` failed twice due to exact match requirements, necessitating a fallback to `write_to_file`.
+
+Successes:
+
+- Successfully implemented the requested schema change and API updates.
+- Successfully resolved the resulting TypeScript error.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Handling `replace_in_file` failures by falling back to `write_to_file` for critical file modifications.
+- Project-specific: Steps for adding new fields to Prisma models and updating tRPC.
+
+---

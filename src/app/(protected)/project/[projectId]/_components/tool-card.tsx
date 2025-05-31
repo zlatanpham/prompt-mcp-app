@@ -2,18 +2,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
 import { XIcon } from "lucide-react";
-import type { Prompt } from "@prisma/client";
+import type { Tool } from "@prisma/client";
 
 interface Props {
-  prompt: Prompt;
+  tool: Tool;
   onEdit: () => void;
   onDelete: () => void;
   className?: string;
 }
 
-const PromptCard = (props: Props) => {
-  const { prompt, onDelete, onEdit, className } = props;
-  const numberOfLines = prompt.content.split("\n").length;
+const ToolCard = (props: Props) => {
+  const { tool, onDelete, onEdit, className } = props;
+  const numberOfLines = tool.content.split("\n").length;
 
   return (
     <div
@@ -26,9 +26,7 @@ const PromptCard = (props: Props) => {
     >
       <header className="flex items-center justify-between">
         <div className="flex w-full items-center justify-between">
-          <span className="line-clamp-1 text-xs font-medium">
-            {prompt.name}
-          </span>
+          <span className="line-clamp-1 text-xs font-medium">{tool.name}</span>
           <div className="absolute -top-2 -right-2 opacity-0 transition-opacity group-hover:opacity-100">
             <Button
               size="sm"
@@ -57,4 +55,4 @@ const PromptCard = (props: Props) => {
   );
 };
 
-export default PromptCard;
+export default ToolCard;

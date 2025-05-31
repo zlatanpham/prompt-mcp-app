@@ -54,9 +54,8 @@ CREATE TABLE "Project" (
 );
 
 -- CreateTable
-CREATE TABLE "Prompt" (
+CREATE TABLE "Tool" (
     "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "tool_name" TEXT NOT NULL,
     "project_id" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
@@ -65,7 +64,7 @@ CREATE TABLE "Prompt" (
     "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deletedAt" TIMESTAMPTZ(6),
 
-    CONSTRAINT "Prompt_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Tool_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -103,10 +102,10 @@ CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provi
 CREATE UNIQUE INDEX "OrganizationMember_organization_id_user_id_key" ON "OrganizationMember"("organization_id", "user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Prompt_tool_name_key" ON "Prompt"("tool_name");
+CREATE UNIQUE INDEX "Tool_name_key" ON "Tool"("name");
 
 -- CreateIndex
-CREATE INDEX "Prompt_project_id_idx" ON "Prompt"("project_id");
+CREATE INDEX "Tool_project_id_idx" ON "Tool"("project_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Session_sessionToken_key" ON "Session"("sessionToken");
@@ -139,7 +138,7 @@ ALTER TABLE "Project" ADD CONSTRAINT "fk_created_by_user" FOREIGN KEY ("created_
 ALTER TABLE "Project" ADD CONSTRAINT "fk_organization" FOREIGN KEY ("organization_id") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "Prompt" ADD CONSTRAINT "fk_prompt_project" FOREIGN KEY ("project_id") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "Tool" ADD CONSTRAINT "fk_prompt_project" FOREIGN KEY ("project_id") REFERENCES "Project"("id") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "Session" ADD CONSTRAINT "Session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
