@@ -24,6 +24,15 @@
 
 - Be prepared to make multiple small UI adjustments based on continuous user feedback to achieve the desired look and feel. This often involves iterative `replace_in_file` operations for styling and component structure.
 
+### Path Alias Resolution
+
+- Always verify `tsconfig.json` for configured path aliases (e.g., `@/*` mapping to `src/*`) at the start of a project or when encountering import resolution issues. Ensure all imports consistently use the defined alias.
+
+### TypeScript and ESLint Error Resolution
+
+- When persistent TypeScript errors (e.g., `Cannot find module`) occur despite correct paths and installed dependencies, it often indicates a stale TypeScript language server or development server cache. A server restart is usually required.
+- Explicitly type parameters and variables to resolve `implicit any` and `unsafe argument` ESLint errors, especially when dealing with data from external sources (like tRPC queries) or complex object structures.
+
 ## Project-Specific Learnings
 
 ### Initial Prisma Setup for New Projects
@@ -74,8 +83,14 @@
 - For actions requiring confirmation or detailed input, integrate `AlertDialog` (for confirmation) and `Dialog` (for forms) within dropdown menu items.
 - Ensure proper state management for dialog visibility and selected items.
 
-## Project-Specific Learnings
-
 ### Correct `queryKey` patterns for tRPC `invalidateQueries`
 
 - When invalidating tRPC queries with React Query, ensure the `queryKey` precisely matches the structure used by the `useQuery` hook. For `api.router.procedure.useQuery()`, the `queryKey` is typically an array containing an array, e.g., `[['router', 'procedure']]`. Using a single array like `['router', 'procedure']` will not correctly invalidate the cache.
+
+### API Key Management Implementation
+
+- **Database Design**: Use a dedicated `ApiKey` model with a secure `key` field and a many-to-many relationship (`ApiKeyOnProject`) to `Project` for granular access control.
+- **Key Generation**: Implement a utility function (e.g., `generateApiKey` using `nanoid`) for creating unique, random API keys.
+- **Public API Endpoint**: For external access, create a dedicated Next.js API route (e.g., `src/app/api/external/tools/route.ts`) that validates the API key from headers (`x-api-key`) and filters data based on associated projects.
+- **One-Time Key Display**: For security, display newly created or regenerated API keys only once in a dedicated dialog, prompting the user to copy it to their clipboard.
+- **UI for Management**: Provide a comprehensive UI for listing, creating, deleting, regenerating, and updating project associations for API keys. Use checkboxes for multi-project selection.

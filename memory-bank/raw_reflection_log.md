@@ -120,3 +120,45 @@ Improvements_Identified_For_Consolidation:
 - Project-specific: Correct `queryKey` patterns for tRPC `invalidateQueries`.
 
 ---
+
+---
+
+Date: 2025-05-31
+TaskRef: "Implement API Key Feature"
+
+Learnings:
+
+- Successfully added `ApiKey` and `ApiKeyOnProject` models to `prisma/schema.prisma` for API key management and project association.
+- Implemented `src/lib/encryption.ts` for generating secure API keys using `nanoid`.
+- Created `src/server/api/routers/apiKey.ts` with tRPC procedures for creating, listing, deleting, regenerating, and updating projects for API keys.
+- Developed `src/app/api/external/tools/route.ts` as a public Next.js API route to fetch tools based on a provided API key, including validation and project access control.
+- Created `src/app/(protected)/api-keys/page.tsx` for the API key management UI, including forms for creation and editing, and display of API keys.
+- Updated `src/components/app-sidebar.tsx` to include a navigation link to the new API Keys page.
+- **Critical Learning**: Discovered that `tsconfig.json` uses `@/*` for path aliases mapping to `src/*`, not `~/*`. This required updating all imports from `~/` to `@/` across multiple files (`src/server/api/routers/apiKey.ts`, `src/app/api/external/tools/route.ts`, `src/app/(protected)/api-keys/page.tsx`, `src/components/ui/multi-select.tsx`).
+- Adapted UI for project selection from a `MultiSelect` component to a list of `Checkbox` components based on user feedback, and removed the `MultiSelect` file.
+- Implemented a one-time display dialog for new/regenerated API keys, with a copy-to-clipboard feature, as per user request.
+- Addressed numerous TypeScript and ESLint errors related to implicit `any` types, unawaited promises, and type compatibility by explicitly typing parameters, casting `Date` objects, and using `void` operator.
+- Encountered persistent `replace_in_file` failures due to auto-formatting, necessitating the use of `write_to_file` as a fallback for `src/app/(protected)/api-keys/page.tsx`.
+
+Difficulties:
+
+- Initial misunderstanding of `tsconfig.json` path aliases (`~` vs `@`), leading to widespread import errors.
+- Repeated `replace_in_file` failures due to subtle auto-formatting changes, making precise SEARCH blocks difficult to match. This required falling back to `write_to_file` for larger file modifications.
+- Managing interactive `pnpm db:generate` prompts during task interruption.
+- Resolving numerous TypeScript and ESLint errors related to type inference and promise handling.
+
+Successes:
+
+- Successfully implemented all core functionalities of the API key feature as planned.
+- Adapted quickly to user feedback regarding UI component choice (MultiSelect to Checkboxes).
+- Successfully debugged and resolved complex TypeScript and ESLint issues.
+- Demonstrated resilience in adapting to `replace_in_file` limitations by using `write_to_file` effectively.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Always verify `tsconfig.json` for path aliases at the start of a project or when encountering import resolution issues.
+- General pattern: When `replace_in_file` repeatedly fails due to auto-formatting or complex changes, consider `write_to_file` as a reliable fallback, providing the complete, intended file content.
+- Project-specific: API Key management implementation details (hashing, project association, one-time display).
+- Project-specific: Next.js API route for public access with API key validation.
+
+---

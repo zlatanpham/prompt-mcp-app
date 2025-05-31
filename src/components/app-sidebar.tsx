@@ -36,6 +36,11 @@ const data = {
       url: "/project",
       icon: Briefcase,
     },
+    {
+      title: "API Keys",
+      url: "/api-keys",
+      icon: Settings2,
+    },
   ],
   navSecondary: [
     {
