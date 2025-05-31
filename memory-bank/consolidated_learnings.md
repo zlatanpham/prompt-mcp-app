@@ -78,4 +78,4 @@
 
 ### Correct `queryKey` patterns for tRPC `invalidateQueries`
 
-- When invalidating tRPC queries with React Query, ensure the `queryKey` precisely matches the structure used by the `useQuery` hook. For example, `api.project.getAll.useQuery()` uses `["project", "getAll"]`, not `["project.getAll"]`.
+- When invalidating tRPC queries with React Query, ensure the `queryKey` precisely matches the structure used by the `useQuery` hook. For `api.router.procedure.useQuery()`, the `queryKey` is typically an array containing an array, e.g., `[['router', 'procedure']]`. Using a single array like `['router', 'procedure']` will not correctly invalidate the cache.

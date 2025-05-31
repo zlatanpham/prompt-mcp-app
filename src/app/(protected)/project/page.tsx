@@ -76,7 +76,9 @@ export default function ProjectPage() {
 
   const createProjectMutation = api.project.create.useMutation({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["project", "getAll"] });
+      await queryClient.invalidateQueries({
+        queryKey: [["project", "getAll"]],
+      });
       setIsCreateOpen(false);
       form.reset();
     },
@@ -84,7 +86,9 @@ export default function ProjectPage() {
 
   const updateProjectMutation = api.project.updateById.useMutation({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["project", "getAll"] });
+      await queryClient.invalidateQueries({
+        queryKey: [["project", "getAll"]],
+      });
       setIsEditOpen(false);
       setSelectedProject(null);
     },
@@ -92,7 +96,9 @@ export default function ProjectPage() {
 
   const deleteProjectMutation = api.project.delete.useMutation({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["project", "getAll"] });
+      await queryClient.invalidateQueries({
+        queryKey: [["project", "getAll"]],
+      });
     },
   });
 
