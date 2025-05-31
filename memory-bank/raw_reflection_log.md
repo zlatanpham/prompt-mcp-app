@@ -11,7 +11,7 @@ Learnings:
   - Updated `src/app/(protected)/project/[projectId]/_components/manual-prompt-dialog.tsx` to reflect the `Tool` model, remove `tool_name` references, and update text.
   - Updated `src/app/(protected)/project/[projectId]/_components/prompt-card.tsx` to reflect the `Tool` model and update text.
   - Encountered persistent TypeScript errors related to Prisma client not recognizing the `Tool` model, which were skipped as per user instruction. This highlights a potential conflict between user instructions and technical dependencies.
-  - Identified and proposed improvements to `.clinerules/self-improving-cline.md` and `.clinerules/1-coding.md` to address command interruption handling, database operation clarity, and prioritizing user instructions vs. technical requirements.
+  - Identified and proposed improvements to `.clinerules/self-improving-cline.md` and `.clinerules/1-coding.2md` to address command interruption handling, database operation clarity, and prioritizing user instructions vs. technical requirements.
 
 Difficulties:
   - Repeated interruptions during `mv` commands and `pnpm db:generate`.

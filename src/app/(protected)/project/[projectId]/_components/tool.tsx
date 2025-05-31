@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Tool } from "@prisma/client";
+import type { Argument } from "@/types/tool";
 import {
   Table,
   TableBody,
@@ -108,6 +109,7 @@ export default function ToolComponent() {
         name: data.name,
         description: data.description,
         content: data.content,
+        args: data.arguments, // Pass arguments to the mutation
       });
     } else {
       createTool.mutate({
@@ -115,6 +117,7 @@ export default function ToolComponent() {
         name: data.name,
         description: data.description,
         content: data.content,
+        args: data.arguments, // Pass arguments to the mutation
       });
     }
   };
@@ -175,7 +178,14 @@ export default function ToolComponent() {
           onOpenChange={setIsDialogOpen}
           onSubmit={onSubmit}
           selectedToolId={selectedToolId}
-          tool={tool ?? null ?? undefined}
+          tool={
+            tool
+              ? {
+                  ...tool,
+                  args: (tool.args as Argument[]) ?? null, // Ensure args is typed correctly
+                }
+              : null
+          }
           isSubmitting={createTool.isPending || updateTool.isPending}
         />
 

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
 import { toolNameSchema } from "@/lib/validators/tool";
+import { argumentSchema, type Argument } from "@/types/tool";
 
 export const toolRouter = createTRPCRouter({
   create: protectedProcedure
@@ -11,7 +12,7 @@ export const toolRouter = createTRPCRouter({
         name: toolNameSchema,
         description: z.string().optional(),
         content: z.string().min(1),
-        args: z.record(z.any()).optional(), // Assuming args is a generic JSON object
+        args: z.array(argumentSchema).optional(), // Changed to array of argumentSchema
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -79,7 +80,7 @@ export const toolRouter = createTRPCRouter({
         name: toolNameSchema.optional(),
         description: z.string().optional(),
         content: z.string().min(1).optional(),
-        args: z.record(z.any()).optional(), // Assuming args is a generic JSON object
+        args: z.array(argumentSchema).optional(), // Changed to array of argumentSchema
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -93,7 +94,7 @@ export const toolRouter = createTRPCRouter({
         name?: string;
         description?: string;
         content?: string;
-        args?: object; // Use object for Json type
+        args?: Argument[]; // Use Argument[] for Json type
         updated_at: Date;
       } = {
         updated_at: new Date(),

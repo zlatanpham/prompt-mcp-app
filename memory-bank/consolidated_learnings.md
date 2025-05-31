@@ -38,9 +38,20 @@
 
 - **Workflow:**
   1.  Modify `prisma/schema.prisma` to add the new field (e.g., `args Json?`).
-  2.  Run `pnpm db:generate` to update the Prisma Client.
-  3.  Run `pnpm dlx prisma migrate dev --name your-migration-name` to create and apply a new database migration.
+  2.  **Crucial Step**: Run `pnpm db:generate` to regenerate the Prisma Client. This is essential for the application's types to recognize the new schema changes.
+  3.  Run `pnpm dlx prisma migrate dev --name your-migration-name` to create and apply a new database migration (if schema changes require it).
   4.  Update relevant tRPC procedures (e.g., `create`, `update`) in `src/server/api/routers/` to include the new field in input schemas and data operations.
+
+### Prisma JSON Type Handling
+
+- When working with `Json` fields in Prisma, avoid explicit casting to `Prisma.JsonArray` or `Prisma.JsonObject` in the data payload for `create` or `update` operations. Prisma can typically handle the serialization of plain JavaScript arrays or objects directly.
+- **Debugging `Unknown argument` errors**: If you encounter `Unknown argument` errors when interacting with Prisma, the primary cause is usually an outdated Prisma Client. Always ensure `pnpm db:generate` has been run successfully after any `prisma/schema.prisma` modifications.
+
+### Dynamic Form Arrays
+
+- **Pattern**: For managing dynamic lists of input fields (e.g., tool arguments), use `react-hook-form`'s `useFieldArray`. This simplifies adding, removing, and managing individual items within a form.
+- **Component Structure**: Create a dedicated component (e.g., `ArgumentsFormArray`) to encapsulate the logic and UI for the form array, promoting reusability and separation of concerns.
+- **Type-only Imports**: When `verbatimModuleSyntax` is enabled in TypeScript, use `import type { TypeName }` for importing types to prevent runtime issues.
 
 ### Zod Validation Patterns for Tool Names
 
