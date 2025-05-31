@@ -11,7 +11,7 @@ export const toolRouter = createTRPCRouter({
         project_id: z.string().uuid(),
         name: toolNameSchema,
         description: z.string().optional(),
-        content: z.string().min(1),
+        prompt: z.string().min(1),
         args: z.array(argumentSchema).optional(), // Changed to array of argumentSchema
       }),
     )
@@ -27,7 +27,7 @@ export const toolRouter = createTRPCRouter({
           project_id: input.project_id,
           name: input.name,
           description: input.description,
-          content: input.content,
+          prompt: input.prompt,
           args: input.args,
         },
       });
@@ -53,7 +53,7 @@ export const toolRouter = createTRPCRouter({
       return tool;
     }),
 
-  getByAgentId: protectedProcedure
+  getByProjectId: protectedProcedure
     .input(
       z.object({
         project_id: z.string().uuid(),
@@ -79,7 +79,7 @@ export const toolRouter = createTRPCRouter({
         id: z.string().uuid(),
         name: toolNameSchema.optional(),
         description: z.string().optional(),
-        content: z.string().min(1).optional(),
+        prompt: z.string().min(1).optional(),
         args: z.array(argumentSchema).optional(), // Changed to array of argumentSchema
       }),
     )
@@ -93,7 +93,7 @@ export const toolRouter = createTRPCRouter({
       const dataToUpdate: {
         name?: string;
         description?: string;
-        content?: string;
+        prompt?: string;
         args?: Argument[]; // Use Argument[] for Json type
         updated_at: Date;
       } = {
@@ -105,8 +105,8 @@ export const toolRouter = createTRPCRouter({
       if (input.description !== undefined) {
         dataToUpdate.description = input.description;
       }
-      if (input.content !== undefined) {
-        dataToUpdate.content = input.content;
+      if (input.prompt !== undefined) {
+        dataToUpdate.prompt = input.prompt;
       }
       if (input.args !== undefined) {
         dataToUpdate.args = input.args;

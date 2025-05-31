@@ -64,7 +64,7 @@ export default function ToolComponent() {
     data: tools,
     refetch,
     isLoading: isLoadingTools,
-  } = api.tool.getByAgentId.useQuery(
+  } = api.tool.getByProjectId.useQuery(
     { project_id: projectId! },
     { enabled: !!projectId },
   );
@@ -108,7 +108,7 @@ export default function ToolComponent() {
         id: selectedToolId,
         name: data.name,
         description: data.description,
-        content: data.content,
+        prompt: data.prompt,
         args: data.arguments, // Pass arguments to the mutation
       });
     } else {
@@ -116,7 +116,7 @@ export default function ToolComponent() {
         project_id: projectId!,
         name: data.name,
         description: data.description,
-        content: data.content,
+        prompt: data.prompt,
         args: data.arguments, // Pass arguments to the mutation
       });
     }

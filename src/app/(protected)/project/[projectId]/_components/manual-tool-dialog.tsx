@@ -29,7 +29,7 @@ import type { Tool } from "@prisma/client";
 const manualToolFormSchema = z.object({
   name: toolNameSchema,
   description: z.string().optional(),
-  content: z.string().min(1, "Content is required"),
+  prompt: z.string().min(1, "Prompt is required"),
   arguments: z.array(argumentSchema).optional(),
 });
 
@@ -63,7 +63,7 @@ const ManualToolDialog = (props: Props) => {
     resolver: zodResolver(manualToolFormSchema),
     defaultValues: {
       name: "",
-      content: "",
+      prompt: "",
       arguments: [], // Initialize arguments as an empty array
     },
   });
@@ -74,14 +74,14 @@ const ManualToolDialog = (props: Props) => {
       form.reset({
         name: tool.name,
         description: tool.description ?? "",
-        content: tool.content,
+        prompt: tool.prompt,
         arguments: (tool.args as Argument[]) ?? [], // Cast args to Argument[]
       });
     } else {
       form.reset({
         name: "",
         description: "",
-        content: "",
+        prompt: "",
         arguments: [],
       });
     }
@@ -141,13 +141,13 @@ const ManualToolDialog = (props: Props) => {
             />
             <FormField
               control={form.control}
-              name="content"
+              name="prompt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Content (Markdown)</FormLabel>
+                  <FormLabel>Prompt (Markdown)</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Write markdown content here..."
+                      placeholder="Write markdown prompt here..."
                       className="max-h-[calc(100dvh-300px)] min-h-40"
                       rows={8}
                       {...field}

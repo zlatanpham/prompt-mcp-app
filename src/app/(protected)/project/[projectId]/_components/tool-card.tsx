@@ -13,7 +13,7 @@ interface Props {
 
 const ToolCard = (props: Props) => {
   const { tool, onDelete, onEdit, className } = props;
-  const numberOfLines = tool.content.split("\n").length;
+  const numberOfLines = tool.prompt.split("\n").length;
 
   return (
     <div
