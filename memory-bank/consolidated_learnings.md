@@ -12,6 +12,14 @@
 
 - When `replace_in_file` fails due to exact match requirements, consider falling back to `write_to_file` for critical file modifications, especially for small to medium-sized files where the full content can be easily managed.
 
+### Centralizing Validation Logic
+
+- For common validation rules (e.g., string formats, lengths), centralize Zod schemas, regex patterns, and messages into a dedicated shared file (e.g., `src/lib/validators/`). This promotes reusability, consistency, and easier maintenance across frontend and backend.
+
+### Iterative Refinement of User-Facing Messages
+
+- Be prepared to refine user-facing messages (e.g., validation error messages) based on user feedback. Prioritize conciseness and clarity.
+
 ## Project-Specific Learnings
 
 ### Initial Prisma Setup for New Projects
@@ -29,3 +37,9 @@
   2.  Run `pnpm db:generate` to update the Prisma Client.
   3.  Run `pnpm dlx prisma migrate dev --name your-migration-name` to create and apply a new database migration.
   4.  Update relevant tRPC procedures (e.g., `create`, `update`) in `src/server/api/routers/` to include the new field in input schemas and data operations.
+
+### Zod Validation Patterns for Tool Names
+
+- For tool names, use a Zod schema with a regex `^[a-z0-9_]+$` to enforce lowercase letters, numbers, and underscores.
+- Apply length constraints (e.g., `min(1)`, `max(100)`) as required.
+- Centralize this schema and related constants in `src/lib/validators/tool.ts` for consistent application across UI and API.

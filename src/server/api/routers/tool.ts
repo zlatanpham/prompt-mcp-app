@@ -1,13 +1,14 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
+import { toolNameSchema } from "@/lib/validators/tool";
 
 export const toolRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
         project_id: z.string().uuid(),
-        name: z.string().min(1),
+        name: toolNameSchema,
         description: z.string().optional(),
         content: z.string().min(1),
         args: z.record(z.any()).optional(), // Assuming args is a generic JSON object
@@ -75,7 +76,7 @@ export const toolRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string().uuid(),
-        name: z.string().min(1).optional(),
+        name: toolNameSchema.optional(),
         description: z.string().optional(),
         content: z.string().min(1).optional(),
         args: z.record(z.any()).optional(), // Assuming args is a generic JSON object

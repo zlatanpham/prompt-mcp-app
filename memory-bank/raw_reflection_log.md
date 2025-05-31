@@ -55,3 +55,34 @@ Improvements_Identified_For_Consolidation:
 - Project-specific: Steps for adding new fields to Prisma models and updating tRPC.
 
 ---
+
+---
+
+Date: 2025-05-31
+TaskRef: "Update validation for Tool name (regex and length)"
+
+Learnings:
+
+- Implemented Zod validation for tool names to accept only lowercase letters, numbers, and underscores, with a maximum length of 100 characters.
+- Centralized validation logic (regex, min/max lengths, messages) into a new shared file `src/lib/validators/tool.ts` for reusability across frontend and backend.
+- Successfully integrated the shared validation schema (`toolNameSchema`) into the UI form (`src/app/(protected)/project/[projectId]/_components/manual-tool-dialog.tsx`) and backend tRPC procedures (`src/server/api/routers/tool.ts`).
+- Refined validation messages to be more concise based on user feedback.
+
+Difficulties:
+
+- Initial `plan_mode_respond` call failed due to incorrect XML formatting (missing `<response>` tag). Corrected and re-sent.
+- Needed to iterate on validation message conciseness based on user feedback.
+
+Successes:
+
+- Achieved consistent and robust validation across the application.
+- Successfully refactored validation logic into a reusable module.
+- Responded effectively to user feedback for message conciseness.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Centralizing validation schemas and constants for reusability.
+- General pattern: Iterative refinement of user-facing messages based on feedback.
+- Project-specific: Zod validation patterns for common string constraints (regex, length).
+
+---

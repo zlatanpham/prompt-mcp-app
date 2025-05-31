@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { toolNameSchema } from "@/lib/validators/tool";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { Tool } from "@prisma/client";
 
 const manualToolFormSchema = z.object({
-  name: z.string().min(1, "Tool name is required"),
+  name: toolNameSchema,
   description: z.string().optional(),
   content: z.string().min(1, "Content is required"),
 });
