@@ -20,6 +20,10 @@
 
 - Be prepared to refine user-facing messages (e.g., validation error messages) based on user feedback. Prioritize conciseness and clarity.
 
+### Iterative UI Refinement
+
+- Be prepared to make multiple small UI adjustments based on continuous user feedback to achieve the desired look and feel. This often involves iterative `replace_in_file` operations for styling and component structure.
+
 ## Project-Specific Learnings
 
 ### Initial Prisma Setup for New Projects
@@ -43,3 +47,13 @@
 - For tool names, use a Zod schema with a regex `^[a-z0-9_]+$` to enforce lowercase letters, numbers, and underscores.
 - Apply length constraints (e.g., `min(1)`, `max(100)`) as required.
 - Centralize this schema and related constants in `src/lib/validators/tool.ts` for consistent application across UI and API.
+
+### Shadcn UI Table Implementation for Displaying Lists
+
+- Use Shadcn UI's `Table`, `TableHeader`, `TableBody`, `TableHead`, `TableRow`, and `TableCell` components for displaying lists of data in a structured, tabular format.
+- Ensure proper data mapping to `TableRow` and `TableCell` components.
+
+### Direct Action Buttons vs. Dropdowns for Common Actions
+
+- For common actions like "Edit" and "Delete" within a list item, prefer direct icon buttons (e.g., `PencilIcon`, `TrashIcon`) over dropdown menus to simplify the UI and reduce clicks, especially when there are only a few actions.
+- For single actions, convert dropdowns to direct buttons for a more streamlined user experience.

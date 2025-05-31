@@ -7,6 +7,8 @@ import {
   HardDriveUpload,
   Plus as PlusIcon,
   Info as InfoIcon,
+  Pencil as PencilIcon,
+  Trash as TrashIcon,
 } from "lucide-react";
 
 import { api } from "@/trpc/react";
@@ -25,11 +27,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { Tool } from "@prisma/client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import ManualToolDialog, {
   type ManualToolFormValues,
 } from "./manual-tool-dialog";
-import ToolCard from "./tool-card";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function ToolComponent() {
   const params = useParams();
@@ -104,14 +124,24 @@ export default function ToolComponent() {
     setIsDialogOpen(true);
   };
 
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
+  const [toolToDelete, setToolToDelete] = useState<string | null>(null);
+
   const onDelete = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this tool?")) {
-      deleteTool.mutate({ id: id });
+    setToolToDelete(id);
+    setIsConfirmDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (toolToDelete) {
+      deleteTool.mutate({ id: toolToDelete });
+      setToolToDelete(null);
+      setIsConfirmDialogOpen(false);
     }
   };
 
   return (
-    <div className="rounded-lg border bg-gray-50 p-4">
+    <div>
       <div className="mb-4 flex items-center justify-between">
         <h4 className="flex items-center gap-1 text-lg font-semibold">
           Project tools{" "}
@@ -129,23 +159,16 @@ export default function ToolComponent() {
             </Tooltip>
           </TooltipProvider>
         </h4>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="default" className="h-8 w-8" disabled={isLoading}>
-              <PlusIcon className="h-6 w-6" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem
-              onSelect={() => {
-                setSelectedToolId(null);
-                setIsDialogOpen(true);
-              }}
-            >
-              Manual input
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          variant="default"
+          disabled={isLoading}
+          onClick={() => {
+            setSelectedToolId(null);
+            setIsDialogOpen(true);
+          }}
+        >
+          Create tool
+        </Button>
 
         <ManualToolDialog
           isOpen={isDialogOpen}
@@ -155,19 +178,65 @@ export default function ToolComponent() {
           tool={tool ?? null ?? undefined}
           isSubmitting={createTool.isPending || updateTool.isPending}
         />
+
+        <AlertDialog
+          open={isConfirmDialogOpen}
+          onOpenChange={setIsConfirmDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete your
+                tool.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       {tools && tools.length > 0 ? (
-        <div className="grid grid-cols-3 gap-3">
-          {tools.map((tool) => (
-            <ToolCard
-              key={tool.id}
-              tool={tool}
-              onEdit={() => onEdit(tool.id as string)}
-              onDelete={() => onDelete(tool.id as string)}
-            />
-          ))}
-        </div>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead>Description</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {tools.map((tool) => (
+              <TableRow key={tool.id}>
+                <TableCell className="font-medium">{tool.name}</TableCell>
+                <TableCell>{tool.description}</TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onEdit(tool.id as string)}
+                    >
+                      <PencilIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onDelete(tool.id as string)}
+                    >
+                      <TrashIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       ) : (
         <div className="flex w-full flex-col items-center justify-center space-y-2 py-5">
           <HardDriveUpload className="text-muted-foreground" />

@@ -163,12 +163,7 @@ export default function ProjectDetailPage() {
             </Dialog>
           </div>
 
-          <div className="grid grid-cols-3">
-            <div className="col-span-2"></div>
-            <div className="col-span-1 space-y-4">
-              <Tool />
-            </div>
-          </div>
+          <Tool />
         </>
       )}
     </DashboardLayout>
