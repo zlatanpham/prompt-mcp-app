@@ -4,17 +4,64 @@ import { db } from "@/server/db";
 import { toolNameSchema } from "@/lib/validators/tool";
 import { argumentSchema, type Argument } from "@/types/tool";
 
+const toolBaseSchema = z.object({
+  name: toolNameSchema,
+  description: z.string().optional(),
+  prompt: z.string().min(1),
+  args: z.array(argumentSchema).optional(),
+});
+
+const toolCreateSchema = toolBaseSchema
+  .extend({
+    project_id: z.string().uuid(),
+  })
+  .refine(
+    (data) => {
+      if (data.args && data.args.length > 0) {
+        for (const arg of data.args) {
+          const placeholder = `{${arg.name}}`;
+          if (!data.prompt.includes(placeholder)) {
+            return false; // Validation fails
+          }
+        }
+      }
+      return true; // Validation passes
+    },
+    {
+      message:
+        "Prompt must contain placeholders for all arguments in the format {argumentName}.",
+      path: ["prompt"], // Attach error to the prompt field
+    },
+  );
+
+const toolUpdateSchema = toolBaseSchema
+  .partial()
+  .extend({
+    id: z.string().uuid(),
+  })
+  .refine(
+    (data) => {
+      if (data.prompt === undefined) return true; // Allow updates without prompt field
+      if (data.args && data.args.length > 0) {
+        for (const arg of data.args) {
+          const placeholder = `{${arg.name}}`;
+          if (!data.prompt.includes(placeholder)) {
+            return false; // Validation fails
+          }
+        }
+      }
+      return true; // Validation passes
+    },
+    {
+      message:
+        "Prompt must contain placeholders for all arguments in the format {argumentName}.",
+      path: ["prompt"], // Attach error to the prompt field
+    },
+  );
+
 export const toolRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(
-      z.object({
-        project_id: z.string().uuid(),
-        name: toolNameSchema,
-        description: z.string().optional(),
-        prompt: z.string().min(1),
-        args: z.array(argumentSchema).optional(), // Changed to array of argumentSchema
-      }),
-    )
+    .input(toolCreateSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session?.user?.id;
       if (!userId) {
@@ -74,15 +121,7 @@ export const toolRouter = createTRPCRouter({
     }),
 
   update: protectedProcedure
-    .input(
-      z.object({
-        id: z.string().uuid(),
-        name: toolNameSchema.optional(),
-        description: z.string().optional(),
-        prompt: z.string().min(1).optional(),
-        args: z.array(argumentSchema).optional(), // Changed to array of argumentSchema
-      }),
-    )
+    .input(toolUpdateSchema)
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session?.user?.id;
       if (!userId) {

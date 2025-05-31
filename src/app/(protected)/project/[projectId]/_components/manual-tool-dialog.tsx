@@ -26,12 +26,31 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { Tool } from "@prisma/client";
 
-const manualToolFormSchema = z.object({
-  name: toolNameSchema,
-  description: z.string().optional(),
-  prompt: z.string().min(1, "Prompt is required"),
-  arguments: z.array(argumentSchema).optional(),
-});
+const manualToolFormSchema = z
+  .object({
+    name: toolNameSchema,
+    description: z.string().optional(),
+    prompt: z.string().min(1, "Prompt is required"),
+    arguments: z.array(argumentSchema).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.arguments && data.arguments.length > 0) {
+        for (const arg of data.arguments) {
+          const placeholder = `{${arg.name}}`;
+          if (!data.prompt.includes(placeholder)) {
+            return false; // Validation fails
+          }
+        }
+      }
+      return true; // Validation passes
+    },
+    {
+      message:
+        "Prompt must contain placeholders for all arguments in the format {argumentName}.",
+      path: ["prompt"], // Attach error to the prompt field
+    },
+  );
 
 export type ManualToolFormValues = z.infer<typeof manualToolFormSchema>;
 
