@@ -15,12 +15,14 @@ import {
 import DashboardLayout from "@/components/dashboard-layout";
 import Tool from "./_components/tool";
 import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
+import ExportToolsDialog from "./_components/export-tools-dialog";
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.projectId as string | undefined;
 
   const [isEditing, setIsEditing] = React.useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = React.useState(false);
 
   const {
     data: project,
@@ -68,25 +70,39 @@ export default function ProjectDetailPage() {
         <>
           <div className="flex items-center justify-between">
             <h1 className="mb-4 text-2xl font-bold">{project.name}</h1>
-            <Dialog open={isEditing} onOpenChange={setIsEditing}>
-              <DialogTrigger asChild>
-                <Button>Edit Project</Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Edit Project</DialogTitle>
-                </DialogHeader>
-                <ProjectForm
-                  defaultValues={{
-                    name: project.name,
-                    description: project.description ?? "",
-                  }}
-                  onSubmit={onSubmit}
-                  isPending={updateProjectMutation.status === "pending"}
-                  onCancel={() => setIsEditing(false)}
+            <div className="flex items-center gap-2">
+              <Dialog open={isEditing} onOpenChange={setIsEditing}>
+                <DialogTrigger asChild>
+                  <Button>Edit Project</Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Edit Project</DialogTitle>
+                  </DialogHeader>
+                  <ProjectForm
+                    defaultValues={{
+                      name: project.name,
+                      description: project.description ?? "",
+                    }}
+                    onSubmit={onSubmit}
+                    isPending={updateProjectMutation.status === "pending"}
+                    onCancel={() => setIsEditing(false)}
+                  />
+                </DialogContent>
+              </Dialog>
+              <Dialog
+                open={isExportDialogOpen}
+                onOpenChange={setIsExportDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline">Export Tools</Button>
+                </DialogTrigger>
+                <ExportToolsDialog
+                  isOpen={isExportDialogOpen}
+                  onOpenChange={setIsExportDialogOpen}
                 />
-              </DialogContent>
-            </Dialog>
+              </Dialog>
+            </div>
           </div>
 
           <Tool />

@@ -33,6 +33,15 @@
 - When persistent TypeScript errors (e.g., `Cannot find module`) occur despite correct paths and installed dependencies, it often indicates a stale TypeScript language server or development server cache. A server restart is usually required.
 - Explicitly type parameters and variables to resolve `implicit any` and `unsafe argument` ESLint errors, especially when dealing with data from external sources (like tRPC queries) or complex object structures.
 
+### Debugging Persistent ESLint/TypeScript Errors
+
+- When ESLint or TypeScript errors persist despite code appearing type-safe and correct (e.g., "Unsafe argument of type any assigned to a parameter of type string" for clearly typed variables), it often indicates a false positive, a stale language server, or a deeper configuration issue.
+- **Troubleshooting Steps**:
+  1.  Verify explicit type annotations are correct.
+  2.  Confirm Prisma schema and generated client types are in sync (`pnpm db:generate`).
+  3.  Consider restarting the development server or IDE's TypeScript language server to clear caches.
+  4.  Review `tsconfig.json` and ESLint configuration for any unusual rules or strictness settings.
+
 ## Project-Specific Learnings
 
 ### Initial Prisma Setup for New Projects
@@ -55,6 +64,17 @@
 
 - When working with `Json` fields in Prisma, avoid explicit casting to `Prisma.JsonArray` or `Prisma.JsonObject` in the data payload for `create` or `update` operations. Prisma can typically handle the serialization of plain JavaScript arrays or objects directly.
 - **Debugging `Unknown argument` errors**: If you encounter `Unknown argument` errors when interacting with Prisma, the primary cause is usually an outdated Prisma Client. Always ensure `pnpm db:generate` has been run successfully after any `prisma/schema.prisma` modifications.
+
+### Client-Side JSON Export and File Download
+
+- To enable client-side export of data as a JSON file:
+  1.  Filter and map the data to the desired export format.
+  2.  Use `JSON.stringify(data, null, 2)` to format the JSON with pretty printing.
+  3.  Create a `Blob` with `new Blob([jsonString], { type: "application/json" })`.
+  4.  Generate a URL for the blob using `URL.createObjectURL(blob)`.
+  5.  Create a temporary `<a>` element, set its `href` to the URL and `download` attribute to the desired filename.
+  6.  Programmatically click the `<a>` element to trigger the download.
+  7.  Clean up by removing the `<a>` element and revoking the object URL (`URL.revokeObjectURL(url)`).
 
 ### Dynamic Form Arrays
 
