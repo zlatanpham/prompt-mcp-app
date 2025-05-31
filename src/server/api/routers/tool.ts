@@ -115,7 +115,6 @@ export const toolRouter = createTRPCRouter({
           name: {
             in: incomingToolNames,
           },
-          deletedAt: null, // Only consider active tools
         },
         select: {
           name: true,
@@ -182,7 +181,7 @@ export const toolRouter = createTRPCRouter({
       // Optionally, verify user has access to the agent here
 
       const tools = await db.tool.findMany({
-        where: { project_id: input.project_id, deletedAt: null },
+        where: { project_id: input.project_id },
         orderBy: { updated_at: "desc" },
       });
       return tools;
@@ -239,11 +238,8 @@ export const toolRouter = createTRPCRouter({
       }
       // Optionally, verify user has access to the tool/agent here
 
-      await db.tool.update({
+      await db.tool.delete({
         where: { id: input.id },
-        data: {
-          deletedAt: new Date(),
-        },
       });
       return { success: true };
     }),
