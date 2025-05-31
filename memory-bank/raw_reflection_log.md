@@ -86,3 +86,37 @@ Improvements_Identified_For_Consolidation:
 - Project-specific: Zod validation patterns for common string constraints (regex, length).
 
 ---
+
+---
+
+Date: 2025-05-31
+TaskRef: "Implement Project Management UI (List Update, Delete, Edit)"
+
+Learnings:
+
+- Corrected `invalidateQueries` key from `["project.getAll"]` to `["project", "getAll"]` for proper cache invalidation in tRPC/React Query.
+- Successfully extracted a reusable `ProjectForm` component for both project creation and editing, promoting code reusability.
+- Implemented a dropdown menu for project actions (Edit, Delete) on the project list page, improving UI/UX.
+- Integrated `AlertDialog` for delete confirmation and `Dialog` with `ProjectForm` for editing within the dropdown.
+- Handled TypeScript type compatibility issues when passing Prisma `Project` object to `ProjectForm`'s `defaultValues` (specifically `description: string | null` to `string | undefined`).
+- Encountered and resolved `replace_in_file` matching issues due to large blocks by falling back to `write_to_file`.
+
+Difficulties:
+
+- Initial `attempt_completion` denied, indicating user dissatisfaction with the UI/UX, leading to the request for dropdown and edit form.
+- `replace_in_file` failures due to large SEARCH blocks, necessitating a fallback to `write_to_file`.
+
+Successes:
+
+- Successfully implemented all requested UI/UX improvements for project management.
+- Demonstrated ability to refactor existing code into reusable components.
+- Effectively used `write_to_file` as a fallback when `replace_in_file` was problematic.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Using `write_to_file` as a reliable fallback for large or complex file modifications when `replace_in_file` fails.
+- General pattern: Refactoring common form patterns into reusable components for consistency and maintainability.
+- General pattern: Implementing complex UI interactions (dropdowns, nested dialogs) with proper state management and `onSelect` handling.
+- Project-specific: Correct `queryKey` patterns for tRPC `invalidateQueries`.
+
+---

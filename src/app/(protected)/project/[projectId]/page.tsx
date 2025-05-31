@@ -6,16 +6,6 @@ import { api } from "@/trpc/react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -23,18 +13,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import DashboardLayout from "@/components/dashboard-layout";
-
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import Tool from "./_components/tool";
-
-const projectFormSchema = z.object({
-  name: z.string().min(1, "Project name is required"),
-  description: z.string().optional(),
-});
-
-type ProjectFormValues = z.infer<typeof projectFormSchema>;
+import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -51,23 +31,6 @@ export default function ProjectDetailPage() {
     { project_id: projectId! },
     { enabled: !!projectId },
   );
-
-  const form = useForm<ProjectFormValues>({
-    resolver: zodResolver(projectFormSchema),
-    defaultValues: {
-      name: project?.name ?? "",
-      description: project?.description ?? "",
-    },
-  });
-
-  React.useEffect(() => {
-    if (project) {
-      form.reset({
-        name: project.name,
-        description: project.description ?? "",
-      });
-    }
-  }, [project, form.reset]);
 
   if (error) {
     return (
@@ -113,52 +76,15 @@ export default function ProjectDetailPage() {
                 <DialogHeader>
                   <DialogTitle>Edit Project</DialogTitle>
                 </DialogHeader>
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-4"
-                    noValidate
-                  >
-                    <FormField
-                      control={form.control}
-                      name="name"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Project Name</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="description"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Description</FormLabel>
-                          <FormControl>
-                            <Textarea {...field} rows={4} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <div className="flex space-x-2">
-                      <Button type="submit" variant="default">
-                        Save
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        onClick={() => setIsEditing(false)}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  </form>
-                </Form>
+                <ProjectForm
+                  defaultValues={{
+                    name: project.name,
+                    description: project.description ?? "",
+                  }}
+                  onSubmit={onSubmit}
+                  isPending={updateProjectMutation.status === "pending"}
+                  onCancel={() => setIsEditing(false)}
+                />
               </DialogContent>
             </Dialog>
           </div>

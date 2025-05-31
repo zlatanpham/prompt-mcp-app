@@ -64,7 +64,18 @@
 - Use Shadcn UI's `Table`, `TableHeader`, `TableBody`, `TableHead`, `TableRow`, and `TableCell` components for displaying lists of data in a structured, tabular format.
 - Ensure proper data mapping to `TableRow` and `TableCell` components.
 
-### Direct Action Buttons vs. Dropdowns for Common Actions
+### Reusable Form Components
 
-- For common actions like "Edit" and "Delete" within a list item, prefer direct icon buttons (e.g., `PencilIcon`, `TrashIcon`) over dropdown menus to simplify the UI and reduce clicks, especially when there are only a few actions.
-- For single actions, convert dropdowns to direct buttons for a more streamlined user experience.
+- Extract common form structures and logic into reusable components (e.g., `ProjectForm`). This promotes consistency, reduces code duplication, and improves maintainability across different parts of the application (e.g., create and edit forms).
+
+### Complex UI Interactions (Dropdowns, Dialogs)
+
+- When implementing multiple actions for an item, use dropdown menus to consolidate options and maintain a clean UI.
+- For actions requiring confirmation or detailed input, integrate `AlertDialog` (for confirmation) and `Dialog` (for forms) within dropdown menu items.
+- Ensure proper state management for dialog visibility and selected items.
+
+## Project-Specific Learnings
+
+### Correct `queryKey` patterns for tRPC `invalidateQueries`
+
+- When invalidating tRPC queries with React Query, ensure the `queryKey` precisely matches the structure used by the `useQuery` hook. For example, `api.project.getAll.useQuery()` uses `["project", "getAll"]`, not `["project.getAll"]`.

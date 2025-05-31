@@ -87,4 +87,32 @@ export const projectRouter = createTRPCRouter({
       });
       return agent;
     }),
+
+  delete: publicProcedure
+    .input(
+      z.object({
+        project_id: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const userId = ctx.session?.user?.id;
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      const { project_id } = input;
+
+      // Optional: Add authorization check here to ensure only the project owner or an admin can delete
+      // For example:
+      // const project = await db.project.findUnique({ where: { id: project_id } });
+      // if (project?.created_by_user_id !== userId) {
+      //   throw new Error("Not authorized to delete this project");
+      // }
+
+      await db.project.delete({
+        where: { id: project_id },
+      });
+
+      return { success: true, project_id };
+    }),
 });

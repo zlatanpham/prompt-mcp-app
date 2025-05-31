@@ -2,7 +2,7 @@
 
 ## Current Work Focus
 
-The primary focus was to rename the "Prompt" entity to "Tool" across the entire application, including the database schema, tRPC API, and React components. This involved updating model names, field names, router definitions, and component imports/usage.
+The primary focus was to implement project management features, including ensuring the project list updates correctly after creation, adding a delete project functionality with confirmation, and refactoring the project edit form into a reusable component for both the project list and detail pages.
 
 ## Recent Changes
 
@@ -15,6 +15,13 @@ The primary focus was to rename the "Prompt" entity to "Tool" across the entire 
 - `src/app/(protected)/project/[projectId]/_components/prompt-card.tsx`: Content updated to function as a `ToolCard`, with relevant type and variable name changes.
 - `.clinerules/self-improving-cline.md`: Added a constraint regarding conflicts between user instructions and technical requirements.
 - `.clinerules/1-coding.md`: Updated "Development Workflow" under "Database Migrations (Prisma)" to clarify initial project setup with `prisma migrate reset --force` and `db:generate`.
+- `src/app/(protected)/project/page.tsx`:
+  - Fixed project list not updating after creation by correcting `invalidateQueries` key.
+  - Added project delete functionality with a confirmation dialog.
+  - Integrated project edit functionality via a dropdown menu and a reusable form component.
+- `src/server/api/routers/project.ts`: Added a `delete` mutation for projects.
+- `src/components/project-form.tsx`: Created a new reusable component for project creation and editing forms.
+- `src/app/(protected)/project/[projectId]/page.tsx`: Updated to use the new `ProjectForm` component for editing.
 
 ## Next Steps
 
@@ -25,14 +32,20 @@ The primary focus was to rename the "Prompt" entity to "Tool" across the entire 
 
 - The decision to not rename component files (e.g., `prompt.tsx` to `tool.tsx`) was made based on user instruction, focusing on content and import updates instead.
 - The conflict between user instruction and technical necessity for `db:generate` was noted and led to a `.clinerules` improvement.
+- Refactored project forms into a shared component to promote reusability and maintainability.
+- Implemented dropdown menus for project actions to improve UI/UX.
 
 ## Important Patterns and Preferences
 
 - Adherence to T3 stack principles.
 - Prioritizing typesafety.
 - Modular component and API design.
+- Reusable UI components (e.g., `ProjectForm`).
+- Effective use of React Query's `invalidateQueries` for UI updates.
 
 ## Learnings and Project Insights
 
 - The importance of clear communication regarding database operations, especially in new projects.
 - The need for robust handling of interrupted commands and potential conflicts between user instructions and technical requirements.
+- The benefits of extracting reusable form components for consistent UI and logic across different parts of the application.
+- How to effectively manage multiple dialogs and dropdowns for complex UI interactions.

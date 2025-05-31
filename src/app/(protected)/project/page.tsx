@@ -4,12 +4,31 @@ import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -30,6 +49,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { MoreHorizontal } from "lucide-react";
+import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Title is required." }),
@@ -41,7 +62,9 @@ export default function ProjectPage() {
   const { organization } = useOrganization();
   const { data: projects, isLoading } = api.project.getAll.useQuery();
 
-  const [open, setOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,20 +74,47 @@ export default function ProjectPage() {
     },
   });
 
-  const ProjectMutation = api.project.create.useMutation({
+  const createProjectMutation = api.project.create.useMutation({
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["project.getAll"] });
-      setOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["project", "getAll"] });
+      setIsCreateOpen(false);
       form.reset();
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const updateProjectMutation = api.project.updateById.useMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["project", "getAll"] });
+      setIsEditOpen(false);
+      setSelectedProject(null);
+    },
+  });
+
+  const deleteProjectMutation = api.project.delete.useMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["project", "getAll"] });
+    },
+  });
+
+  const onCreateSubmit = (values: z.infer<typeof formSchema>) => {
     const organization_id = organization?.id ?? "";
-    ProjectMutation.mutate({
+    createProjectMutation.mutate({
       ...values,
       organization_id,
     });
+  };
+
+  const onEditSubmit = (values: ProjectFormValues) => {
+    if (!selectedProject) return;
+    updateProjectMutation.mutate({
+      project_id: selectedProject.id,
+      name: values.name,
+      description: values.description,
+    });
+  };
+
+  const handleDelete = (projectId: string) => {
+    deleteProjectMutation.mutate({ project_id: projectId });
   };
 
   return (
@@ -73,7 +123,7 @@ export default function ProjectPage() {
     >
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">projects</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button>Create Project</Button>
           </DialogTrigger>
@@ -83,7 +133,7 @@ export default function ProjectPage() {
             </DialogHeader>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onCreateSubmit)}
                 className="grid gap-4 py-4"
               >
                 <FormField
@@ -115,7 +165,7 @@ export default function ProjectPage() {
                 <div className="flex justify-end pt-4">
                   <Button
                     type="submit"
-                    disabled={ProjectMutation.status === "pending"}
+                    disabled={createProjectMutation.status === "pending"}
                   >
                     Create
                   </Button>
@@ -140,21 +190,96 @@ export default function ProjectPage() {
               ? format(new Date(date), "PPP p")
               : "N/A";
             return (
-              <Link href={`/project/${project.id}`} key={project.id}>
-                <Card key={project.id} className="p-4">
-                  <h2 className="mb-2 text-lg font-semibold">{project.name}</h2>
-                  <p className="mb-4 text-sm">
-                    {project.description ?? "No description"}
-                  </p>
-                  <p className="text-muted-foreground text-xs">
-                    Updated at: {formattedDate}
-                  </p>
-                </Card>
-              </Link>
+              <Card key={project.id} className="p-4">
+                <div className="flex items-center justify-between">
+                  <Link href={`/project/${project.id}`} key={project.id}>
+                    <h2 className="mb-2 text-lg font-semibold">
+                      {project.name}
+                    </h2>
+                  </Link>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setSelectedProject(project);
+                          setIsEditOpen(true);
+                        }}
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <DropdownMenuItem
+                            onSelect={(e) => e.preventDefault()} // Prevent dropdown from closing
+                            className="text-red-600"
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete your project and remove its
+                              data from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(project.id)}
+                              disabled={
+                                deleteProjectMutation.status === "pending"
+                              }
+                            >
+                              Continue
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <p className="mb-4 text-sm">
+                  {project.description ?? "No description"}
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  Updated at: {formattedDate}
+                </p>
+              </Card>
             );
           })}
         </div>
       )}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Project</DialogTitle>
+          </DialogHeader>
+          {selectedProject && (
+            <ProjectForm
+              defaultValues={{
+                name: selectedProject.name,
+                description: selectedProject.description ?? "",
+              }}
+              onSubmit={onEditSubmit}
+              isPending={updateProjectMutation.status === "pending"}
+              onCancel={() => setIsEditOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 }
