@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import { api } from "@/trpc/react";
 
@@ -16,13 +16,15 @@ import DashboardLayout from "@/components/dashboard-layout";
 import Tool from "./_components/tool";
 import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
 import ExportToolsDialog from "./_components/export-tools-dialog";
+import { ImportToolsDialog } from "./_components/import-tools-dialog";
 
 export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params.projectId as string | undefined;
 
-  const [isEditing, setIsEditing] = React.useState(false);
-  const [isExportDialogOpen, setIsExportDialogOpen] = React.useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
 
   const {
     data: project,
@@ -100,6 +102,19 @@ export default function ProjectDetailPage() {
                 <ExportToolsDialog
                   isOpen={isExportDialogOpen}
                   onOpenChange={setIsExportDialogOpen}
+                />
+              </Dialog>
+              <Dialog
+                open={isImportDialogOpen}
+                onOpenChange={setIsImportDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline">Import Tools</Button>
+                </DialogTrigger>
+                <ImportToolsDialog
+                  projectId={projectId!}
+                  open={isImportDialogOpen}
+                  onOpenChange={setIsImportDialogOpen}
                 />
               </Dialog>
             </div>

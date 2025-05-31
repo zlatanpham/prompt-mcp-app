@@ -59,6 +59,11 @@ const toolUpdateSchema = toolBaseSchema
     },
   );
 
+const toolImportInputSchema = z.object({
+  project_id: z.string().uuid(),
+  tools: z.array(toolBaseSchema),
+});
+
 export const toolRouter = createTRPCRouter({
   create: protectedProcedure
     .input(toolCreateSchema)
@@ -79,6 +84,69 @@ export const toolRouter = createTRPCRouter({
         },
       });
       return tool;
+    }),
+
+  importTools: protectedProcedure
+    .input(toolImportInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id;
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      // 1. Check for duplicate names within the incoming batch
+      const incomingToolNames = input.tools.map((tool) => tool.name);
+      const uniqueIncomingToolNames = new Set(incomingToolNames);
+      if (uniqueIncomingToolNames.size !== incomingToolNames.length) {
+        const duplicates = incomingToolNames.filter(
+          (name, index) => incomingToolNames.indexOf(name) !== index,
+        );
+        throw new Error(
+          `Duplicate tool names found in the import batch: ${[
+            ...new Set(duplicates),
+          ].join(", ")}.`,
+        );
+      }
+
+      // 2. Check for existing tool names in the database for this project
+      const existingTools = await db.tool.findMany({
+        where: {
+          project_id: input.project_id,
+          name: {
+            in: incomingToolNames,
+          },
+          deletedAt: null, // Only consider active tools
+        },
+        select: {
+          name: true,
+        },
+      });
+
+      if (existingTools.length > 0) {
+        const existingNames = existingTools.map((tool) => tool.name);
+        throw new Error(
+          `Tools with these names already exist in this project: ${existingNames.join(
+            ", ",
+          )}.`,
+        );
+      }
+
+      // 3. Create tools in a transaction
+      const createdTools = await db.$transaction(
+        input.tools.map((tool) =>
+          db.tool.create({
+            data: {
+              project_id: input.project_id,
+              name: tool.name,
+              description: tool.description,
+              prompt: tool.prompt,
+              args: tool.args,
+            },
+          }),
+        ),
+      );
+
+      return createdTools;
     }),
 
   getById: protectedProcedure

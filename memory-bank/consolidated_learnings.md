@@ -10,7 +10,7 @@
 
 ### Handling `replace_in_file` Failures
 
-- When `replace_in_file` fails due to exact match requirements, consider falling back to `write_to_file` for critical file modifications, especially for small to medium-sized files where the full content can be easily managed.
+- When `replace_in_file` fails due to exact match requirements, consider falling back to `write_to_file` for critical file modifications, especially for small to medium-sized files where the full content can be managed.
 
 ### Centralizing Validation Logic
 
@@ -36,11 +36,13 @@
 ### Debugging Persistent ESLint/TypeScript Errors
 
 - When ESLint or TypeScript errors persist despite code appearing type-safe and correct (e.g., "Unsafe argument of type any assigned to a parameter of type string" for clearly typed variables), it often indicates a false positive, a stale language server, or a deeper configuration issue.
+- **Crucial Insight**: Persistent and misleading parsing errors (e.g., `Parsing error: '...' expected.`) that do not resolve with code modifications often point to issues external to the file's content, such as misconfigured ESLint, TypeScript, or Babel/SWC setups, or version incompatibilities.
 - **Troubleshooting Steps**:
   1.  Verify explicit type annotations are correct.
   2.  Confirm Prisma schema and generated client types are in sync (`pnpm db:generate`).
   3.  Consider restarting the development server or IDE's TypeScript language server to clear caches.
   4.  Review `tsconfig.json` and ESLint configuration for any unusual rules or strictness settings.
+  5.  If parsing errors persist despite correct code, investigate tooling configurations (ESLint, TypeScript, Babel/SWC) and their versions.
 
 ## Project-Specific Learnings
 
@@ -106,6 +108,7 @@
 ### Correct `queryKey` patterns for tRPC `invalidateQueries`
 
 - When invalidating tRPC queries with React Query, ensure the `queryKey` precisely matches the structure used by the `useQuery` hook. For `api.router.procedure.useQuery()`, the `queryKey` is typically an array containing an array, e.g., `[['router', 'procedure']]`. Using a single array like `['router', 'procedure']` will not correctly invalidate the cache.
+- **Crucial**: When invalidating queries with parameters, the property names in the invalidation object (e.g., `{ projectId }`) must exactly match the input schema of the tRPC procedure (e.g., `{ project_id }`). Always verify the exact query name and its input schema from the tRPC router definition.
 
 ### API Key Management Implementation
 
@@ -114,3 +117,17 @@
 - **Public API Endpoint**: For external access, create a dedicated Next.js API route (e.g., `src/app/api/external/tools/route.ts`) that validates the API key from headers (`x-api-key`) and filters data based on associated projects.
 - **One-Time Key Display**: For security, display newly created or regenerated API keys only once in a dedicated dialog, prompting the user to copy it to their clipboard.
 - **UI for Management**: Provide a comprehensive UI for listing, creating, deleting, regenerating, and updating project associations for API keys. Use checkboxes for multi-project selection.
+
+### Tool Import Functionality
+
+- **Backend Implementation**:
+  - Use a Zod schema (`toolImportInputSchema`) to validate the incoming array of tools, ensuring correct structure and data types for each tool.
+  - Implement uniqueness checks for tool names:
+    - First, check for duplicate names within the incoming batch itself.
+    - Then, query the database to check for existing tool names in the target project.
+    - If any duplicates are found, reject the entire import batch with a descriptive error message.
+  - Use a Prisma transaction (`db.$transaction`) to atomically create all valid tools, ensuring all or none are imported.
+- **Frontend Implementation**:
+  - Create a dedicated dialog component (`ImportToolsDialog`) for uploading/pasting JSON content.
+  - Implement client-side JSON parsing and validation using the same Zod schemas as the backend for immediate user feedback.
+  - Handle success and error states, displaying appropriate toast notifications.
