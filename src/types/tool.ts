@@ -1,9 +1,12 @@
 import { z } from "zod";
+import { toolNameSchema } from "@/lib/validators/tool";
 
 export const argumentSchema = z.object({
-  name: z.string().min(1, "Argument name is required"),
-  description: z.string().optional(),
-  type: z.enum(["string", "number"]),
+  name: toolNameSchema,
+  description: z.string().min(1, "Argument description is required"),
+  type: z.enum(["string", "number"], {
+    required_error: "Argument type is required",
+  }),
 });
 
 export type Argument = z.infer<typeof argumentSchema>;
