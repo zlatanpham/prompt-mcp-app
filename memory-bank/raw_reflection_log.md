@@ -58,3 +58,32 @@ Improvements_Identified_For_Consolidation:
 - General pattern: Providing multiple copy options (raw data vs. formatted config) for sensitive information.
 
 ---
+
+---
+
+Date: 2025-06-01
+TaskRef: "Implement authentication redirection for protected pages"
+
+Learnings:
+
+- Implemented server-side authentication check and redirection in Next.js App Router layout (`src/app/(protected)/layout.tsx`).
+- Used `auth()` from `@/server/auth` to get the session on the server.
+- Used `redirect()` from `next/navigation` for server-side redirection.
+- Encountered and resolved a TypeScript path alias issue (`~/server/auth` vs `@/server/auth`) by checking `tsconfig.json` and aligning with existing aliases.
+- Encountered and resolved an incorrect import name (`getServerAuthSession` vs `auth`) by inspecting the export from `src/server/auth/index.ts`.
+
+Difficulties:
+
+- Initial path alias mismatch and incorrect import name required iterative debugging and file inspection.
+
+Successes:
+
+- Successfully implemented the required authentication redirection logic.
+- Correctly identified and fixed path and import issues.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Server-side authentication and redirection in Next.js App Router.
+- Specific action: When encountering module resolution errors with aliases, check `tsconfig.json` and verify exported members from the target module.
+
+---
