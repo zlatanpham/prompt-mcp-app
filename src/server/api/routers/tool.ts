@@ -243,4 +243,27 @@ export const toolRouter = createTRPCRouter({
       });
       return { success: true };
     }),
+
+  toggleActive: protectedProcedure
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        is_active: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id;
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      const tool = await db.tool.update({
+        where: { id: input.id },
+        data: {
+          is_active: input.is_active,
+          updated_at: new Date(),
+        },
+      });
+      return tool;
+    }),
 });

@@ -41,6 +41,7 @@ export async function GET(req: NextRequest) {
         project_id: {
           in: projectIds,
         },
+        is_active: true,
       },
     });
 

@@ -73,6 +73,7 @@ model Tool {
     description String?
     prompt      String   @db.Text
     args        Json?
+    is_active   Boolean  @default(true)
     created_at  DateTime @default(now()) @db.Timestamptz(6)
     updated_at  DateTime @default(now()) @db.Timestamptz(6)
 

@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import {
   HardDriveUpload,
-  Plus as PlusIcon,
   Info as InfoIcon,
   Pencil as PencilIcon,
   Trash as TrashIcon,
@@ -20,13 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import type { Tool } from "@prisma/client";
+import { Switch } from "@/components/ui/switch"; // Import Switch component
 import type { Argument } from "@/types/tool";
 import {
   Table,
@@ -98,6 +91,12 @@ export default function ToolComponent() {
     onSuccess: () => {
       refetch();
       setSelectedToolId(null);
+    },
+  });
+
+  const toggleToolActive = api.tool.toggleActive.useMutation({
+    onSuccess: () => {
+      refetch();
     },
   });
 
@@ -217,6 +216,7 @@ export default function ToolComponent() {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Active</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -225,19 +225,30 @@ export default function ToolComponent() {
               <TableRow key={tool.id}>
                 <TableCell className="font-medium">{tool.name}</TableCell>
                 <TableCell>{tool.description}</TableCell>
+                <TableCell>
+                  <Switch
+                    checked={tool.is_active}
+                    onCheckedChange={(checked) =>
+                      toggleToolActive.mutate({
+                        id: tool.id,
+                        is_active: checked,
+                      })
+                    }
+                  />
+                </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end space-x-2">
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onEdit(tool.id as string)}
+                      onClick={() => onEdit(tool.id)}
                     >
                       <PencilIcon className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onDelete(tool.id as string)}
+                      onClick={() => onDelete(tool.id)}
                     >
                       <TrashIcon className="h-4 w-4" />
                     </Button>
