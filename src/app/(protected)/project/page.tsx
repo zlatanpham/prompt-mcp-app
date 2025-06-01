@@ -39,22 +39,32 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Wrench } from "lucide-react";
 import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
+import { Badge } from "@/components/ui/badge"; // Import Badge component
 
 const formSchema = z.object({
   name: z.string().min(1, { message: "Title is required." }),
   description: z.string().optional(),
 });
 
+// Extend the Project type to include the _count property from Prisma
+type ProjectWithToolCount = Project & {
+  _count: {
+    Tool: number;
+  };
+};
+
 export default function ProjectPage() {
   const queryClient = useQueryClient();
   const { organization } = useOrganization();
-  const { data: projects, isLoading } = api.project.getAll.useQuery();
+  const { data: projects, isLoading } =
+    api.project.getAll.useQuery<ProjectWithToolCount[]>();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] =
+    useState<ProjectWithToolCount | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -193,55 +203,69 @@ export default function ProjectPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-          {projects?.map((project: Project) => {
+          {projects?.map((project: ProjectWithToolCount) => {
             const date = project.updated_at ?? project.created_at;
             const formattedDate = date
               ? format(new Date(date), "PPP p")
               : "N/A";
             return (
-              <Card key={project.id} className="p-4">
-                <div className="flex items-center justify-between">
-                  <Link href={`/project/${project.id}`} key={project.id}>
-                    <h2 className="mb-2 text-lg font-semibold">
-                      {project.name}
-                    </h2>
-                  </Link>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setSelectedProject(project);
-                          setIsEditOpen(true);
-                        }}
-                      >
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onSelect={(e) => {
-                          e.preventDefault(); // Prevent dropdown from closing
-                          handleDeleteClick(project.id);
-                        }}
-                        className="text-red-600"
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+              <Card
+                key={project.id}
+                className="flex flex-col justify-between p-4 transition-all hover:shadow-md"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <Link href={`/project/${project.id}`}>
+                      <h2 className="mb-2 text-lg font-semibold">
+                        {project.name}
+                      </h2>
+                    </Link>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedProject(project);
+                            setIsEditOpen(true);
+                          }}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onSelect={(e) => {
+                            e.preventDefault(); // Prevent dropdown from closing
+                            handleDeleteClick(project.id);
+                          }}
+                          className="text-red-600"
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <p className="text-muted-foreground mb-4 text-sm">
+                    {project.description ?? "No description"}
+                  </p>
                 </div>
-                <p className="mb-4 text-sm">
-                  {project.description ?? "No description"}
-                </p>
-                <p className="text-muted-foreground text-xs">
-                  Updated at: {formattedDate}
-                </p>
+                <div className="flex items-center justify-between pt-4">
+                  <Badge
+                    variant="secondary"
+                    className="flex items-center gap-1"
+                  >
+                    <Wrench className="h-3 w-3" />
+                    <span>{project._count.Tool} Tools</span>
+                  </Badge>
+                  <p className="text-muted-foreground text-xs">
+                    Updated at: {formattedDate}
+                  </p>
+                </div>
               </Card>
             );
           })}

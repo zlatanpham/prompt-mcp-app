@@ -8,6 +8,13 @@ export const projectRouter = createTRPCRouter({
       orderBy: {
         updated_at: "desc",
       },
+      include: {
+        _count: {
+          select: {
+            Tool: true,
+          },
+        },
+      },
     });
     return projects;
   }),

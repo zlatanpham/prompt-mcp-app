@@ -34,6 +34,7 @@
 ## UI & Styling
 
 - Utilize Shadcn UI components built on Radix UI and Tailwind CSS. Add components using `pnpm ui:add -- [component]`.
+- **Prioritize Shadcn UI Design:** When making UI enhancements or adding new UI elements, always prioritize using existing Shadcn UI components and adhering to their design patterns and styling conventions. If a direct Shadcn component is not available, ensure custom components align seamlessly with the Shadcn aesthetic using Tailwind CSS.
 - Maintain consistency using Tailwind utility classes and `tailwind.config.ts`.
 - Ensure accessibility and responsive design across devices.
 - **Centralized Dialogs:** For common UI patterns like confirmation dialogs, use a single, reusable component (e.g., `ConfirmActionDialog`) to ensure consistency across the application and reduce code duplication.

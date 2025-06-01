@@ -1,25 +1,22 @@
 ---
 Date: 2025-06-01
-TaskRef: "Refactor confirmation dialogs to reuse ConfirmActionDialog component"
+TaskRef: "Enhance Project List UI with Tool Count"
 
 Learnings:
-  - Successfully identified and refactored AlertDialog usages in `src/app/(protected)/project/[projectId]/_components/tool.tsx` and `src/app/(protected)/project/page.tsx` to use the new `ConfirmActionDialog` component.
-  - The `ConfirmActionDialog` provides a consistent and reusable pattern for actions requiring user confirmation.
-  - The process involved:
-      1. Identifying files with existing AlertDialog implementations for confirmation.
-      2. Replacing AlertDialog imports with ConfirmActionDialog imports.
-      3. Adapting state management (e.g., `isConfirmDeleteDialogOpen`, `projectToDelete`) to work with the new component's props (`isOpen`, `onOpenChange`, `onConfirm`).
-      4. Mapping existing title, description, confirm, and cancel texts to the new component's props.
+  - Successfully updated tRPC `project.getAll` procedure to include `_count` of related `Tool` models using Prisma's `include` and `_count` aggregation.
+  - Implemented UI enhancements in `src/app/(protected)/project/page.tsx` to display the tool count.
+  - Adhered to Shadcn UI standards by using the `Badge` component and `Wrench` icon from `lucide-react`.
+  - Improved project card visual appeal with Tailwind CSS classes for layout, typography, and hover effects.
 
 Difficulties:
-  - None encountered during the refactoring process. The existing AlertDialog structure was straightforward to adapt.
+  - None encountered. The process was straightforward given the existing project structure and Shadcn UI components.
 
 Successes:
-  - Achieved a more consistent UI/UX for confirmation actions across the application.
-  - Reduced code duplication by reusing a centralized component.
-  - Improved maintainability by abstracting the confirmation logic into a dedicated component.
+  - Successfully integrated backend data (tool count) with frontend UI.
+  - Enhanced user experience by providing more essential information on the project list page.
+  - Maintained consistency with Shadcn UI design principles.
 
 Improvements_Identified_For_Consolidation:
-  - General pattern: Centralized confirmation dialogs for consistent UI/UX and reduced code duplication.
-  - Specific refactoring steps for replacing AlertDialog with ConfirmActionDialog.
+  - General pattern: Using Prisma `_count` for related model aggregation in tRPC queries.
+  - UI pattern: Displaying counts of related entities using Shadcn `Badge` and `lucide-react` icons for enhanced user engagement.
 ---
