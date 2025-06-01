@@ -33,7 +33,6 @@ import {
 import ManualToolDialog, {
   type ManualToolFormValues,
 } from "./manual-tool-dialog";
-import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -224,7 +223,11 @@ export default function ToolComponent() {
             {tools.map((tool) => (
               <TableRow key={tool.id}>
                 <TableCell className="font-medium">{tool.name}</TableCell>
-                <TableCell>{tool.description}</TableCell>
+                <TableCell>
+                  <div className="max-w-[500px] truncate">
+                    {tool.description}
+                  </div>
+                </TableCell>
                 <TableCell>
                   <Switch
                     checked={tool.is_active}

@@ -149,7 +149,6 @@ const ManualToolDialog = (props: Props) => {
                   <FormControl>
                     <Textarea
                       placeholder="Briefly describe the tool..."
-                      className="min-h-20"
                       rows={3}
                       {...field}
                     />
@@ -167,7 +166,7 @@ const ManualToolDialog = (props: Props) => {
                   <FormControl>
                     <Textarea
                       placeholder="Write markdown prompt here..."
-                      className="max-h-[calc(100dvh-300px)] min-h-40"
+                      className="max-h-[400px] min-h-40"
                       rows={8}
                       {...field}
                     />

@@ -105,3 +105,9 @@
 - **tRPC Mutation**: Created a `toggleActive` mutation in `src/server/api/routers/tool.ts` to update the `is_active` status.
 - **UI Integration**: Integrated a Shadcn UI `Switch` component in `src/app/(protected)/project/[projectId]/_components/tool.tsx` to allow users to toggle the `is_active` status directly from the tool table.
 - **Known Issue (Hydration Error)**: Persistent hydration errors related to whitespace in JSX (`<tr>` children) due to auto-formatting. This requires user intervention to configure their local formatter.
+
+### UI/UX: Handling Long Text in Tables
+
+- **Pattern**: Truncate long text fields in table cells to a fixed number of lines (e.g., two lines) using Tailwind CSS `line-clamp-2` and `overflow-hidden`.
+- **Column Sizing**: Control column width using fixed `w-[...]` classes on `TableHead` and `TableCell` to prevent layout issues.
+- **User Preference**: Prioritize direct visual truncation over tooltips when explicitly requested by the user for a cleaner UI.
