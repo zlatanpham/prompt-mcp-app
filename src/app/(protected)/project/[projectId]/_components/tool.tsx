@@ -13,6 +13,7 @@ import { api } from "@/trpc/react";
 
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch"; // Import Switch component
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
 import type { Argument } from "@/types/tool";
 import {
   Table,
@@ -167,7 +168,15 @@ export default function ToolComponent() {
         />
       </div>
 
-      {tools && tools.length > 0 ? (
+      {isLoading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      ) : tools && tools.length > 0 ? (
         <Table>
           <TableHeader>
             <TableRow>
