@@ -79,7 +79,7 @@ export default function ApiKeysPage() {
       setIsApiKeyDisplayDialogOpen(true);
     },
   });
-  const updateProjectsMutation = api.apiKey.updateProjects.useMutation({
+  const updateApiKeyMutation = api.apiKey.updateApiKey.useMutation({
     onSuccess: () => void refetch(),
   });
 
@@ -125,11 +125,12 @@ export default function ApiKeysPage() {
     regenerateApiKeyMutation.mutate({ id });
   };
 
-  const handleUpdateProjects = () => {
+  const handleUpdateProjects = (newName: string) => {
     if (apiKeyToEditProjects) {
-      updateProjectsMutation.mutate(
+      updateApiKeyMutation.mutate(
         {
           id: apiKeyToEditProjects.id,
+          name: newName,
           projectIds: editSelectedProjectIds,
         },
         {
@@ -249,7 +250,7 @@ export default function ApiKeysPage() {
                           setIsEditProjectsDialogOpen(true);
                         }}
                       >
-                        Edit Projects
+                        Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleRegenerateApiKey(apiKey.id)}

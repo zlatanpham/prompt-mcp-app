@@ -84,15 +84,16 @@ export const apiKeyRouter = createTRPCRouter({
       return updatedApiKey;
     }),
 
-  updateProjects: protectedProcedure
+  updateApiKey: protectedProcedure
     .input(
       z.object({
         id: z.string().uuid(),
-        projectIds: z.array(z.string().uuid()),
+        name: z.string().min(1).max(255).optional(),
+        projectIds: z.array(z.string().uuid()).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id, projectIds } = input;
+      const { id, name, projectIds } = input;
       const userId = ctx.session.user.id;
 
       const apiKey = await ctx.db.apiKey.findUnique({
@@ -103,19 +104,31 @@ export const apiKeyRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      // Disconnect all existing projects
-      await ctx.db.apiKeyOnProject.deleteMany({
-        where: { apiKeyId: id },
+      const updateData: { name?: string } = {};
+      if (name !== undefined) {
+        updateData.name = name;
+      }
+
+      if (projectIds !== undefined) {
+        // Disconnect all existing projects
+        await ctx.db.apiKeyOnProject.deleteMany({
+          where: { apiKeyId: id },
+        });
+
+        // Connect new projects
+        await ctx.db.apiKeyOnProject.createMany({
+          data: projectIds.map((projectId) => ({
+            apiKeyId: id,
+            projectId,
+          })),
+        });
+      }
+
+      const updatedApiKey = await ctx.db.apiKey.update({
+        where: { id },
+        data: updateData,
       });
 
-      // Connect new projects
-      await ctx.db.apiKeyOnProject.createMany({
-        data: projectIds.map((projectId) => ({
-          apiKeyId: id,
-          projectId,
-        })),
-      });
-
-      return { success: true };
+      return updatedApiKey;
     }),
 });

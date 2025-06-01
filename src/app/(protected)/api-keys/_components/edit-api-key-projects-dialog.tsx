@@ -12,6 +12,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
+import { useState, useEffect } from "react";
+import { Input } from "@/components/ui/input";
+
 interface EditApiKeyProjectsDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -23,7 +26,7 @@ interface EditApiKeyProjectsDialogProps {
   editSelectedProjectIds: string[];
   setEditSelectedProjectIds: (ids: string[]) => void;
   projectOptions: { value: string; label: string }[];
-  handleUpdateProjects: () => void;
+  handleUpdateProjects: (newName: string) => void;
 }
 
 export function EditApiKeyProjectsDialog({
@@ -35,6 +38,14 @@ export function EditApiKeyProjectsDialog({
   projectOptions,
   handleUpdateProjects,
 }: EditApiKeyProjectsDialogProps) {
+  const [apiName, setApiName] = useState(apiKeyToEditProjects?.name ?? "");
+
+  useEffect(() => {
+    if (apiKeyToEditProjects) {
+      setApiName(apiKeyToEditProjects.name);
+    }
+  }, [apiKeyToEditProjects]);
+
   const handleEditCheckboxChange = (checked: boolean, projectId: string) => {
     let newEditSelectedProjectIds: string[];
     if (checked) {
@@ -51,14 +62,23 @@ export function EditApiKeyProjectsDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            Edit Projects for {apiKeyToEditProjects?.name}
-          </DialogTitle>
+          <DialogTitle>Edit API Key</DialogTitle>
           <DialogDescription>
-            Select projects this API key can access.
+            Update the API key name and select projects it can access.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="api-key-name" className="text-right">
+              API Key Name
+            </Label>
+            <Input
+              id="api-key-name"
+              value={apiName}
+              onChange={(e) => setApiName(e.target.value)}
+              className="col-span-3"
+            />
+          </div>
           <div className="grid grid-cols-4 items-start gap-4">
             <Label htmlFor="edit-projects" className="pt-2 text-right">
               Projects
@@ -84,7 +104,9 @@ export function EditApiKeyProjectsDialog({
             </div>
           </div>
         </div>
-        <Button onClick={handleUpdateProjects}>Save Changes</Button>
+        <Button onClick={() => handleUpdateProjects(apiName)}>
+          Save Changes
+        </Button>
       </DialogContent>
     </Dialog>
   );
