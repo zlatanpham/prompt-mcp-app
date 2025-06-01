@@ -4,7 +4,6 @@ import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/trpc/react";
 import { toolNameSchema } from "@/lib/validators/tool";
 import { argumentSchema } from "@/types/tool";
+import { toast } from "sonner";
 
 const toolBaseSchema = z.object({
   name: toolNameSchema,
@@ -141,7 +141,7 @@ export function ImportToolsDialog({
                   <FormControl>
                     <Textarea
                       placeholder={placeholderJson}
-                      className="min-h-[200px]"
+                      className="max-h-[calc(100vh-300px)] min-h-[200px]"
                       {...field}
                     />
                   </FormControl>

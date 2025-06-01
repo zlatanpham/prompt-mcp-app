@@ -6,6 +6,7 @@ import { HydrateClient } from "@/trpc/server";
 import { OrganizationProvider } from "./_context/organization";
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
+import { Toaster } from "@/components/ui/sonner";
 
 export default async function RootLayout({
   children,
@@ -22,6 +23,7 @@ export default async function RootLayout({
         <HydrateClient>
           <AppSidebar />
           <SidebarInset>{children}</SidebarInset>
+          <Toaster />
         </HydrateClient>
       </OrganizationProvider>
     </SidebarProvider>
