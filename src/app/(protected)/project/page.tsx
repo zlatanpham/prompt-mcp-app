@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
+import { timeAgo } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -196,18 +197,16 @@ export default function ProjectPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="mb-2 h-40 w-full" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {projects?.map((project: ProjectWithToolCount) => {
             const date = project.updated_at ?? project.created_at;
-            const formattedDate = date
-              ? format(new Date(date), "PPP p")
-              : "N/A";
+            const timeAgoString = date ? timeAgo(date) : "N/A";
             return (
               <Card
                 key={project.id}
@@ -263,7 +262,7 @@ export default function ProjectPage() {
                     <span>{project._count.Tool} Tools</span>
                   </Badge>
                   <p className="text-muted-foreground text-xs">
-                    Updated at: {formattedDate}
+                    Last edited {timeAgoString}
                   </p>
                 </div>
               </Card>
