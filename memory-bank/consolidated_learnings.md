@@ -60,6 +60,18 @@
   - A copy of the key embedded within a formatted configuration (e.g., for direct pasting into a configuration file).
 - This caters to different user needs and contexts for using the key.
 
+### Refactoring Large Page Components
+
+- Refactor large page components into smaller, page-specific sub-components. This improves modularity, reduces file length, and enhances readability and maintainability.
+
+### Handling `useState` Setter Type Issues
+
+- When encountering `useState` setter type issues with functional updates in complex component interactions (e.g., with UI library components), consider calculating the new state directly and passing it, or explicitly typing all intermediate parameters.
+
+### Breaking Down Large `replace_in_file` Operations
+
+- Break down large `replace_in_file` operations into smaller, sequential blocks for increased reliability and to avoid "SEARCH block does not match" errors.
+
 ## Project-Specific Learnings
 
 ### Initial Prisma Setup for New Projects

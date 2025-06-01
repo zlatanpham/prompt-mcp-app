@@ -18,28 +18,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Check, Copy, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
+import { CreateApiKeyDialog } from "./_components/create-api-key-dialog";
+import { ApiKeyDisplayDialog } from "./_components/api-key-display-dialog";
+import { DeleteApiKeyDialog } from "./_components/delete-api-key-dialog";
+import { EditApiKeyProjectsDialog } from "./_components/edit-api-key-projects-dialog";
 
 export default function ApiKeysPage() {
   const formatApiKeyNameForMcp = (name: string) => {
@@ -172,63 +154,16 @@ export default function ApiKeysPage() {
     <div className="container mx-auto py-10">
       <h1 className="mb-6 text-3xl font-bold">API Keys</h1>
 
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogTrigger asChild>
-          <Button className="mb-4">Create New API Key</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create New API Key</DialogTitle>
-            <DialogDescription>
-              Generate a new API key and select projects it can access.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
-                id="name"
-                value={newApiKeyName}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewApiKeyName(e.target.value)
-                }
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="projects" className="pt-2 text-right">
-                Projects
-              </Label>
-              <div className="col-span-3 flex flex-col gap-2">
-                {projectOptions.map((project) => (
-                  <div
-                    key={project.value}
-                    className="flex items-center space-x-2"
-                  >
-                    <Checkbox
-                      id={`create-project-${project.value}`}
-                      checked={selectedProjectIds.includes(project.value)}
-                      onCheckedChange={(checked) => {
-                        setSelectedProjectIds((prev) =>
-                          checked
-                            ? [...prev, project.value]
-                            : prev.filter((id) => id !== project.value),
-                        );
-                      }}
-                    />
-                    <Label htmlFor={`create-project-${project.value}`}>
-                      {project.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <Button onClick={handleCreateApiKey}>Create API Key</Button>
-        </DialogContent>
-      </Dialog>
+      <CreateApiKeyDialog
+        isOpen={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        newApiKeyName={newApiKeyName}
+        setNewApiKeyName={setNewApiKeyName}
+        selectedProjectIds={selectedProjectIds}
+        setSelectedProjectIds={setSelectedProjectIds}
+        projectOptions={projectOptions}
+        handleCreateApiKey={handleCreateApiKey}
+      />
 
       <Table>
         <TableHeader>
@@ -347,114 +282,28 @@ export default function ApiKeysPage() {
         </TableBody>
       </Table>
 
-      {/* API Key Display Dialog */}
-      <Dialog
-        open={isApiKeyDisplayDialogOpen}
+      <ApiKeyDisplayDialog
+        isOpen={isApiKeyDisplayDialogOpen}
         onOpenChange={setIsApiKeyDisplayDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Your New API Key</DialogTitle>
-            <DialogDescription>
-              Please copy your API key now. This is the only time it will be
-              displayed.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="displayed-key" className="text-right">
-                MCP Config
-              </Label>
-              <Textarea
-                id="displayed-key"
-                value={displayedApiKey ?? ""}
-                readOnly
-                className="col-span-3 h-40 font-mono"
-              />
-            </div>
-          </div>
-          <Button
-            onClick={() => {
-              if (displayedApiKey) {
-                void navigator.clipboard.writeText(displayedApiKey);
-              }
-              setIsApiKeyDisplayDialogOpen(false);
-            }}
-          >
-            Copy Config to Clipboard
-          </Button>
-        </DialogContent>
-      </Dialog>
+        displayedApiKey={displayedApiKey}
+        setDisplayedApiKey={setDisplayedApiKey}
+      />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={isDeleteDialogOpen}
+      <DeleteApiKeyDialog
+        isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              API Key.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteApiKey}>
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        handleDeleteApiKey={handleDeleteApiKey}
+      />
 
-      {/* Edit Projects Dialog */}
-      <Dialog
-        open={isEditProjectsDialogOpen}
+      <EditApiKeyProjectsDialog
+        isOpen={isEditProjectsDialogOpen}
         onOpenChange={setIsEditProjectsDialogOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              Edit Projects for {apiKeyToEditProjects?.name}
-            </DialogTitle>
-            <DialogDescription>
-              Select projects this API key can access.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="edit-projects" className="pt-2 text-right">
-                Projects
-              </Label>
-              <div className="col-span-3 flex flex-col gap-2">
-                {projectOptions.map((project) => (
-                  <div
-                    key={project.value}
-                    className="flex items-center space-x-2"
-                  >
-                    <Checkbox
-                      id={`edit-project-${project.value}`}
-                      checked={editSelectedProjectIds.includes(project.value)}
-                      onCheckedChange={(checked) => {
-                        setEditSelectedProjectIds((prev) =>
-                          checked
-                            ? [...prev, project.value]
-                            : prev.filter((id) => id !== project.value),
-                        );
-                      }}
-                    />
-                    <Label htmlFor={`edit-project-${project.value}`}>
-                      {project.label}
-                    </Label>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-          <Button onClick={handleUpdateProjects}>Save Changes</Button>
-        </DialogContent>
-      </Dialog>
+        apiKeyToEditProjects={apiKeyToEditProjects}
+        editSelectedProjectIds={editSelectedProjectIds}
+        setEditSelectedProjectIds={setEditSelectedProjectIds}
+        projectOptions={projectOptions}
+        handleUpdateProjects={handleUpdateProjects}
+      />
     </div>
   );
 }

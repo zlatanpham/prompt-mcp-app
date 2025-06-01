@@ -11,6 +11,8 @@
 - Follow T3 structure: `server/api` for tRPC, `prisma/schema.prisma` for DB, `lib` for utils/auth.
 - Name variables and functions descriptively (e.g., `isLoadingUser`, `getUserById`).
 - Organize files logically within `app`, `components`, `lib`, `server`.
+- For UI components (forms, dialogs) that are specific to a particular page, place them in a private `_components` folder located within that page's directory (e.g., `src/app/(protected)/page-name/_components`).
+- Avoid making page files excessively long; break down large page files into multiple, smaller, and reusable components.
 - Use lowercase-kebab-case for directory and file names (e.g., `components/user-profile`, `lib/utils.ts`).
 
 ## Optimization & Performance
