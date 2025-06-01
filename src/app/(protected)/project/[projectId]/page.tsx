@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import DashboardLayout from "@/components/dashboard-layout";
 import Tool from "./_components/tool";
 import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
@@ -63,11 +64,28 @@ export default function ProjectDetailPage() {
       bredcrumb={[
         { label: "Dashboard", href: "/" },
         { label: "Project", href: "/project" },
-        { label: !isLoading || project ? (project?.name ?? "") : "..." },
+        {
+          label:
+            !isLoading || project ? (
+              (project?.name ?? "")
+            ) : (
+              <Skeleton className="h-4 w-20" />
+            ),
+        },
       ]}
     >
       {isLoading || !project ? (
-        <p>Loading...</p>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-8 w-1/3" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-9 w-24" />
+              <Skeleton className="h-9 w-28" />
+              <Skeleton className="h-9 w-28" />
+            </div>
+          </div>
+          <Skeleton className="h-[calc(100vh-200px)] w-full" />
+        </div>
       ) : (
         <>
           <div className="flex items-center justify-between">

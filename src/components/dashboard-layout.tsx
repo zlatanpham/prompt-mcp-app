@@ -11,7 +11,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Fragment, type PropsWithChildren } from "react";
 
 interface BreadcrumbItem {
-  label: string;
+  label: React.ReactNode;
   href?: string;
 }
 interface Props extends PropsWithChildren {

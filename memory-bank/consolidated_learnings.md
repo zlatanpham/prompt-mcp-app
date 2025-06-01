@@ -20,3 +20,13 @@
      - Update relevant TypeScript types to include the `_count` property.
      - Utilize Shadcn UI components like `Badge` and `lucide-react` icons (e.g., `Wrench`) to visually represent the count.
      - Apply appropriate Tailwind CSS classes for styling to ensure consistency with the overall design system.
+
+### Skeleton Loading State
+
+- **Pattern:** Utilize Shadcn UI's `Skeleton` component to replace text-based or simple loading indicators with a visual representation of the content structure.
+- **Benefits:** Improves perceived performance and user experience by providing a more engaging and less jarring loading state. Mimics the layout of the actual content, reducing layout shifts once data is loaded.
+- **Implementation Steps:**
+  1. Import the `Skeleton` component: `import { Skeleton } from "@/components/ui/skeleton";`.
+  2. In the loading conditional block, replace the simple loading text with `Skeleton` components.
+  3. Apply Tailwind CSS utility classes to the `Skeleton` components (e.g., `h-`, `w-`, `flex`, `gap-`) to match the dimensions and layout of the content that will eventually load.
+  4. **Important:** If rendering a `Skeleton` component (or any React element) in a prop that previously expected a `string`, update the prop's type definition to `React.ReactNode` to avoid TypeScript errors.
