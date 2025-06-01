@@ -30,7 +30,7 @@
 
 ### TypeScript and ESLint Error Resolution
 
-- When persistent TypeScript errors (e.g., `Cannot find module`) occur despite correct paths and installed dependencies, it often indicates a stale TypeScript language server or development server cache. A server restart is usually required.
+- When persistent TypeScript errors (e.g., `Cannot find module`) occur despite code appearing type-safe and correct (e.g., "Unsafe argument of type any assigned to a parameter of type string" for clearly typed variables), it often indicates a false positive, a stale TypeScript language server or development server cache. A server restart is usually required.
 - Explicitly type parameters and variables to resolve `implicit any` and `unsafe argument` ESLint errors, especially when dealing with data from external sources (like tRPC queries) or complex object structures.
 
 ### Debugging Persistent ESLint/TypeScript Errors
@@ -72,72 +72,6 @@
 
 - Break down large `replace_in_file` operations into smaller, sequential blocks for increased reliability and to avoid "SEARCH block does not match" errors.
 
-## Project-Specific Learnings
-
-### Initial Prisma Setup for New Projects
-
-- For brand new projects or when extensive schema changes are made and data preservation is not critical, the recommended workflow for Prisma is to:
-  1.  Modify `prisma/schema.prisma`.
-  2.  Run `pnpm dlx prisma migrate reset --force` to clear the database and re-apply all migrations.
-  3.  Run `pnpm db:generate` to ensure the Prisma Client is updated.
-- This process ensures the database schema and Prisma client are in sync with the latest `schema.prisma` without concern for existing data.
-
-### Adding New Fields to Prisma Models and Updating tRPC
-
-- **Workflow:**
-  1.  Modify `prisma/schema.prisma` to add the new field (e.g., `args Json?`).
-  2.  **Crucial Step**: Run `pnpm db:generate` to regenerate the Prisma Client. This is essential for the application's types to recognize the new schema changes.
-  3.  Run `pnpm dlx prisma migrate dev --name your-migration-name` to create and apply a new database migration (if schema changes require it).
-  4.  Update relevant tRPC procedures (e.g., `create`, `update`) in `src/server/api/routers/` to include the new field in input schemas and data operations.
-
-### Prisma JSON Type Handling
-
-- When working with `Json` fields in Prisma, avoid explicit casting to `Prisma.JsonArray` or `Prisma.JsonObject` in the data payload for `create` or `update` operations. Prisma can typically handle the serialization of plain JavaScript arrays or objects directly.
-- **Debugging `Unknown argument` errors**: If you encounter `Unknown argument` errors when interacting with Prisma, the primary cause is usually an outdated Prisma Client. Always ensure `pnpm db:generate` has been run successfully after any `prisma/schema.prisma` modifications.
-
-### Client-Side JSON Export and File Download
-
-- To enable client-side export of data as a JSON file:
-  1.  Filter and map the data to the desired export format.
-  2.  Use `JSON.stringify(data, null, 2)` to format the JSON with pretty printing.
-  3.  Create a `Blob` with `new Blob([jsonString], { type: "application/json" })`.
-  4.  Generate a URL for the blob using `URL.createObjectURL(blob)`.
-  5.  Create a temporary `<a>` element, set its `href` to the URL and `download` attribute to the desired filename.
-  6.  Programmatically click the `<a>` element to trigger the download.
-  7.  Clean up by removing the `<a>` element and revoking the object URL (`URL.revokeObjectURL(url)`).
-
-### Dynamic Form Arrays
-
-- **Pattern**: For managing dynamic lists of input fields (e.g., tool arguments), use `react-hook-form`'s `useFieldArray`. This simplifies adding, removing, and managing individual items within a form.
-- **Component Structure**: Create a dedicated component (e.g., `ArgumentsFormArray`) to encapsulate the logic and UI for the form array, promoting reusability and separation of concerns.
-- **Type-only Imports**: When `verbatimModuleSyntax` is enabled in TypeScript, use `import type { TypeName }` for importing types to prevent runtime issues.
-
-### Zod Validation Patterns for Tool Names
-
-- For tool names, use a Zod schema with a regex `^[a-z0-9_]+$` to enforce lowercase letters, numbers, and underscores.
-- Apply length constraints (e.g., `min(1)`, `max(100)`) as required.
-- Centralize this schema and related constants in `src/lib/validators/tool.ts` for consistent application across UI and API.
-
-### Shadcn UI Table Implementation for Displaying Lists
-
-- Use Shadcn UI's `Table`, `TableHeader`, `TableBody`, `TableHead`, `TableRow`, and `TableCell` components for displaying lists of data in a structured, tabular format.
-- Ensure proper data mapping to `TableRow` and `TableCell` components.
-
-### Reusable Form Components
-
-- Extract common form structures and logic into reusable components (e.g., `ProjectForm`). This promotes consistency, reduces code duplication, and improves maintainability across different parts of the application (e.g., create and edit forms).
-
-### Complex UI Interactions (Dropdowns, Dialogs)
-
-- When implementing multiple actions for an item, use dropdown menus to consolidate options and maintain a clean UI.
-- For actions requiring confirmation or detailed input, integrate `AlertDialog` (for confirmation) and `Dialog` (for forms) within dropdown menu items.
-- Ensure proper state management for dialog visibility and selected items.
-
-### Correct `queryKey` patterns for tRPC `invalidateQueries`
-
-- When invalidating tRPC queries with React Query, ensure the `queryKey` precisely matches the structure used by the `useQuery` hook. For `api.router.procedure.useQuery()`, the `queryKey` is typically an array containing an array, e.g., `[['router', 'procedure']]`. Using a single array like `['router', 'procedure']` will not correctly invalidate the cache.
-- **Crucial**: When invalidating queries with parameters, the property names in the invalidation object (e.g., `{ projectId }`) must exactly match the input schema of the tRPC procedure (e.g., `{ project_id }`). Always verify the exact query name and its input schema from the tRPC router definition.
-
 ### API Key Management Implementation
 
 - **Database Design**: Use a dedicated `ApiKey` model with a secure `key` field and a many-to-many relationship (`ApiKeyOnProject`) to `Project` for granular access control.
@@ -163,3 +97,11 @@
   - Create a dedicated dialog component (`ImportToolsDialog`) for uploading/pasting JSON content.
   - Implement client-side JSON parsing and validation using the same Zod schemas as the backend for immediate user feedback.
   - Handle success and error states, displaying appropriate toast notifications.
+
+### Tool Active Status Management
+
+- **Database Field**: Added an `is_active` boolean field with a default of `true` to the `Tool` model in `prisma/schema.prisma`.
+- **API Filtering**: Modified `src/app/api/tools/route.ts` to filter tools by `is_active: true` when fetched via API key.
+- **tRPC Mutation**: Created a `toggleActive` mutation in `src/server/api/routers/tool.ts` to update the `is_active` status.
+- **UI Integration**: Integrated a Shadcn UI `Switch` component in `src/app/(protected)/project/[projectId]/_components/tool.tsx` to allow users to toggle the `is_active` status directly from the tool table.
+- **Known Issue (Hydration Error)**: Persistent hydration errors related to whitespace in JSX (`<tr>` children) due to auto-formatting. This requires user intervention to configure their local formatter.
