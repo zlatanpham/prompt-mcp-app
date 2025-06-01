@@ -86,6 +86,7 @@ export function ArgumentsFormArray({ name }: ArgumentsFormArrayProps) {
                   <SelectContent>
                     <SelectItem value="string">String</SelectItem>
                     <SelectItem value="number">Number</SelectItem>
+                    <SelectItem value="array">Array</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
