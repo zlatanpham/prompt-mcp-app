@@ -2,7 +2,7 @@
 
 ## Current Work Focus
 
-The primary focus was to implement project management features, including ensuring the project list updates correctly after creation, adding a delete project functionality with confirmation, and refactoring the project edit form into a reusable component for both the project list and detail pages.
+The primary focus was to implement project management features, including ensuring the project list updates correctly after creation, adding a delete project functionality with confirmation, and refactoring the project edit form into a reusable component for both the project list and detail pages. More recently, the focus shifted to enhancing API key management.
 
 ## Recent Changes
 
@@ -22,6 +22,11 @@ The primary focus was to implement project management features, including ensuri
 - `src/server/api/routers/project.ts`: Added a `delete` mutation for projects.
 - `src/components/project-form.tsx`: Created a new reusable component for project creation and editing forms.
 - `src/app/(protected)/project/[projectId]/page.tsx`: Updated to use the new `ProjectForm` component for editing.
+- `src/app/(protected)/api-keys/page.tsx`:
+  - Modified API key display: truncated in table, full MCP config JSON in a read-only textarea in the display dialog.
+  - Added a direct copy button for the raw API key in the table's "Key" column.
+  - Added a "Copy Config" option to the actions dropdown menu for each API key, copying the full MCP config JSON.
+  - Updated the main copy button in the display dialog to copy the full MCP config JSON.
 
 ## Next Steps
 
@@ -34,6 +39,7 @@ The primary focus was to implement project management features, including ensuri
 - The conflict between user instruction and technical necessity for `db:generate` was noted and led to a `.clinerules` improvement.
 - Refactored project forms into a shared component to promote reusability and maintainability.
 - Implemented dropdown menus for project actions to improve UI/UX.
+- Enhanced API key display and copy functionality to provide more flexibility and ease of use for users.
 
 ## Important Patterns and Preferences
 
@@ -42,6 +48,8 @@ The primary focus was to implement project management features, including ensuri
 - Modular component and API design.
 - Reusable UI components (e.g., `ProjectForm`).
 - Effective use of React Query's `invalidateQueries` for UI updates.
+- Dynamic URL construction using `window.location.origin`.
+- Client-side clipboard operations with visual feedback.
 
 ## Learnings and Project Insights
 
@@ -49,3 +57,4 @@ The primary focus was to implement project management features, including ensuri
 - The need for robust handling of interrupted commands and potential conflicts between user instructions and technical requirements.
 - The benefits of extracting reusable form components for consistent UI and logic across different parts of the application.
 - How to effectively manage multiple dialogs and dropdowns for complex UI interactions.
+- The importance of providing flexible and user-friendly options for handling sensitive data like API keys, including various copy formats.

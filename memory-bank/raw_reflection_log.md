@@ -25,3 +25,36 @@ Improvements_Identified_For_Consolidation:
 - General pattern: Invalidating tRPC queries after mutations for UI updates.
 - Specific action: Always verify exact tRPC query names and input schema property names from router definitions when invalidating queries.
 ---
+
+---
+
+Date: 2025-06-01
+TaskRef: "Update API key reader for truncated display and config copy"
+
+Learnings:
+
+- Implemented truncation for API keys in table display.
+- Added a direct copy button for the raw API key in the table column.
+- Modified API key display dialog to show full MCP server configuration JSON.
+- Updated copy functionality in the dialog and added a new dropdown option to copy the full MCP config JSON.
+- Used `window.location.origin` to dynamically construct the `API_URL` for the MCP config.
+- Handled temporary visual feedback for copy actions using `useState` and `setTimeout`.
+
+Difficulties:
+
+- Ensuring all copy actions (raw key, full config) were correctly implemented and triggered.
+- Integrating new UI elements (copy button, dropdown item) while maintaining existing functionality.
+
+Successes:
+
+- Successfully implemented all requested features for API key display and copying.
+- Ensured the MCP config JSON is correctly formatted and includes dynamic `API_URL`.
+- Maintained typesafety and addressed ESLint warnings during the process.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Dynamic construction of URLs based on `window.location.origin`.
+- General pattern: Implementing client-side clipboard copy with visual feedback.
+- General pattern: Providing multiple copy options (raw data vs. formatted config) for sensitive information.
+
+---

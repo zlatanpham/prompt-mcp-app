@@ -44,6 +44,22 @@
   4.  Review `tsconfig.json` and ESLint configuration for any unusual rules or strictness settings.
   5.  If parsing errors persist despite correct code, investigate tooling configurations (ESLint, TypeScript, Babel/SWC) and their versions.
 
+### Dynamic URL Construction
+
+- When constructing URLs dynamically in client-side code, use `window.location.origin` to get the base URL and then append specific paths (e.g., `/api/tools`). This ensures the URL is correct regardless of the deployment environment.
+
+### Client-Side Clipboard Copy with Visual Feedback
+
+- For client-side copy functionality, use `navigator.clipboard.writeText()` to copy content to the clipboard.
+- Provide temporary visual feedback (e.g., changing an icon or displaying a "Copied!" message) using `useState` and `setTimeout` to inform the user of successful copy.
+
+### Providing Multiple Copy Options for Sensitive Information
+
+- When dealing with sensitive information like API keys, offer multiple copy options:
+  - A direct copy of the raw key (e.g., for quick use).
+  - A copy of the key embedded within a formatted configuration (e.g., for direct pasting into a configuration file).
+- This caters to different user needs and contexts for using the key.
+
 ## Project-Specific Learnings
 
 ### Initial Prisma Setup for New Projects
@@ -117,6 +133,10 @@
 - **Public API Endpoint**: For external access, create a dedicated Next.js API route (e.g., `src/app/api/external/tools/route.ts`) that validates the API key from headers (`x-api-key`) and filters data based on associated projects.
 - **One-Time Key Display**: For security, display newly created or regenerated API keys only once in a dedicated dialog, prompting the user to copy it to their clipboard.
 - **UI for Management**: Provide a comprehensive UI for listing, creating, deleting, regenerating, and updating project associations for API keys. Use checkboxes for multi-project selection.
+- **Enhanced Key Display and Copy**:
+  - Display truncated API keys in tables with a direct copy button for the full key.
+  - Provide an option to copy the full MCP server configuration JSON (including dynamic `API_URL`) from the actions dropdown.
+  - Show the full MCP server configuration JSON in a read-only textarea in the key display dialog after generation/regeneration.
 
 ### Tool Import Functionality
 

@@ -16,7 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { Check, Copy, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import {
   AlertDialog,
@@ -39,19 +39,36 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function ApiKeysPage() {
+  const formatApiKeyNameForMcp = (name: string) => {
+    return `mcp-prompt-${name.toLowerCase().replace(/\s+/g, "-")}`;
+  };
+
   const { data: apiKeys, isLoading, refetch } = api.apiKey.getAll.useQuery();
   const { data: projects, isLoading: isLoadingProjects } =
     api.project.getAll.useQuery();
 
   const createApiKeyMutation = api.apiKey.create.useMutation({
-    onSuccess: (data: { key: string }) => {
+    onSuccess: (data: { key: string; name: string }) => {
       void refetch();
       setNewApiKeyName("");
       setSelectedProjectIds([]);
       setIsCreateDialogOpen(false);
-      setDisplayedApiKey(data.key);
+      const mcpConfig = {
+        mcpServers: {
+          [formatApiKeyNameForMcp(data.name)]: {
+            command: "npx",
+            args: ["-y", "@x-mcp/prompt@latest"],
+            env: {
+              API_URL: `${window.location.origin}/api/tools`,
+              API_KEY: data.key,
+            },
+          },
+        },
+      };
+      setDisplayedApiKey(JSON.stringify(mcpConfig, null, 2));
       setIsApiKeyDisplayDialogOpen(true);
     },
   });
@@ -59,9 +76,21 @@ export default function ApiKeysPage() {
     onSuccess: () => void refetch(),
   });
   const regenerateApiKeyMutation = api.apiKey.regenerate.useMutation({
-    onSuccess: (data: { key: string }) => {
+    onSuccess: (data: { key: string; name: string }) => {
       void refetch();
-      setDisplayedApiKey(data.key);
+      const mcpConfig = {
+        mcpServers: {
+          [formatApiKeyNameForMcp(data.name)]: {
+            command: "npx",
+            args: ["-y", "@x-mcp/prompt@latest"],
+            env: {
+              API_URL: `${window.location.origin}/api/tools`,
+              API_KEY: data.key,
+            },
+          },
+        },
+      };
+      setDisplayedApiKey(JSON.stringify(mcpConfig, null, 2));
       setIsApiKeyDisplayDialogOpen(true);
     },
   });
@@ -79,6 +108,7 @@ export default function ApiKeysPage() {
   const [isApiKeyDisplayDialogOpen, setIsApiKeyDisplayDialogOpen] =
     useState(false);
   const [displayedApiKey, setDisplayedApiKey] = useState<string | null>(null);
+  const [copiedKeyId, setCopiedKeyId] = useState<string | null>(null);
 
   const [isEditProjectsDialogOpen, setIsEditProjectsDialogOpen] =
     useState(false);
@@ -216,7 +246,25 @@ export default function ApiKeysPage() {
             <TableRow key={apiKey.id}>
               <TableCell className="font-medium">{apiKey.name}</TableCell>
               <TableCell className="font-mono text-sm">
-                {apiKey.key.substring(0, 8)}...
+                <div className="flex items-center gap-2">
+                  <span>{apiKey.key.substring(0, 8)}...</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(apiKey.key);
+                      setCopiedKeyId(apiKey.id);
+                      setTimeout(() => setCopiedKeyId(null), 2000);
+                    }}
+                    className="h-6 w-6 p-0"
+                  >
+                    {copiedKeyId === apiKey.id ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <Copy className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
               </TableCell>
               <TableCell>
                 {apiKey.projects
@@ -224,10 +272,10 @@ export default function ApiKeysPage() {
                   .join(", ")}
               </TableCell>
               <TableCell>
-                {new Date(apiKey.createdAt as Date).toLocaleDateString()}
+                {new Date(apiKey.createdAt).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                {new Date(apiKey.updatedAt as Date).toLocaleDateString()}
+                {new Date(apiKey.updatedAt).toLocaleDateString()}
               </TableCell>
               <TableCell className="text-right">
                 <DropdownMenu>
@@ -248,7 +296,6 @@ export default function ApiKeysPage() {
                           ),
                         });
                         setEditSelectedProjectIds(
-                          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                           apiKey.projects
                             .map((p: { projectId: string }) => p.projectId)
                             .filter((id): id is string => id !== undefined),
@@ -259,15 +306,34 @@ export default function ApiKeysPage() {
                       Edit Projects
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() =>
-                        handleRegenerateApiKey(apiKey.id as string)
-                      }
+                      onClick={() => handleRegenerateApiKey(apiKey.id)}
                     >
                       Regenerate Key
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => {
-                        setApiKeyToDelete(apiKey.id as string);
+                        const mcpConfig = {
+                          mcpServers: {
+                            [formatApiKeyNameForMcp(apiKey.name)]: {
+                              command: "npx",
+                              args: ["-y", "@x-mcp/prompt@latest"],
+                              env: {
+                                API_URL: `${window.location.origin}/api/tools`,
+                                API_KEY: apiKey.key,
+                              },
+                            },
+                          },
+                        };
+                        void navigator.clipboard.writeText(
+                          JSON.stringify(mcpConfig, null, 2),
+                        );
+                      }}
+                    >
+                      Copy Config
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setApiKeyToDelete(apiKey.id);
                         setIsDeleteDialogOpen(true);
                       }}
                     >
@@ -297,13 +363,13 @@ export default function ApiKeysPage() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="displayed-key" className="text-right">
-                API Key
+                MCP Config
               </Label>
-              <Input
+              <Textarea
                 id="displayed-key"
                 value={displayedApiKey ?? ""}
                 readOnly
-                className="col-span-3 font-mono"
+                className="col-span-3 h-40 font-mono"
               />
             </div>
           </div>
@@ -315,7 +381,7 @@ export default function ApiKeysPage() {
               setIsApiKeyDisplayDialogOpen(false);
             }}
           >
-            Copy to Clipboard
+            Copy Config to Clipboard
           </Button>
         </DialogContent>
       </Dialog>
