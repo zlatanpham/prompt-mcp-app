@@ -12,31 +12,36 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface DeleteApiKeyDialogProps {
+interface ConfirmActionDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  handleDeleteApiKey: () => void;
+  onConfirm: () => void;
+  title: string;
+  description: string;
+  confirmText: string;
+  cancelText: string;
 }
 
-export function DeleteApiKeyDialog({
+export function ConfirmActionDialog({
   isOpen,
   onOpenChange,
-  handleDeleteApiKey,
-}: DeleteApiKeyDialogProps) {
+  onConfirm,
+  title,
+  description,
+  confirmText,
+  cancelText,
+}: ConfirmActionDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your API
-            Key.
-          </AlertDialogDescription>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDeleteApiKey}>
-            Continue
+          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm}>
+            {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

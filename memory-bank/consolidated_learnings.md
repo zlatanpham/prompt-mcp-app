@@ -24,6 +24,18 @@
 
 - Be prepared to make multiple small UI adjustments based on continuous user feedback to achieve the desired look and feel. This often involves iterative `replace_in_file` operations for styling and component structure.
 
+### Reusable UI Components
+
+- Best practice to create generic, reusable UI components (e.g., confirmation dialogs) and place them in a shared `src/components` directory for better organization and reusability across the application.
+
+### `replace_in_file` and Auto-formatting
+
+- When using `replace_in_file`, be aware that auto-formatting can alter file content (e.g., import paths, indentation). This requires precise matching in SEARCH blocks and may necessitate iterative, smaller changes or re-reading the file content to ensure accuracy.
+
+### Sensitive Action Confirmation
+
+- Implement confirmation steps for destructive or sensitive user actions (e.g., API key regeneration, deletion) to prevent accidental operations and improve user experience.
+
 ### Path Alias Resolution
 
 - Always verify `tsconfig.json` for configured path aliases (e.g., `@/*` mapping to `src/*`) at the start of a project or when encountering import resolution issues. Ensure all imports consistently use the defined alias.

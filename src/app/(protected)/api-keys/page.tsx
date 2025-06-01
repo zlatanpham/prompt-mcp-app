@@ -20,7 +20,7 @@ import { Check, Copy, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { CreateApiKeyDialog } from "./_components/create-api-key-dialog";
 import { ApiKeyDisplayDialog } from "./_components/api-key-display-dialog";
-import { DeleteApiKeyDialog } from "./_components/delete-api-key-dialog";
+import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { EditApiKeyProjectsDialog } from "./_components/edit-api-key-projects-dialog";
 import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton import
 
@@ -83,8 +83,15 @@ export default function ApiKeysPage() {
     onSuccess: () => void refetch(),
   });
 
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+    useState(false);
   const [apiKeyToDelete, setApiKeyToDelete] = useState<string | null>(null);
+
+  const [isConfirmRegenerateDialogOpen, setIsConfirmRegenerateDialogOpen] =
+    useState(false);
+  const [apiKeyToRegenerate, setApiKeyToRegenerate] = useState<string | null>(
+    null,
+  );
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newApiKeyName, setNewApiKeyName] = useState("");
@@ -116,13 +123,22 @@ export default function ApiKeysPage() {
   const handleDeleteApiKey = () => {
     if (apiKeyToDelete) {
       deleteApiKeyMutation.mutate({ id: apiKeyToDelete });
-      setIsDeleteDialogOpen(false);
+      setIsConfirmDeleteDialogOpen(false);
       setApiKeyToDelete(null);
     }
   };
 
-  const handleRegenerateApiKey = (id: string) => {
-    regenerateApiKeyMutation.mutate({ id });
+  const handleRegenerateApiKeyClick = (id: string) => {
+    setApiKeyToRegenerate(id);
+    setIsConfirmRegenerateDialogOpen(true);
+  };
+
+  const handleConfirmRegenerateApiKey = () => {
+    if (apiKeyToRegenerate) {
+      regenerateApiKeyMutation.mutate({ id: apiKeyToRegenerate });
+      setIsConfirmRegenerateDialogOpen(false);
+      setApiKeyToRegenerate(null);
+    }
   };
 
   const handleUpdateProjects = (newName: string) => {
@@ -253,7 +269,7 @@ export default function ApiKeysPage() {
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleRegenerateApiKey(apiKey.id)}
+                        onClick={() => handleRegenerateApiKeyClick(apiKey.id)}
                       >
                         Regenerate Key
                       </DropdownMenuItem>
@@ -281,7 +297,7 @@ export default function ApiKeysPage() {
                       <DropdownMenuItem
                         onClick={() => {
                           setApiKeyToDelete(apiKey.id);
-                          setIsDeleteDialogOpen(true);
+                          setIsConfirmDeleteDialogOpen(true);
                         }}
                       >
                         Delete
@@ -302,10 +318,24 @@ export default function ApiKeysPage() {
         setDisplayedApiKey={setDisplayedApiKey}
       />
 
-      <DeleteApiKeyDialog
-        isOpen={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-        handleDeleteApiKey={handleDeleteApiKey}
+      <ConfirmActionDialog
+        isOpen={isConfirmDeleteDialogOpen}
+        onOpenChange={setIsConfirmDeleteDialogOpen}
+        onConfirm={handleDeleteApiKey}
+        title="Are you absolutely sure?"
+        description="This action cannot be undone. This will permanently delete your API Key."
+        confirmText="Continue"
+        cancelText="Cancel"
+      />
+
+      <ConfirmActionDialog
+        isOpen={isConfirmRegenerateDialogOpen}
+        onOpenChange={setIsConfirmRegenerateDialogOpen}
+        onConfirm={handleConfirmRegenerateApiKey}
+        title="Are you sure you want to regenerate this API Key?"
+        description="Regenerating the API Key will invalidate the old key and generate a new one. This action cannot be undone."
+        confirmText="Regenerate"
+        cancelText="Cancel"
       />
 
       <EditApiKeyProjectsDialog
