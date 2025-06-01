@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/trpc/react";
 import { useOrganization } from "../_context/organization";
 import DashboardLayout from "@/components/dashboard-layout";
@@ -176,7 +177,10 @@ export default function ProjectPage() {
                     <FormItem>
                       <FormLabel>Description</FormLabel>
                       <FormControl>
-                        <Input placeholder="Project description" {...field} />
+                        <Textarea
+                          placeholder="Project description"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -208,64 +212,67 @@ export default function ProjectPage() {
             const date = project.updated_at ?? project.created_at;
             const timeAgoString = date ? timeAgo(date) : "N/A";
             return (
-              <Card
-                key={project.id}
-                className="flex flex-col justify-between p-4 transition-all hover:shadow-md"
-              >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <Link href={`/project/${project.id}`}>
+              <Link key={project.id} href={`/project/${project.id}`}>
+                <Card className="flex h-full flex-col justify-between p-4 transition-all hover:shadow-md">
+                  <div>
+                    <div className="flex items-center justify-between">
                       <h2 className="mb-2 text-lg font-semibold">
                         {project.name}
                       </h2>
-                    </Link>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setSelectedProject(project);
-                            setIsEditOpen(true);
-                          }}
-                        >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onSelect={(e) => {
-                            e.preventDefault(); // Prevent dropdown from closing
-                            handleDeleteClick(project.id);
-                          }}
-                          className="text-red-600"
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0"
+                            onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
+                          >
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation(); // Stop propagation for dropdown items
+                              setSelectedProject(project);
+                              setIsEditOpen(true);
+                            }}
+                          >
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onSelect={(e) => {
+                              e.preventDefault(); // Prevent dropdown from closing
+                              e.stopPropagation(); // Stop propagation for dropdown items
+                              handleDeleteClick(project.id);
+                            }}
+                            className="text-red-600"
+                          >
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <p className="text-muted-foreground mb-4 text-sm">
+                      {project.description ?? "No description"}
+                    </p>
                   </div>
-                  <p className="text-muted-foreground mb-4 text-sm">
-                    {project.description ?? "No description"}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between pt-4">
-                  <Badge
-                    variant="secondary"
-                    className="flex items-center gap-1"
-                  >
-                    <Wrench className="h-3 w-3" />
-                    <span>{project._count.Tool} Tools</span>
-                  </Badge>
-                  <p className="text-muted-foreground text-xs">
-                    Last edited {timeAgoString}
-                  </p>
-                </div>
-              </Card>
+                  <div className="flex items-center justify-between pt-4">
+                    <Badge
+                      variant="secondary"
+                      className="flex items-center gap-1"
+                    >
+                      <Wrench className="h-3 w-3" />
+                      <span>{project._count.Tool} Tools</span>
+                    </Badge>
+                    <p className="text-muted-foreground text-xs">
+                      Last edited {timeAgoString}
+                    </p>
+                  </div>
+                </Card>
+              </Link>
             );
           })}
         </div>
