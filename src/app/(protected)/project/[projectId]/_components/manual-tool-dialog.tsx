@@ -29,7 +29,7 @@ import type { Tool } from "@prisma/client";
 const manualToolFormSchema = z
   .object({
     name: toolNameSchema,
-    description: z.string().optional(),
+    description: z.string().min(1, "Description is required"),
     prompt: z.string().min(1, "Prompt is required"),
     arguments: z.array(argumentSchema).optional(),
   })
@@ -145,7 +145,7 @@ const ManualToolDialog = (props: Props) => {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Briefly describe the tool..."

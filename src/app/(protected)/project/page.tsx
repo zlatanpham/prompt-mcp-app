@@ -125,10 +125,10 @@ export default function ProjectPage() {
 
   return (
     <DashboardLayout
-      bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "projects" }]}
+      bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "Projects" }]}
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">projects</h1>
+        <h1 className="text-2xl font-bold">Projects</h1>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button>Create Project</Button>

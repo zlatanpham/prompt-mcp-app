@@ -23,6 +23,7 @@
 - Use Next.js `dynamic` imports for code splitting.
 - Design mobile-first, responsive UIs with Tailwind.
 - Optimize images (Next.js `<Image>`, modern formats like WebP).
+- Implement granular loading states (e.g., skeleton UIs for specific data tables or components) rather than hiding entire page layouts during data fetching.
 
 ## Error Handling & Validation
 

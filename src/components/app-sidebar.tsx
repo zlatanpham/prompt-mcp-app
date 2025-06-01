@@ -4,11 +4,11 @@ import * as React from "react";
 import { useSession } from "next-auth/react";
 import {
   Briefcase,
-  Command,
-  LifeBuoy,
   Send,
   Settings2,
   SquareTerminal,
+  GithubIcon,
+  ComponentIcon,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -32,7 +32,7 @@ const data = {
       icon: SquareTerminal,
     },
     {
-      title: "Project",
+      title: "Projects",
       url: "/project",
       icon: Briefcase,
     },
@@ -44,13 +44,13 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
+      title: "Github",
+      url: "https://github.com/zlatanpham/prompt-mcp",
+      icon: GithubIcon,
     },
     {
       title: "Feedback",
-      url: "#",
+      url: "https://github.com/zlatanpham/prompt-mcp/issues",
       icon: Send,
     },
   ],
@@ -85,11 +85,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
+                  <ComponentIcon className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
+                  <span className="truncate font-medium">Prompt</span>
+                  <span className="truncate text-xs">MCP server</span>
                 </div>
               </a>
             </SidebarMenuButton>
