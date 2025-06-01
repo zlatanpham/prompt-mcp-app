@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Check, Copy, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { CreateApiKeyDialog } from "./_components/create-api-key-dialog";
 import { ApiKeyDisplayDialog } from "./_components/api-key-display-dialog";
@@ -230,9 +231,23 @@ export default function ApiKeysPage() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {apiKey.projects
-                    .map((p: { project: { name: string } }) => p.project.name)
-                    .join(", ")}
+                  <div className="flex flex-wrap gap-x-1">
+                    {apiKey.projects.map(
+                      (
+                        p: { project: { name: string; id: string } },
+                        index: number,
+                      ) => (
+                        <Link
+                          key={p.project.id}
+                          href={`/project/${p.project.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {p.project.name}
+                          {index < apiKey.projects.length - 1 ? "," : ""}
+                        </Link>
+                      ),
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {new Date(apiKey.createdAt).toLocaleDateString()}

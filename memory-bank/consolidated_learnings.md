@@ -15,7 +15,7 @@
 - **Pattern:** Enhance UI elements (e.g., cards, lists) to display counts of related entities for improved user engagement and information density.
 - **Benefits:** Provides essential at-a-glance information, makes pages more engaging, and helps users quickly understand the scope of an item.
 - **Implementation Steps:**
-  1. **Backend (tRPC/Prisma):** Modify the data fetching procedure to include `_count` aggregation for the related model (e.g., `Prisma.Project.findMany({ include: { _count: { select: { Tool: true } } } })`).
+  1. **Backend (tRPC/Prisma):** Modify the data fetching procedure to include `_count` aggregation for the related model (e.g., `Prisma.Project.findMany({ include: { _count: { select: { Tool: true } } })`).
   2. **Frontend (React/Shadcn UI):**
      - Update relevant TypeScript types to include the `_count` property.
      - Utilize Shadcn UI components like `Badge` and `lucide-react` icons (e.g., `Wrench`) to visually represent the count.
@@ -56,3 +56,13 @@
   1. Import the `Textarea` component from `src/components/ui/textarea`.
   2. Replace the `Input` component with `Textarea` for the relevant form field.
   3. Ensure the form handling (e.g., `react-hook-form`) correctly binds to the `textarea` element.
+
+### Internal Navigation in Tables/Lists
+
+- **Pattern:** Use `next/link` to enable navigation to detail pages directly from elements within tables or lists.
+- **Benefits:** Improves user experience by providing direct access to related information, reducing clicks and improving workflow efficiency.
+- **Implementation Steps:**
+  1. Import `Link` from `next/link`.
+  2. Wrap the clickable text or element within the table cell with the `Link` component.
+  3. Construct the `href` attribute dynamically using the relevant ID (e.g., `projectId`) to point to the correct detail page.
+  4. Apply appropriate styling (e.g., `text-blue-600 hover:underline`) to indicate clickability.

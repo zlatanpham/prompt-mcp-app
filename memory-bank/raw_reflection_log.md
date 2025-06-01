@@ -21,3 +21,28 @@ Improvements_Identified_For_Consolidation:
   - General pattern: Creating reusable date formatting utilities (e.g., `timeAgo`).
   - UI/UX: Using `textarea` for multi-line text inputs.
 ---
+
+---
+
+Date: 2025-06-01
+TaskRef: "Make project names in API keys table clickable"
+
+Learnings:
+
+- Implemented navigation to project detail pages from the API keys table.
+- Used `next/link` to wrap project names in `src/app/(protected)/api-keys/page.tsx`.
+- Ensured correct `href` construction using `projectId` for each project.
+
+Difficulties:
+
+- None.
+
+Successes:
+
+- Successfully made project names clickable, improving navigation and user experience.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Using `next/link` for internal navigation within tables or lists.
+
+---
