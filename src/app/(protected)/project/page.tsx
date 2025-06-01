@@ -3,17 +3,7 @@
 import React, { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import {
   Dialog,
   DialogContent,
@@ -119,8 +109,21 @@ export default function ProjectPage() {
     });
   };
 
-  const handleDelete = (projectId: string) => {
-    deleteProjectMutation.mutate({ project_id: projectId });
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
+    useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
+
+  const handleDeleteClick = (projectId: string) => {
+    setProjectToDelete(projectId);
+    setIsConfirmDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (projectToDelete) {
+      deleteProjectMutation.mutate({ project_id: projectToDelete });
+      setIsConfirmDeleteDialogOpen(false);
+      setProjectToDelete(null);
+    }
   };
 
   return (
@@ -221,39 +224,15 @@ export default function ProjectPage() {
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem
-                            onSelect={(e) => e.preventDefault()} // Prevent dropdown from closing
-                            className="text-red-600"
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>
-                              Are you absolutely sure?
-                            </AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will
-                              permanently delete your project and remove its
-                              data from our servers.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => handleDelete(project.id)}
-                              disabled={
-                                deleteProjectMutation.status === "pending"
-                              }
-                            >
-                              Continue
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          e.preventDefault(); // Prevent dropdown from closing
+                          handleDeleteClick(project.id);
+                        }}
+                        className="text-red-600"
+                      >
+                        Delete
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -286,6 +265,16 @@ export default function ProjectPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ConfirmActionDialog
+        isOpen={isConfirmDeleteDialogOpen}
+        onOpenChange={setIsConfirmDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        title="Are you absolutely sure?"
+        description="This action cannot be undone. This will permanently delete your project and remove its data from our servers."
+        confirmText="Continue"
+        cancelText="Cancel"
+      />
     </DashboardLayout>
   );
 }

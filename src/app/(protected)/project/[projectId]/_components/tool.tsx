@@ -5,7 +5,6 @@ import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import {
   HardDriveUpload,
-  Info as InfoIcon,
   Pencil as PencilIcon,
   Trash as TrashIcon,
 } from "lucide-react";
@@ -13,12 +12,6 @@ import {
 import { api } from "@/trpc/react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Switch } from "@/components/ui/switch"; // Import Switch component
 import type { Argument } from "@/types/tool";
 import {
@@ -33,16 +26,7 @@ import {
 import ManualToolDialog, {
   type ManualToolFormValues,
 } from "./manual-tool-dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 
 export default function ToolComponent() {
   const params = useParams();
@@ -144,22 +128,7 @@ export default function ToolComponent() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h4 className="flex items-center gap-1 text-lg font-semibold">
-          Project tools{" "}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <InfoIcon className="h-4 w-4" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  Project tools provide context for the AI writer
-                  <br /> or to generate tools
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </h4>
+        <h4 className="text-lg font-semibold">Project tools</h4>
         <Button
           variant="default"
           disabled={isLoading}
@@ -187,26 +156,15 @@ export default function ToolComponent() {
           isSubmitting={createTool.isPending || updateTool.isPending}
         />
 
-        <AlertDialog
-          open={isConfirmDialogOpen}
+        <ConfirmActionDialog
+          isOpen={isConfirmDialogOpen}
           onOpenChange={setIsConfirmDialogOpen}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                tool.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDelete}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          onConfirm={confirmDelete}
+          title="Are you absolutely sure?"
+          description="This action cannot be undone. This will permanently delete your tool."
+          confirmText="Continue"
+          cancelText="Cancel"
+        />
       </div>
 
       {tools && tools.length > 0 ? (

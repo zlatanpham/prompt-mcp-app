@@ -36,6 +36,7 @@
 - Utilize Shadcn UI components built on Radix UI and Tailwind CSS. Add components using `pnpm ui:add -- [component]`.
 - Maintain consistency using Tailwind utility classes and `tailwind.config.ts`.
 - Ensure accessibility and responsive design across devices.
+- **Centralized Dialogs:** For common UI patterns like confirmation dialogs, use a single, reusable component (e.g., `ConfirmActionDialog`) to ensure consistency across the application and reduce code duplication.
 
 ## Form Handling
 

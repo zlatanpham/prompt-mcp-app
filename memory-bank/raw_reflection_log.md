@@ -1,47 +1,25 @@
 ---
 Date: 2025-06-01
-TaskRef: "Fixing long text in tool table description"
+TaskRef: "Refactor confirmation dialogs to reuse ConfirmActionDialog component"
 
 Learnings:
-  - Successfully implemented text truncation to two lines using Tailwind CSS `line-clamp-2` and `overflow-hidden` classes.
-  - Applied fixed width to table columns using `w-[400px]` Tailwind class to control layout.
-  - Confirmed that `replace_in_file` can be used for adding class names to existing HTML/JSX elements.
+  - Successfully identified and refactored AlertDialog usages in `src/app/(protected)/project/[projectId]/_components/tool.tsx` and `src/app/(protected)/project/page.tsx` to use the new `ConfirmActionDialog` component.
+  - The `ConfirmActionDialog` provides a consistent and reusable pattern for actions requiring user confirmation.
+  - The process involved:
+      1. Identifying files with existing AlertDialog implementations for confirmation.
+      2. Replacing AlertDialog imports with ConfirmActionDialog imports.
+      3. Adapting state management (e.g., `isConfirmDeleteDialogOpen`, `projectToDelete`) to work with the new component's props (`isOpen`, `onOpenChange`, `onConfirm`).
+      4. Mapping existing title, description, confirm, and cancel texts to the new component's props.
 
 Difficulties:
-  - Initial plan to use tooltips was rejected by the user, requiring a pivot to line clamping and fixed column widths. This highlights the importance of user feedback in refining solutions.
+  - None encountered during the refactoring process. The existing AlertDialog structure was straightforward to adapt.
 
 Successes:
-  - The revised solution directly addressed the user's preference and the visual issue effectively.
-  - The use of `replace_in_file` was precise and efficient for the required changes.
+  - Achieved a more consistent UI/UX for confirmation actions across the application.
+  - Reduced code duplication by reusing a centralized component.
+  - Improved maintainability by abstracting the confirmation logic into a dedicated component.
 
 Improvements_Identified_For_Consolidation:
-  - General pattern: Handling long text in tables using `line-clamp` and fixed column widths for better UI control.
-  - User preference: Prioritize direct visual truncation over tooltips when explicitly requested.
+  - General pattern: Centralized confirmation dialogs for consistent UI/UX and reduced code duplication.
+  - Specific refactoring steps for replacing AlertDialog with ConfirmActionDialog.
 ---
-
----
-
-Date: 2025-06-01
-TaskRef: "Add confirmation before API key regeneration and refactor confirmation dialog"
-
-Learnings:
-
-- Implemented a generic confirmation dialog component (`ConfirmActionDialog`) for reusable confirmation flows.
-- Refactored component location from a feature-specific `_components` directory to a shared `src/components` directory based on user feedback, emphasizing the importance of component reusability and proper organization.
-- Applied confirmation step for sensitive actions (API key regeneration) to improve user experience and prevent accidental operations.
-
-Difficulties:
-
-- Encountered issues with `replace_in_file` due to auto-formatting changing import paths, requiring careful adjustment of SEARCH blocks and iterative application of changes. This highlights the need for precise matching and adapting to formatter behavior.
-
-Successes:
-
-- Successfully moved and refactored a component to a more appropriate shared location.
-- Successfully implemented a user-requested confirmation step for a sensitive action.
-
-Improvements_Identified_For_Consolidation:
-
-- General pattern: Creating generic, reusable UI components (e.g., confirmation dialogs).
-- Component organization: Best practice to move generic components to a shared `src/components` directory.
-- Workflow: Handling auto-formatting during `replace_in_file` operations by re-reading file content or using smaller, more precise SEARCH blocks.
-- User experience: Implementing confirmation steps for destructive or sensitive actions.
