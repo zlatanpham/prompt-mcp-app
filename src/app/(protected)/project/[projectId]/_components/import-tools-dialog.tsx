@@ -4,6 +4,11 @@ import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Editor from "react-simple-code-editor";
+import { highlight, languages, type Grammar } from "prismjs";
+import "prismjs/components/prism-json"; // Import JSON language for Prism
+import "prismjs/components/prism-markup"; // Import markup for fallback
+import "prismjs/themes/prism.css"; // Or any other theme you prefer
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +27,11 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/trpc/react";
 import { toolNameSchema } from "@/lib/validators/tool";
 import { argumentSchema } from "@/types/tool";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 const toolBaseSchema = z.object({
   name: toolNameSchema,
@@ -56,6 +61,7 @@ export function ImportToolsDialog({
   onOpenChange,
 }: ImportToolsDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const importToolsMutation = api.tool.importTools.useMutation();
   const utils = api.useContext(); // Add this line
 
@@ -139,11 +145,30 @@ export function ImportToolsDialog({
                 <FormItem>
                   <FormLabel>JSON Content</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder={placeholderJson}
-                      className="max-h-[calc(100vh-300px)] min-h-[200px]"
-                      {...field}
-                    />
+                    <div
+                      className={cn(
+                        "border-input max-h-[calc(100vh-300px)] min-h-[200px] overflow-y-auto rounded-md border",
+                        isFocused &&
+                          "ring-ring ring-offset-background ring-2 ring-offset-2",
+                      )}
+                    >
+                      <Editor
+                        value={field.value}
+                        onValueChange={field.onChange}
+                        highlight={(code) =>
+                          highlight(code, languages.json as Grammar, "json")
+                        }
+                        padding={10}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        className={cn(
+                          "bg-background placeholder:text-muted-foreground min-h-[100%] rounded-md text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50",
+                          "font-mono", // Ensure monospaced font for code
+                          "whitespace-pre-wrap", // Ensure text wraps within the editor
+                        )}
+                        placeholder={placeholderJson}
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
