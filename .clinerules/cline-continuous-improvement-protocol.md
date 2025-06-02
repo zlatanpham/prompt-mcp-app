@@ -41,38 +41,35 @@ Before signaling task completion (e.g., via `attempt_completion`), Cline **must*
 ### 1.2. Logging to `memory-bank/raw_reflection_log.md`:
 
 - Based on Task Review & Analysis (1.1), create a timestamped, task-referenced entry in `memory-bank/raw_reflection_log.md` detailing all learnings, difficulties (and their resolutions/learnings), and successes (and contributing factors).
-- Prepend each entry with newest entries at the top, maintaining a chronological order.
 - This file serves as the initial, detailed record. Its entries are candidates for later consolidation.
+- The oldest entries should be pruned periodically to keep the file manageable, but only after their insights have been successfully transferred to `memory-bank/consolidated_learnings.md`. Convert the old entry into a log and put it in `memory-bank/logs/` before pruning. The file name should be in the format `YYYY-MM-DD-task-reflection.md` (e.g., `2023-10-01-implement-jwt-refresh.md`).
 - _Example Entry in `memory-bank/raw_reflection_log.md`:_
 
   ```markdown
   ---
+  
   Date: {{CURRENT_DATE_YYYY_MM_DD}}
   TaskRef: "Implement JWT refresh logic for Project Alpha"
   
   Learnings:
+  
   - Discovered `jose` library's `createRemoteJWKSet` is highly effective for dynamic key fetching for Project Alpha's auth.
   - Confirmed that a 401 error with `X-Reason: token-signature-invalid` from the auth provider requires re-fetching JWKS.
   - Project Alpha's integration tests: `cd services/auth && poetry run pytest -m integration --maxfail=1`
   - Required ENV for local testing of Project Alpha auth: `AUTH_API_KEY="test_key_alpha"`
   
   Difficulties:
+  
   - Initial confusion about JWKS caching led to intermittent validation failures. Resolved by implementing a 5-minute cache.
   
   Successes:
+  
   - The 5-minute JWKS cache with explicit bust mechanism proved effective.
   
   Improvements_Identified_For_Consolidation:
+  
   - General pattern: JWKS caching strategy (5-min cache, explicit bust).
   - Project Alpha: Specific commands and ENV vars.
-  ---
-
-  Date: {{CURRENT_DATE_YYYY_MM_DD}}
-  TaskRef: "Other Task Example..."
-
-  Learnings:
-  ...
-
   ---
   ```
 
