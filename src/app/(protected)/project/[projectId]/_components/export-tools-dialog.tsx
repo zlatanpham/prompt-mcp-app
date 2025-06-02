@@ -13,7 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import type { Argument } from "@/types/tool";
 
 interface ExportToolsDialogProps {
   isOpen: boolean;

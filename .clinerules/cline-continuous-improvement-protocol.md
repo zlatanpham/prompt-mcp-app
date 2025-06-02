@@ -42,7 +42,7 @@ Before signaling task completion (e.g., via `attempt_completion`), Cline **must*
 
 - Based on Task Review & Analysis (1.1), create a timestamped, task-referenced entry in `memory-bank/raw_reflection_log.md` detailing all learnings, difficulties (and their resolutions/learnings), and successes (and contributing factors).
 - This file serves as the initial, detailed record. Its entries are candidates for later consolidation.
-- The oldest entries should be pruned periodically to keep the file manageable, but only after their insights have been successfully transferred to `memory-bank/consolidated_learnings.md`. Convert the old entry into a log and put it in `memory-bank/logs/` before pruning. The file name should be in the format `YYYY-MM-DD-task-reflection.md` (e.g., `2023-10-01-implement-jwt-refresh.md`).
+- The oldest entries should be pruned periodically to keep the file manageable, but only after their insights have been successfully transferred to `memory-bank/consolidated_learnings.md`. Convert the pruned entries into logs and put them in `memory-bank/logs/`. The file name should be in the format `YYYY-MM-DD-task-reflection.md` (e.g., `2023-10-01-implement-jwt-refresh.md`).
 - _Example Entry in `memory-bank/raw_reflection_log.md`:_
 
   ```markdown

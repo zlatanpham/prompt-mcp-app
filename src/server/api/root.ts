@@ -9,12 +9,14 @@ import { projectRouter } from "./routers/project";
 import { organizationRouter } from "./routers/organization";
 import { toolRouter } from "./routers/tool";
 import { apiKeyRouter } from "./routers/apiKey";
+import { userRouter } from "./routers/user";
 
 export const appRouter = createTRPCRouter({
   project: projectRouter,
   organization: organizationRouter,
   tool: toolRouter,
   apiKey: apiKeyRouter,
+  user: userRouter,
 });
 
 // export type definition of API

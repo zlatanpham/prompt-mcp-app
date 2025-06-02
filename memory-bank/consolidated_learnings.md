@@ -114,12 +114,25 @@
 - **Pattern:** When `verbatimModuleSyntax` is enabled in `tsconfig.json`, import types using `import type { ... } from '...'` to explicitly distinguish them from value imports.
 - **Benefits:** Prevents accidental runtime imports of types, improves bundle size, and aligns with modern TypeScript practices.
 
+## ESLint & TypeScript Patterns
+
+### Handling ESLint "Unbound Methods" Warnings
+
+- **Pattern:** When ESLint warns about "unbound methods" (e.g., `Avoid referencing unbound methods which may cause unintentional scoping of 'this'`) for functions obtained from hooks or libraries (like `useRouter().push`), access the method directly from the returned object instead of destructuring it.
+- **Example:** Instead of `const { push } = useRouter();`, use `const router = useRouter();` and then call `router.push(...)`.
+- **Benefits:** Resolves ESLint warnings by ensuring the method is called with its correct `this` context, leading to cleaner code and preventing potential runtime issues related to `this` binding.
+
 ## Development Workflow & Troubleshooting
 
 ### Handling `replace_in_file` Failures
 
 - **Pattern:** When `replace_in_file` fails due to intermittent errors (e.g., "Failed to open diff editor") or complex changes leading to incorrect matches, retry the operation. If repeated failures occur, consider using `write_to_file` as a more robust fallback to overwrite the entire file with the desired content.
 - **Benefits:** Ensures task completion even when targeted edits are problematic, providing a reliable recovery mechanism.
+
+### `replace_in_file` Precision
+
+- **Pattern:** Always refer to the `final_file_content` after any file modification. For complex changes, break them into multiple, smaller `SEARCH/REPLACE` blocks to minimize errors and simplify debugging.
+- **Benefits:** Improves reliability and reduces errors during file modifications, especially with auto-formatting.
 
 ### Adapting to Dynamic User Requirements
 
@@ -130,3 +143,17 @@
 
 - **Pattern:** If persistent and cryptic parsing errors occur in JSX/TSX files, and direct code modifications do not resolve them, investigate external factors such as ESLint, TypeScript, or Babel/SWC configurations and versions.
 - **Benefits:** Prevents wasted effort on non-existent code bugs and directs troubleshooting towards the actual environmental root cause.
+
+## Authentication & Session Management
+
+### Next-Auth Session Retrieval
+
+- **Pattern:** For fetching the user session in server components or API routes, use `auth()` from `@/server/auth` instead of `getServerAuthSession`.
+- **Benefits:** Aligns with the actual export structure of the Next-Auth configuration, preventing import errors.
+
+## tRPC Patterns
+
+### `useMutation` Error Handling
+
+- **Pattern:** When defining the `onError` callback for `api.yourRouter.yourMutation.useMutation()`, if `TRPCClientError<AppRouter>` causes type incompatibility issues, consider using `any` for the `error` parameter as a pragmatic solution.
+- **Benefits:** Unblocks development when precise tRPC error typing is complex or unclear, allowing for continued progress while still providing error messages to the user. Note this as an area for future refinement if a more specific tRPC utility type becomes available or is identified.
