@@ -8,7 +8,7 @@
   1. Create a generic `ConfirmActionDialog` component with props for `isOpen`, `onOpenChange`, `onConfirm`, `title`, `description`, `confirmText`, and `cancelText`.
   2. Identify existing `AlertDialog` or similar confirmation implementations.
   3. Replace direct `AlertDialog` usage with the `ConfirmActionDialog` component.
-  4. Map existing state variables (e.g., `isConfirmDialogOpen`, `itemToDelete`) and handlers to the new component's props.
+  4. Map existing state variables (e.g., `isConfirmDeleteDialogOpen`, `itemToDelete`) and handlers to the new component's props.
 
 ### Displaying Related Entity Counts
 
@@ -66,3 +66,13 @@
   2. Wrap the clickable text or element within the table cell with the `Link` component.
   3. Construct the `href` attribute dynamically using the relevant ID (e.g., `projectId`) to point to the correct detail page.
   4. Apply appropriate styling (e.g., `text-blue-600 hover:underline`) to indicate clickability.
+
+### Custom UI Component Placement
+
+- **Pattern:** Place custom UI components (not part of a specific UI library like Shadcn UI) directly in `src/components/` rather than in subdirectories like `src/components/ui/`.
+- **Benefits:** Maintains clear separation between custom components and library-specific components, improving project organization and adherence to established conventions.
+
+### Notion-like Highlight Styling
+
+- **Pattern:** To create a subtle, Notion-like highlight for text, use a combination of Tailwind CSS classes: `inline-block`, `rounded-md`, `px-2`, `py-0.5`, `bg-gray-100` (for light background), `text-rose-500` (for light red text), and `dark:bg-gray-800 dark:text-gray-200` for dark mode compatibility.
+- **Benefits:** Visually emphasizes specific text elements in a clean and modern way, enhancing readability and user focus.

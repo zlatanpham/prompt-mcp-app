@@ -24,6 +24,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { Highlight } from "@/components/highlight";
 import ManualToolDialog, {
   type ManualToolFormValues,
 } from "./manual-tool-dialog";
@@ -189,7 +190,9 @@ export default function ToolComponent() {
           <TableBody>
             {tools.map((tool) => (
               <TableRow key={tool.id}>
-                <TableCell className="font-medium">{tool.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Highlight>{tool.name}</Highlight>
+                </TableCell>
                 <TableCell>
                   <div className="max-w-[500px] truncate">
                     {tool.description}

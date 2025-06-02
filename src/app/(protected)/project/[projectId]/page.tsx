@@ -63,7 +63,7 @@ export default function ProjectDetailPage() {
     <DashboardLayout
       bredcrumb={[
         { label: "Dashboard", href: "/" },
-        { label: "Project", href: "/project" },
+        { label: "Projects", href: "/project" },
         {
           label:
             !isLoading || project ? (
