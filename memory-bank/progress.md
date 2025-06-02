@@ -1,37 +1,25 @@
-# Progress
-
 ## What Works
 
-- The database schema has been updated to reflect the `Tool` model with the `name` field as unique and `tool_name` removed.
-- The tRPC router for tools (`src/server/api/routers/tool.ts`) has been updated to interact with the new `Tool` model.
-- The main project page (`src/app/(protected)/project/[projectId]/page.tsx`) correctly imports and uses the `Tool` component.
-- The `Tool` component (`src/app/(protected)/project/[projectId]/_components/prompt.tsx`), `ManualToolDialog` (`src/app/(protected)/project/[projectId]/_components/manual-prompt-dialog.tsx`), and `ToolCard` (`src/app/(protected)/project/[projectId]/_components/prompt-card.tsx`) have all been updated to use the `Tool` model and reflect the new terminology.
-- The `.clinerules` for self-improvement and coding standards have been updated to incorporate learnings from this task.
-- The project list now correctly updates after a new project is created.
-- Projects can be deleted from the project list page with a confirmation dialog.
-- Projects can be edited from the project list page using a shared form component.
-- The project edit form has been extracted into a reusable component (`src/components/project-form.tsx`) and is used on both the project list and detail pages.
-- Shared layout container (`DashboardLayout`) is now used consistently across protected pages (dashboard, projects, API keys).
-- API Keys page now displays a skeleton UI for the table during loading, keeping the `DashboardLayout` visible.
+- **API Keys Table Enhancement:**
+  - The API keys table now includes a "Tools" column displaying the count of associated tools.
+  - Clicking the tool count opens a side drawer (`Sheet`) that lists all tools, grouped by their respective projects.
+  - Tool names within the drawer are highlighted using the `Highlight` component.
+  - The tool list within the drawer is scrollable.
+  - The tool count is displayed within a `Badge` component with a `Wrench` icon, consistent with the project card style.
 
 ## What's Left to Build
 
-- The TypeScript errors related to the Prisma client not recognizing the `Tool` model still exist because `pnpm db:generate` was skipped. This needs to be resolved by running the command.
-- Full application functionality needs to be verified by the user.
+- All features requested for the API keys table and tool count display have been implemented and refined based on user feedback.
 
 ## Current Status
 
-All requested code changes have been implemented. The application is in a state where it should conceptually work with the "Tool" entity, and project management features (create, edit, delete) are implemented and integrated. The shared layout is consistent, and the API keys loading state has been improved. The TypeScript errors indicate a build-time issue that needs external resolution (running `pnpm db:generate`).
+The task of adding a tool count column and a detailed tool list drawer to the API keys table is complete.
 
 ## Known Issues
 
-- TypeScript errors: `Module '"@prisma/client"' has no exported member 'Tool'`. This prevents successful compilation and is due to the Prisma client not being regenerated.
+- None related to this task.
 
 ## Evolution of Project Decisions
 
-- Initially, I planned to rename the component files (e.g., `prompt.tsx` to `tool.tsx`), but the user clarified that only content and imports should be updated, which was then followed.
-- The conflict regarding `db:generate` commands highlighted a need for clearer `.clinerules` on how to handle such situations, leading to updates in the rules.
-- The decision to refactor the project edit form into a shared component was made to improve code reusability and maintainability across different parts of the application.
-- The UI for project actions was updated from direct buttons to a dropdown menu to provide a cleaner interface and consolidate actions.
-- The layout of protected pages was standardized using `DashboardLayout` for consistency.
-- The loading state in the API Keys page was refined to use a skeleton UI for the table, ensuring the main layout remains visible.
+- Initial decision to add a direct `tools` relation to `ApiKey` in Prisma was revised to a more appropriate approach of fetching nested counts and detailed tool data via tRPC procedures, ensuring correct data modeling and efficient data retrieval.
+- The choice of Shadcn UI's `Drawer` was refined to `Sheet` for better side panel presentation, and further UI/UX improvements were made based on user feedback (highlighting tool names, scrollability, removing redundant buttons).

@@ -38,12 +38,66 @@ export const apiKeyRouter = createTRPCRouter({
       include: {
         projects: {
           include: {
-            project: true,
+            project: {
+              include: {
+                _count: {
+                  select: {
+                    Tool: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
     });
   }),
+
+  getToolsByApiKeyId: protectedProcedure
+    .input(z.object({ apiKeyId: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const { apiKeyId } = input;
+      const userId = ctx.session.user.id;
+
+      const apiKey = await ctx.db.apiKey.findUnique({
+        where: { id: apiKeyId, userId },
+        select: { id: true },
+      });
+
+      if (!apiKey) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "API Key not found or not owned by user.",
+        });
+      }
+
+      const projectsWithTools = await ctx.db.project.findMany({
+        where: {
+          ApiKeyOnProject: {
+            some: {
+              apiKeyId: apiKeyId,
+            },
+          },
+        },
+        include: {
+          Tool: {
+            select: {
+              id: true,
+              name: true,
+              description: true,
+            },
+          },
+        },
+      });
+
+      const groupedTools = projectsWithTools.map((project) => ({
+        projectId: project.id,
+        projectName: project.name,
+        tools: project.Tool,
+      }));
+
+      return groupedTools;
+    }),
 
   delete: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))

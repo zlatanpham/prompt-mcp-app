@@ -23,11 +23,16 @@ import { CreateApiKeyDialog } from "./_components/create-api-key-dialog";
 import { ApiKeyDisplayDialog } from "./_components/api-key-display-dialog";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 import { EditApiKeyProjectsDialog } from "./_components/edit-api-key-projects-dialog";
-import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton import
-
+import { Skeleton } from "@/components/ui/skeleton";
 import DashboardLayout from "@/components/dashboard-layout";
+import { ApiKeyToolsDrawer } from "./_components/api-key-tools-drawer";
+import { Badge } from "@/components/ui/badge";
+import { Wrench } from "lucide-react";
 
 export default function ApiKeysPage() {
+  const [isToolsDrawerOpen, setIsToolsDrawerOpen] = useState(false);
+  const [apiKeyIdForTools, setApiKeyIdForTools] = useState<string | null>(null);
+
   const formatApiKeyNameForMcp = (name: string) => {
     return `mcp-prompt-${name.toLowerCase().replace(/\s+/g, "-")}`;
   };
@@ -200,43 +205,45 @@ export default function ApiKeysPage() {
               <TableHead>Name</TableHead>
               <TableHead>Key</TableHead>
               <TableHead>Projects</TableHead>
+              <TableHead>Tools</TableHead> {/* Changed label to "Tools" */}
               <TableHead>Created At</TableHead>
               <TableHead>Updated At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {apiKeys?.map((apiKey: (typeof apiKeys)[number]) => (
-              <TableRow key={apiKey.id}>
-                <TableCell className="font-medium">{apiKey.name}</TableCell>
-                <TableCell className="font-mono text-sm">
-                  <div className="flex items-center gap-2">
-                    <span>{apiKey.key.substring(0, 8)}...</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        void navigator.clipboard.writeText(apiKey.key);
-                        setCopiedKeyId(apiKey.id);
-                        setTimeout(() => setCopiedKeyId(null), 2000);
-                      }}
-                      className="h-6 w-6 p-0"
-                    >
-                      {copiedKeyId === apiKey.id ? (
-                        <Check className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <Copy className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-x-1">
-                    {apiKey.projects.map(
-                      (
-                        p: { project: { name: string; id: string } },
-                        index: number,
-                      ) => (
+            {apiKeys?.map((apiKey) => {
+              const totalToolCount = apiKey.projects.reduce(
+                (sum, ap) => sum + (ap.project._count?.Tool || 0),
+                0,
+              );
+              return (
+                <TableRow key={apiKey.id}>
+                  <TableCell className="font-medium">{apiKey.name}</TableCell>
+                  <TableCell className="font-mono text-sm">
+                    <div className="flex items-center gap-2">
+                      <span>{apiKey.key.substring(0, 8)}...</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(apiKey.key);
+                          setCopiedKeyId(apiKey.id);
+                          setTimeout(() => setCopiedKeyId(null), 2000);
+                        }}
+                        className="h-6 w-6 p-0"
+                      >
+                        {copiedKeyId === apiKey.id ? (
+                          <Check className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <Copy className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-x-1">
+                      {apiKey.projects.map((p, index) => (
                         <Link
                           key={p.project.id}
                           href={`/project/${p.project.id}`}
@@ -245,83 +252,101 @@ export default function ApiKeysPage() {
                           {p.project.name}
                           {index < apiKey.projects.length - 1 ? "," : ""}
                         </Link>
-                      ),
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {new Date(apiKey.createdAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(apiKey.updatedAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setApiKeyToEditProjects({
-                            id: apiKey.id,
-                            name: apiKey.name,
-                            currentProjectIds: apiKey.projects.map(
-                              (p: { projectId: string }) => p.projectId,
-                            ),
-                          });
-                          setEditSelectedProjectIds(
-                            apiKey.projects
-                              .map((p: { projectId: string }) => p.projectId)
-                              .filter((id): id is string => id !== undefined),
-                          );
-                          setIsEditProjectsDialogOpen(true);
-                        }}
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="link"
+                      className="h-auto p-0"
+                      onClick={() => {
+                        setApiKeyIdForTools(apiKey.id);
+                        setIsToolsDrawerOpen(true);
+                      }}
+                    >
+                      <Badge
+                        variant="secondary"
+                        className="flex items-center gap-1"
                       >
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleRegenerateApiKeyClick(apiKey.id)}
-                      >
-                        Regenerate Key
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          const mcpConfig = {
-                            mcpServers: {
-                              [formatApiKeyNameForMcp(apiKey.name)]: {
-                                command: "npx",
-                                args: ["-y", "@x-mcp/prompt@latest"],
-                                env: {
-                                  API_URL: `${window.location.origin}/api/tools`,
-                                  API_KEY: apiKey.key,
+                        <Wrench className="h-3 w-3" />
+                        <span>{totalToolCount} Tools</span>
+                      </Badge>
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(apiKey.createdAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {new Date(apiKey.updatedAt).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setApiKeyToEditProjects({
+                              id: apiKey.id,
+                              name: apiKey.name,
+                              currentProjectIds: apiKey.projects.map(
+                                (p) => p.projectId,
+                              ),
+                            });
+                            setEditSelectedProjectIds(
+                              apiKey.projects
+                                .map((p) => p.projectId)
+                                .filter((id): id is string => id !== undefined),
+                            );
+                            setIsEditProjectsDialogOpen(true);
+                          }}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleRegenerateApiKeyClick(apiKey.id)}
+                        >
+                          Regenerate Key
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            const mcpConfig = {
+                              mcpServers: {
+                                [formatApiKeyNameForMcp(apiKey.name)]: {
+                                  command: "npx",
+                                  args: ["-y", "@x-mcp/prompt@latest"],
+                                  env: {
+                                    API_URL: `${window.location.origin}/api/tools`,
+                                    API_KEY: apiKey.key,
+                                  },
                                 },
                               },
-                            },
-                          };
-                          void navigator.clipboard.writeText(
-                            JSON.stringify(mcpConfig, null, 2),
-                          );
-                        }}
-                      >
-                        Copy Config
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          setApiKeyToDelete(apiKey.id);
-                          setIsConfirmDeleteDialogOpen(true);
-                        }}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+                            };
+                            void navigator.clipboard.writeText(
+                              JSON.stringify(mcpConfig, null, 2),
+                            );
+                          }}
+                        >
+                          Copy Config
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setApiKeyToDelete(apiKey.id);
+                            setIsConfirmDeleteDialogOpen(true);
+                          }}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}
@@ -361,6 +386,12 @@ export default function ApiKeysPage() {
         setEditSelectedProjectIds={setEditSelectedProjectIds}
         projectOptions={projectOptions}
         handleUpdateProjects={handleUpdateProjects}
+      />
+
+      <ApiKeyToolsDrawer
+        isOpen={isToolsDrawerOpen}
+        onOpenChange={setIsToolsDrawerOpen}
+        apiKeyId={apiKeyIdForTools}
       />
     </DashboardLayout>
   );

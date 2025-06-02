@@ -77,20 +77,47 @@
 - **Pattern:** To create a subtle, Notion-like highlight for text, use a combination of Tailwind CSS classes: `inline-block`, `rounded-md`, `px-2`, `py-0.5`, `bg-gray-100` (for light background), `text-rose-500` (for light red text), and `dark:bg-gray-800 dark:text-gray-200` for dark mode compatibility.
 - **Benefits:** Visually emphasizes specific text elements in a clean and modern way, enhancing readability and user focus.
 
-### Drawer Component Usage (Shadcn UI)
+### Drawer/Sheet Component Usage (Shadcn UI)
 
-- **Pattern:** Utilize the Shadcn UI `Drawer` component for forms or content that require more vertical space or a less intrusive overlay than a traditional dialog, especially when opening from the side of the screen.
+- **Pattern:** Utilize Shadcn UI's `Drawer` or `Sheet` components for forms or content that require more vertical space or a less intrusive overlay than a traditional dialog. `Sheet` is preferred for side panels.
 - **Benefits:** Provides a better user experience for complex forms or detailed views by offering more screen real estate and a smoother transition.
 - **Implementation Steps:**
-  1. Import `Drawer`, `DrawerContent`, `DrawerHeader`, and `DrawerTitle` from `@/components/ui/drawer`.
-  2. Replace `Dialog` components with `Drawer` components.
-  3. Set `direction="right"` on the `Drawer` component to open it from the right edge of the window.
-  4. Adjust the `className` on `DrawerContent` (e.g., `sm:max-w-lg`) to control its width.
-  5. For forms within the drawer, move action buttons (submit/cancel) to the `DrawerHeader` for persistent visibility.
-  6. Associate submit buttons in the header with the form using the `form` prop on the `Button` and an `id` on the `<form>` element.
-  7. Wrap the form content in a scrollable `div` (e.g., `overflow-y-auto p-4`) to handle long content and provide internal padding.
-  8. **Refinement:** Ensure title and action buttons in the `DrawerHeader` are on one line by applying `flex items-center` to their container.
-  9. **Refinement:** Style the cancel button to be smaller and appear as a link using `variant="ghost"` and `size="sm"`.
+  1. Import `Sheet`, `SheetClose`, `SheetContent`, `SheetDescription`, `SheetFooter`, `SheetHeader`, and `SheetTitle` from `@/components/ui/sheet` for side panels.
+  2. Replace `Dialog` or `Drawer` components with `Sheet` components for side panels.
+  3. Set `side="right"` (or `left`, `top`, `bottom`) on the `SheetContent` to control its opening direction.
+  4. Adjust the `className` on `SheetContent` (e.g., `sm:max-w-lg`, `flex flex-col`) to control its width and layout.
+  5. For forms/content within the sheet, ensure the main content area is scrollable using `flex-1 overflow-y-auto p-4` to handle long content.
+  6. **Refinement:** Remove redundant close buttons if the `Sheet` component already provides one in the header.
+
+## Data Fetching & Aggregation
+
+### Handling Nested Counts and Aggregations (tRPC/Prisma)
+
+- **Pattern:** When displaying counts of related entities that are several levels deep in the data model (e.g., tools associated with projects linked to an API key), use Prisma's nested `_count` aggregation in tRPC `getAll` procedures for efficient initial data loading.
+- **Benefits:** Reduces the number of database queries and simplifies frontend data processing for summary information.
+- **Implementation Steps:**
+  1. In the Prisma query, include nested relations and their `_count` selects (e.g., `include: { projects: { include: { project: { include: { _count: { select: { Tool: true } } } } } } }`).
+  2. In the frontend, use `reduce` or similar array methods to sum up the nested counts.
+
+### Lazy Loading Detailed Data
+
+- **Pattern:** For detailed lists or complex data associated with a summary view (e.g., a list of tools for an API key), fetch the detailed data only when explicitly requested by the user (e.g., by clicking a count or opening a drawer).
+- **Benefits:** Optimizes initial page load times and reduces unnecessary data transfer, improving application performance and responsiveness.
+- **Implementation Steps:**
+  1. Create a separate tRPC procedure to fetch the detailed data (e.g., `getToolsByApiKeyId`).
+  2. In the frontend, use `useQuery` with the `enabled` option set to `false` initially, and enable it (`enabled: !!someId`) when the user action triggers the need for the detailed data.
+
+## Component Usage & Consistency
+
+### Always Verify Component Props
+
+- **Pattern:** Before using a component, especially when encountering TypeScript errors related to props, always refer to the component's definition file (e.g., `src/components/highlight.tsx`) to understand its expected props and their types.
+- **Benefits:** Prevents common TypeScript errors, ensures correct component usage, and reduces debugging time.
+
+### Applying Consistent UI Patterns
+
+- **Pattern:** Maintain visual and functional consistency across the application by reusing established UI patterns for similar data representations (e.g., using a `Badge` with an icon for counts).
+- **Benefits:** Enhances user experience through predictability, reinforces brand identity, and simplifies future development by leveraging existing styles and components.
 
 ## UI/UX Design & Interpretation
 
