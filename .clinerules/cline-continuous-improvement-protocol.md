@@ -41,6 +41,7 @@ Before signaling task completion (e.g., via `attempt_completion`), Cline **must*
 ### 1.2. Logging to `memory-bank/raw_reflection_log.md`:
 
 - Based on Task Review & Analysis (1.1), create a timestamped, task-referenced entry in `memory-bank/raw_reflection_log.md` detailing all learnings, difficulties (and their resolutions/learnings), and successes (and contributing factors).
+- Prepend each entry with newest entries at the top, maintaining a chronological order.
 - This file serves as the initial, detailed record. Its entries are candidates for later consolidation.
 - _Example Entry in `memory-bank/raw_reflection_log.md`:_
 
@@ -64,6 +65,14 @@ Before signaling task completion (e.g., via `attempt_completion`), Cline **must*
   Improvements_Identified_For_Consolidation:
   - General pattern: JWKS caching strategy (5-min cache, explicit bust).
   - Project Alpha: Specific commands and ENV vars.
+  ---
+
+  Date: {{CURRENT_DATE_YYYY_MM_DD}}
+  TaskRef: "Other Task Example..."
+
+  Learnings:
+  ...
+
   ---
   ```
 
