@@ -1,23 +1,37 @@
-import { auth } from "@/server/auth";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { EditNameDialog } from "./_components/edit-name-dialog"; // Will create this next
+import { EditNameDialog } from "./_components/edit-name-dialog";
+import { useConfirmAction } from "@/components/confirm-action-dialog";
+import { api } from "@/trpc/react";
 
-export default async function AccountPage() {
-  const session = await auth();
+export default function AccountPage() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const user = session?.user;
 
-  if (!user) {
+  const { confirm, ConfirmActionDialog } = useConfirmAction();
+  const { data: tools, isLoading: isLoadingTools } =
+    api.tool.getAllByUserId.useQuery();
+
+  if (status === "loading") {
     return (
       <div className="flex h-full items-center justify-center">
-        <p>Please log in to view your account details.</p>
+        <p>Loading account details...</p>
       </div>
     );
+  }
+
+  if (status === "unauthenticated" || !user) {
+    router.push("/login");
+    return null; // Or a loading spinner/message
   }
 
   const userInitials = user.name
@@ -29,6 +43,43 @@ export default async function AccountPage() {
     : user.email
       ? user.email[0]?.toUpperCase()
       : "U"; // Default to 'U' for unknown
+
+  const handleExportAllTools = async () => {
+    if (isLoadingTools) return;
+
+    const numTools = tools?.length ?? 0;
+    const confirmed = await confirm(
+      "Export All Tools",
+      `Are you sure you want to export ${numTools} tools?`,
+      "Export",
+      "Cancel",
+    );
+
+    if (confirmed) {
+      if (!tools || tools.length === 0) {
+        alert("No tools available to export.");
+        return;
+      }
+
+      const toolsToExport = tools.map((tool) => ({
+        name: tool.name,
+        description: tool.description,
+        prompt: tool.prompt,
+        args: tool.args ?? [],
+      }));
+
+      const jsonString = JSON.stringify(toolsToExport, null, 2);
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `exported_all_tools.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
 
   return (
     <div className="mx-auto max-w-lg space-y-6 p-8 pb-16">
@@ -84,7 +135,25 @@ export default async function AccountPage() {
             Reset password
           </Button>
         </div>
+
+        <Separator />
+
+        <div className="grid gap-2">
+          <Label htmlFor="export-tools">Export All Tools</Label>
+          <p className="text-muted-foreground text-sm">
+            Export all your tools from all projects in JSON format.
+          </p>
+          <Button
+            variant="outline"
+            className="w-fit"
+            onClick={handleExportAllTools}
+            disabled={isLoadingTools}
+          >
+            {isLoadingTools ? "Loading Tools..." : "Export All Tools"}
+          </Button>
+        </div>
       </div>
+      {ConfirmActionDialog}
     </div>
   );
 }

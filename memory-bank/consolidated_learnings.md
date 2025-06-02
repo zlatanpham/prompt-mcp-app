@@ -184,3 +184,25 @@
 
 - **Pattern:** When defining the `onError` callback for `api.yourRouter.yourMutation.useMutation()`, if `TRPCClientError<AppRouter>` causes type incompatibility issues, consider using `any` for the `error` parameter as a pragmatic solution.
 - **Benefits:** Unblocks development when precise tRPC error typing is complex or unclear, allowing for continued progress while still providing error messages to the user. Note this as an area for future refinement if a more specific tRPC utility type becomes available or is identified.
+
+## New Learnings from "Export All Tools" Task
+
+### Pattern: Using `write_to_file` as a fallback for complex `replace_in_file` operations
+
+- **Description:** When `replace_in_file` repeatedly fails due to inexact `SEARCH` block matches (e.g., after file content reverts or auto-formatting), using `write_to_file` to overwrite the entire file can be a more robust solution.
+- **Benefits:** Ensures task completion even when targeted edits are problematic, providing a reliable recovery mechanism.
+
+### Pattern: Implementing client-side session fetching and state management for pages that need interactive UI elements in Next.js App Router
+
+- **Description:** For Next.js App Router pages that require client-side interactivity (e.g., `useState`, `onClick` handlers), they must be converted to Client Components (`"use client";`). Session data, if previously fetched server-side, needs to be fetched client-side using `useSession` from `next-auth/react`.
+- **Benefits:** Enables dynamic UI interactions and state management on pages that were initially designed as Server Components.
+
+### Pattern: Enhancing generic UI hooks (like `useConfirmAction`) to return Promises for better asynchronous flow control
+
+- **Description:** Modifying generic UI hooks that trigger dialogs (e.g., confirmation dialogs) to return a Promise allows for `await`ing user interaction (confirm/cancel) directly in the calling function.
+- **Benefits:** Simplifies asynchronous control flow, making code cleaner and more readable by avoiding nested callbacks or complex state management for dialog results.
+
+### Prisma: Correctly identifying and using foreign key relationships
+
+- **Description:** When querying related data in Prisma, it's crucial to correctly identify the foreign key field in the schema (e.g., `created_by_user_id` on the `Project` model linking to `User.id`) to ensure accurate data retrieval.
+- **Benefits:** Prevents query errors and ensures the correct data relationships are leveraged for efficient database operations.

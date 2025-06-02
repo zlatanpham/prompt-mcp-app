@@ -266,4 +266,29 @@ export const toolRouter = createTRPCRouter({
       });
       return tool;
     }),
+
+  getAllByUserId: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session?.user?.id;
+    if (!userId) {
+      throw new Error("Unauthorized");
+    }
+
+    const projects = await db.project.findMany({
+      where: { created_by_user_id: userId },
+      select: { id: true },
+    });
+
+    const projectIds = projects.map((p) => p.id);
+
+    const tools = await db.tool.findMany({
+      where: {
+        project_id: {
+          in: projectIds,
+        },
+      },
+      orderBy: { updated_at: "desc" },
+    });
+
+    return tools;
+  }),
 });
