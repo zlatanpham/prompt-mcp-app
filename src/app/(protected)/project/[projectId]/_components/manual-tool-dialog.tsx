@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form"; // Added useFieldArray
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toolNameSchema } from "@/lib/validators/tool";
@@ -84,6 +84,11 @@ const ManualToolDialog = (props: Props) => {
       prompt: "",
       arguments: [], // Initialize arguments as an empty array
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "arguments",
   });
 
   // Reset form when tool changes
@@ -202,8 +207,24 @@ const ManualToolDialog = (props: Props) => {
               />
 
               <div className="space-y-2">
-                <FormLabel>Arguments (Optional)</FormLabel>
-                <ArgumentsFormArray name="arguments" />
+                <div className="flex items-center justify-between">
+                  <FormLabel>Arguments (Optional)</FormLabel>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      append({
+                        name: "",
+                        description: "",
+                        type: "string",
+                      } as Argument)
+                    }
+                  >
+                    Add Argument
+                  </Button>
+                </div>
+                <ArgumentsFormArray fields={fields} remove={remove} />
               </div>
             </form>
           </Form>

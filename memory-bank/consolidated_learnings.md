@@ -92,6 +92,28 @@
   8. **Refinement:** Ensure title and action buttons in the `DrawerHeader` are on one line by applying `flex items-center` to their container.
   9. **Refinement:** Style the cancel button to be smaller and appear as a link using `variant="ghost"` and `size="sm"`.
 
+## UI/UX Design & Interpretation
+
+### Interpreting "Single Line" Layout
+
+- **Pattern:** When user feedback requests "single line" for inputs, clarify whether it means horizontal alignment of multiple inputs on one line, or vertical stacking where each input occupies its own full line.
+- **Guidance:** For complex forms with multi-line inputs (e.g., `Textarea`), vertical stacking often provides better readability and prevents cramped layouts, even if it means more vertical space.
+- **Benefit:** Avoids misinterpretations and ensures the final UI aligns with user expectations for clarity and usability.
+
+## React Hook Form Patterns
+
+### Centralizing `useFieldArray`
+
+- **Pattern:** For forms with dynamic arrays of inputs (e.g., arguments, items), centralize the `useFieldArray` hook in the parent component that manages the overall form state. Pass `fields` and `remove` (and `append` if needed by a button in the child) as props to the child component responsible for rendering the array items.
+- **Benefits:** Simplifies state management, ensures the parent form has direct control over the array, and makes child components more reusable and focused on presentation.
+
+## TypeScript Best Practices
+
+### Type-Only Imports
+
+- **Pattern:** When `verbatimModuleSyntax` is enabled in `tsconfig.json`, import types using `import type { ... } from '...'` to explicitly distinguish them from value imports.
+- **Benefits:** Prevents accidental runtime imports of types, improves bundle size, and aligns with modern TypeScript practices.
+
 ## Development Workflow & Troubleshooting
 
 ### Handling `replace_in_file` Failures

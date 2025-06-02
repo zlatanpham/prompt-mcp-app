@@ -1,26 +1,27 @@
 ---
 Date: 2025-06-02
-TaskRef: "Refactor edit and create tool dialog to use a drawer - Feedback Round"
+TaskRef: "Improve UI/UX for tool argument creation"
 
 Learnings:
-  - Refined UI/UX for drawer headers: ensured title and action buttons are on one line using `flex items-center` on the container.
-  - Styled buttons as links: used `variant="ghost"` and `size="sm"` for a smaller, link-like appearance for the cancel button.
+- Successfully refactored `useFieldArray` hook and "Add Argument" button from child component (`ArgumentsFormArray`) to parent component (`ManualToolDialog`) to achieve desired UI alignment.
+- Implemented visual "boxes" around each argument using `border rounded-md p-4 mb-4` for better visual grouping.
+- Ensured all `FormLabel` components are always visible, improving clarity.
+- Learned to interpret user feedback on UI layout more precisely: "break to single line for each input" meant vertical stacking of inputs (Name, Description, Type) within each argument box, rather than a horizontal grid. This required reverting from a `grid` layout to `space-y-4` for the inputs.
+- Successfully resolved TypeScript errors related to type-only imports (`type FieldArrayWithId`, `type UseFieldArrayRemove`) and parsing errors caused by comments within template literals in JSX.
 
 Difficulties:
-  - None.
+- Initial misinterpretation of "single line for each input" led to a horizontal grid layout, which was not the user's intent. This was corrected after user feedback.
+- Encountered TypeScript and ESLint errors after initial refactoring, which required careful attention to import types and removal of comments in JSX template literals.
 
 Successes:
-  - Successfully implemented user feedback to refine the drawer's appearance and button styling.
+- Successfully implemented all user-requested UI/UX changes, including button placement, visual grouping, and input stacking.
+- Demonstrated adaptability in re-interpreting and implementing user feedback.
 
 Improvements_Identified_For_Consolidation:
-  - UI/UX: Specific styling for drawer header elements (title and buttons).
-  - UI/UX: Using Shadcn UI button `variant` and `size` props for specific visual effects (e.g., link-like buttons).
+- UI/UX interpretation: Clarify "single line" context (horizontal vs. vertical stacking of inputs).
+- React Hook Form: Pattern for moving `useFieldArray` to parent for shared control.
+- TypeScript: Best practice for `type` imports with `verbatimModuleSyntax`.
 ---
-
-Date: 2025-06-01
-TaskRef: "Refactor confirmation dialogs to reuse ConfirmActionDialog component"
-
-Learnings:
 
 - Successfully identified and refactored AlertDialog usages in `src/app/(protected)/project/[projectId]/_components/tool.tsx` and `src/app/(protected)/project/page.tsx` to use the new `ConfirmActionDialog` component.
 - The `ConfirmActionDialog` provides a consistent and reusable pattern for actions requiring user confirmation.
