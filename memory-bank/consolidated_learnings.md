@@ -76,3 +76,35 @@
 
 - **Pattern:** To create a subtle, Notion-like highlight for text, use a combination of Tailwind CSS classes: `inline-block`, `rounded-md`, `px-2`, `py-0.5`, `bg-gray-100` (for light background), `text-rose-500` (for light red text), and `dark:bg-gray-800 dark:text-gray-200` for dark mode compatibility.
 - **Benefits:** Visually emphasizes specific text elements in a clean and modern way, enhancing readability and user focus.
+
+### Drawer Component Usage (Shadcn UI)
+
+- **Pattern:** Utilize the Shadcn UI `Drawer` component for forms or content that require more vertical space or a less intrusive overlay than a traditional dialog, especially when opening from the side of the screen.
+- **Benefits:** Provides a better user experience for complex forms or detailed views by offering more screen real estate and a smoother transition.
+- **Implementation Steps:**
+  1. Import `Drawer`, `DrawerContent`, `DrawerHeader`, and `DrawerTitle` from `@/components/ui/drawer`.
+  2. Replace `Dialog` components with `Drawer` components.
+  3. Set `direction="right"` on the `Drawer` component to open it from the right edge of the window.
+  4. Adjust the `className` on `DrawerContent` (e.g., `sm:max-w-lg`) to control its width.
+  5. For forms within the drawer, move action buttons (submit/cancel) to the `DrawerHeader` for persistent visibility.
+  6. Associate submit buttons in the header with the form using the `form` prop on the `Button` and an `id` on the `<form>` element.
+  7. Wrap the form content in a scrollable `div` (e.g., `overflow-y-auto p-4`) to handle long content and provide internal padding.
+  8. **Refinement:** Ensure title and action buttons in the `DrawerHeader` are on one line by applying `flex items-center` to their container.
+  9. **Refinement:** Style the cancel button to be smaller and appear as a link using `variant="ghost"` and `size="sm"`.
+
+## Development Workflow & Troubleshooting
+
+### Handling `replace_in_file` Failures
+
+- **Pattern:** When `replace_in_file` fails due to intermittent errors (e.g., "Failed to open diff editor") or complex changes leading to incorrect matches, retry the operation. If repeated failures occur, consider using `write_to_file` as a more robust fallback to overwrite the entire file with the desired content.
+- **Benefits:** Ensures task completion even when targeted edits are problematic, providing a reliable recovery mechanism.
+
+### Adapting to Dynamic User Requirements
+
+- **Pattern:** Be prepared to adjust the plan and implementation mid-task based on new user instructions or feedback.
+- **Benefits:** Ensures the final solution aligns precisely with evolving user needs and preferences, leading to higher satisfaction.
+
+### Troubleshooting Misleading Parsing Errors
+
+- **Pattern:** If persistent and cryptic parsing errors occur in JSX/TSX files, and direct code modifications do not resolve them, investigate external factors such as ESLint, TypeScript, or Babel/SWC configurations and versions.
+- **Benefits:** Prevents wasted effort on non-existent code bugs and directs troubleshooting towards the actual environmental root cause.

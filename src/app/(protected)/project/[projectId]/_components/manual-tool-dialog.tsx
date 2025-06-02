@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,11 +8,11 @@ import { ArgumentsFormArray } from "./arguments-form-array";
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer";
 import {
   Form,
   FormControl,
@@ -116,83 +115,101 @@ const ManualToolDialog = (props: Props) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onDialogClose}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{selectedToolId ? "Edit Tool" : "New Tool"}</DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-4"
-            noValidate
-          >
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Tool name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Briefly describe the tool..."
-                      rows={3}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="prompt"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prompt (Markdown)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Write markdown prompt here..."
-                      className="max-h-[400px] min-h-40"
-                      rows={8}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-2">
-              <FormLabel>Arguments (Optional)</FormLabel>
-              <ArgumentsFormArray name="arguments" />
-            </div>
-
-            <div className="flex justify-end space-x-2">
-              <Button type="submit" variant="default" disabled={isSubmitting}>
-                {selectedToolId ? "Update" : "Create"}
-              </Button>
-              <Button type="button" variant="secondary" onClick={onDialogClose}>
+    <Drawer open={isOpen} onOpenChange={onDialogClose} direction="right">
+      <DrawerContent className="sm:max-w-lg">
+        <DrawerHeader>
+          <div className="flex items-center justify-between">
+            <DrawerTitle>
+              {selectedToolId ? "Edit Tool" : "New Tool"}
+            </DrawerTitle>
+            <div className="flex items-center space-x-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-sm"
+                onClick={onDialogClose}
+              >
                 Cancel
               </Button>
+              <Button
+                type="submit"
+                variant="default"
+                disabled={isSubmitting}
+                size="sm"
+                form="manual-tool-form"
+              >
+                {selectedToolId ? "Update" : "Create"}
+              </Button>
             </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          </div>
+        </DrawerHeader>
+        <div className="overflow-y-auto p-4">
+          <Form {...form}>
+            <form
+              id="manual-tool-form"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4"
+              noValidate
+            >
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Tool name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Briefly describe the tool..."
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="prompt"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Prompt (Markdown)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Write markdown prompt here..."
+                        className="max-h-[400px] min-h-40"
+                        rows={8}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-2">
+                <FormLabel>Arguments (Optional)</FormLabel>
+                <ArgumentsFormArray name="arguments" />
+              </div>
+            </form>
+          </Form>
+        </div>
+      </DrawerContent>
+    </Drawer>
   );
 };
 

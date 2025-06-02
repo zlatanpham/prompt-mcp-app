@@ -70,7 +70,7 @@ export default function ExportToolsDialog({
     setSelectedToolIds(() => {
       const newSet = new Set<string>();
       if (checked && tools) {
-        tools.forEach((tool) => newSet.add(tool.id as string));
+        tools.forEach((tool) => newSet.add(tool.id));
       }
       return newSet;
     });
@@ -80,12 +80,12 @@ export default function ExportToolsDialog({
     if (!tools) return;
 
     const toolsToExport = tools
-      .filter((tool) => selectedToolIds.has(tool.id as string))
+      .filter((tool) => selectedToolIds.has(tool.id))
       .map((tool) => ({
         name: tool.name,
         description: tool.description,
         prompt: tool.prompt,
-        args: (tool.args as Argument[]) ?? [],
+        args: tool.args ?? [],
       }));
 
     const jsonString = JSON.stringify(toolsToExport, null, 2);
@@ -129,9 +129,9 @@ export default function ExportToolsDialog({
                   <div key={tool.id} className="flex items-center space-x-2">
                     <Checkbox
                       id={tool.id}
-                      checked={selectedToolIds.has(tool.id as string)}
+                      checked={selectedToolIds.has(tool.id)}
                       onCheckedChange={(checked: boolean) =>
-                        handleSelectTool(tool.id as string, checked)
+                        handleSelectTool(tool.id, checked)
                       }
                     />
                     <Label htmlFor={tool.id}>{tool.name}</Label>

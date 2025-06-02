@@ -1,4 +1,21 @@
 ---
+Date: 2025-06-02
+TaskRef: "Refactor edit and create tool dialog to use a drawer - Feedback Round"
+
+Learnings:
+  - Refined UI/UX for drawer headers: ensured title and action buttons are on one line using `flex items-center` on the container.
+  - Styled buttons as links: used `variant="ghost"` and `size="sm"` for a smaller, link-like appearance for the cancel button.
+
+Difficulties:
+  - None.
+
+Successes:
+  - Successfully implemented user feedback to refine the drawer's appearance and button styling.
+
+Improvements_Identified_For_Consolidation:
+  - UI/UX: Specific styling for drawer header elements (title and buttons).
+  - UI/UX: Using Shadcn UI button `variant` and `size` props for specific visual effects (e.g., link-like buttons).
+---
 
 Date: 2025-06-01
 TaskRef: "Refactor confirmation dialogs to reuse ConfirmActionDialog component"
