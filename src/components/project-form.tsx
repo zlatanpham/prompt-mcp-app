@@ -46,7 +46,7 @@ export function ProjectForm({
     if (defaultValues) {
       form.reset(defaultValues);
     }
-  }, [defaultValues, form.reset]);
+  }, [defaultValues, form, form.reset]);
 
   return (
     <Form {...form}>

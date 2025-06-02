@@ -38,8 +38,7 @@ export default function ApiKeysPage() {
   };
 
   const { data: apiKeys, isLoading, refetch } = api.apiKey.getAll.useQuery();
-  const { data: projects, isLoading: isLoadingProjects } =
-    api.project.getAll.useQuery();
+  const { data: projects } = api.project.getAll.useQuery();
 
   const createApiKeyMutation = api.apiKey.create.useMutation({
     onSuccess: (data: { key: string; name: string }) => {

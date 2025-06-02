@@ -156,6 +156,7 @@ export function ImportToolsDialog({
                         value={field.value}
                         onValueChange={field.onChange}
                         highlight={(code) =>
+                          // eslint-disable-next-line
                           highlight(code, languages.json as Grammar, "json")
                         }
                         padding={10}
