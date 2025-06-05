@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
+import { ToolSelectorDropdown } from "@/components/tool-selector-dropdown";
+import { type Tool } from "@/types/tool";
 
 const API_KEY_STORAGE_KEYS = {
   google: "google_ai_api_key",
@@ -59,12 +61,15 @@ export default function ChatPage() {
     // This function is just to satisfy the onClose prop type
   };
 
+  const [enabledTools, setEnabledTools] = useState<Tool[]>([]);
+
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
     useChat({
       api: "/api/chat",
       body: {
         apiKeys: apiKeys, // Pass all apiKeys
         model: selectedModel,
+        tools: enabledTools, // Pass enabled tools
       },
     });
 
@@ -75,18 +80,21 @@ export default function ChatPage() {
       <Card className="flex flex-grow flex-col">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>AI Chat</CardTitle>
-          <Select value={selectedModel} onValueChange={setSelectedModel}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Select a model" />
-            </SelectTrigger>
-            <SelectContent>
-              {MODELS.map((model) => (
-                <SelectItem key={model.value} value={model.value}>
-                  {model.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex items-center gap-2">
+            <ToolSelectorDropdown onToolsChange={setEnabledTools} />
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select a model" />
+              </SelectTrigger>
+              <SelectContent>
+                {MODELS.map((model) => (
+                  <SelectItem key={model.value} value={model.value}>
+                    {model.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent className="flex-grow overflow-hidden">
           <ScrollArea className="h-full pr-4">

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { toolNameSchema } from "@/lib/validators/tool";
+import { type Tool as PrismaTool } from "@prisma/client";
 
 export const argumentSchema = z.object({
   name: toolNameSchema,
@@ -10,3 +11,7 @@ export const argumentSchema = z.object({
 });
 
 export type Argument = z.infer<typeof argumentSchema>;
+
+export type Tool = PrismaTool & {
+  args: Argument[];
+};
