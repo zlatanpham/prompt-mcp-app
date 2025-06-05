@@ -206,3 +206,14 @@
 
 - **Description:** When querying related data in Prisma, it's crucial to correctly identify the foreign key field in the schema (e.g., `created_by_user_id` on the `Project` model linking to `User.id`) to ensure accurate data retrieval.
 - **Benefits:** Prevents query errors and ensures the correct data relationships are leveraged for efficient database operations.
+
+## Data Fetching Patterns
+
+### Lazy Data Fetching with tRPC/React Query
+
+- **Pattern:** For manual or lazy data fetching in tRPC/React Query, use `api.yourRouter.yourProcedure.useQuery(input, { enabled: false })` and trigger the fetch using the `refetch()` function returned by the hook.
+- **Benefits:** Prevents automatic data fetching on component mount, allowing data to be fetched only when explicitly needed (e.g., on a button click), optimizing initial page load and resource usage.
+- **Implementation Steps:**
+  1. Initialize the query with `enabled: false`: `const { data, isLoading, refetch } = api.yourRouter.yourProcedure.useQuery(input, { enabled: false });`
+  2. Call `await refetch()` in the event handler to trigger the data fetch.
+  3. Use the `data` returned from `refetch()` (e.g., `const { data: fetchedData } = await refetch();`) for subsequent logic that depends on the fetched data.

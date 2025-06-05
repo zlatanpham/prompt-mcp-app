@@ -50,6 +50,7 @@
 - Rely on tRPC (React Query integration) for server state management (fetching, caching, mutations).
 - Use React state/context or Zustand for minimal client-side UI state when necessary.
 - Define database models and relations clearly in `prisma/schema.prisma`.
+- For manual or lazy data fetching with tRPC/React Query, use `api.yourRouter.yourProcedure.useQuery(input, { enabled: false })` and trigger the fetch using the `refetch()` function returned by the hook.
 
 ## Database Migrations (Prisma)
 

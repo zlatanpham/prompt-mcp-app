@@ -18,8 +18,8 @@ export default function AccountPage() {
   const user = session?.user;
 
   const { confirm, ConfirmActionDialog } = useConfirmAction();
-  const { data: tools, isLoading: isLoadingTools } =
-    api.tool.getAllByUserId.useQuery();
+  const { isLoading: isLoadingTools, refetch: refetchTools } =
+    api.tool.getAllByUserId.useQuery(undefined, { enabled: false });
 
   if (status === "loading") {
     return (
@@ -45,9 +45,12 @@ export default function AccountPage() {
       : "U"; // Default to 'U' for unknown
 
   const handleExportAllTools = async () => {
-    if (isLoadingTools) return;
+    // Trigger data fetch when export button is clicked
+    const { data: fetchedTools } = await refetchTools();
 
-    const numTools = tools?.length ?? 0;
+    if (isLoadingTools) return; // This check might be redundant if refetchTools() awaits completion
+
+    const numTools = fetchedTools?.length ?? 0;
     const confirmed = await confirm(
       "Export All Tools",
       `Are you sure you want to export ${numTools} tools?`,
@@ -56,12 +59,12 @@ export default function AccountPage() {
     );
 
     if (confirmed) {
-      if (!tools || tools.length === 0) {
+      if (!fetchedTools || fetchedTools.length === 0) {
         alert("No tools available to export.");
         return;
       }
 
-      const toolsToExport = tools.map((tool) => ({
+      const toolsToExport = fetchedTools.map((tool) => ({
         name: tool.name,
         description: tool.description,
         prompt: tool.prompt,
@@ -149,7 +152,7 @@ export default function AccountPage() {
             onClick={handleExportAllTools}
             disabled={isLoadingTools}
           >
-            {isLoadingTools ? "Loading Tools..." : "Export All Tools"}
+            {isLoadingTools ? "Exporting Tools..." : "Export All Tools"}
           </Button>
         </div>
       </div>
