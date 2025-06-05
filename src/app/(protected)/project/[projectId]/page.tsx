@@ -12,6 +12,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardLayout from "@/components/dashboard-layout";
 import Tool from "./_components/tool";
@@ -112,44 +119,46 @@ export default function ProjectDetailPage() {
                   />
                 </DialogContent>
               </Dialog>
-              <Dialog
-                open={isExportDialogOpen}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    Tools
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onSelect={() => setIsExportDialogOpen(true)}
+                  >
+                    Export Tools
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setIsImportDialogOpen(true)}
+                  >
+                    Import Tools
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => setIsMoveToolsDialogOpen(true)}
+                  >
+                    Move Tools
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <ExportToolsDialog
+                isOpen={isExportDialogOpen}
                 onOpenChange={setIsExportDialogOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline">Export Tools</Button>
-                </DialogTrigger>
-                <ExportToolsDialog
-                  isOpen={isExportDialogOpen}
-                  onOpenChange={setIsExportDialogOpen}
-                />
-              </Dialog>
-              <Dialog
+              />
+              <ImportToolsDialog
+                projectId={projectId!}
                 open={isImportDialogOpen}
                 onOpenChange={setIsImportDialogOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline">Import Tools</Button>
-                </DialogTrigger>
-                <ImportToolsDialog
-                  projectId={projectId!}
-                  open={isImportDialogOpen}
-                  onOpenChange={setIsImportDialogOpen}
-                />
-              </Dialog>
-              <Dialog
-                open={isMoveToolsDialogOpen}
+              />
+              <MoveToolsDialog
+                isOpen={isMoveToolsDialogOpen}
                 onOpenChange={setIsMoveToolsDialogOpen}
-              >
-                <DialogTrigger asChild>
-                  <Button variant="outline">Move Tools</Button>
-                </DialogTrigger>
-                <MoveToolsDialog
-                  isOpen={isMoveToolsDialogOpen}
-                  onOpenChange={setIsMoveToolsDialogOpen}
-                  currentProjectId={projectId!}
-                />
-              </Dialog>
+                currentProjectId={projectId!}
+              />
             </div>
           </div>
           <Tool />

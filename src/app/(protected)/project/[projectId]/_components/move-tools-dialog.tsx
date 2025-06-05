@@ -191,7 +191,7 @@ export function MoveToolsDialog({
                         }
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select a project" />
                           </SelectTrigger>
                         </FormControl>
