@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
 
 const API_KEY_STORAGE_KEYS = {
@@ -23,11 +30,19 @@ const API_KEY_STORAGE_KEYS = {
 
 export default function ChatPage() {
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({
-    google: localStorage.getItem(API_KEY_STORAGE_KEYS.google) ?? "",
-    openai: localStorage.getItem(API_KEY_STORAGE_KEYS.openai) ?? "",
-    deepseek: localStorage.getItem(API_KEY_STORAGE_KEYS.deepseek) ?? "",
-    anthropic: localStorage.getItem(API_KEY_STORAGE_KEYS.anthropic) ?? "",
+    google: localStorage.getItem(API_KEY_STORAGE_KEYS.google ?? "") ?? "",
+    openai: localStorage.getItem(API_KEY_STORAGE_KEYS.openai ?? "") ?? "",
+    deepseek: localStorage.getItem(API_KEY_STORAGE_KEYS.deepseek ?? "") ?? "",
+    anthropic: localStorage.getItem(API_KEY_STORAGE_KEYS.anthropic ?? "") ?? "",
   });
+
+  const MODELS = [
+    { label: "DeepSeek Chat v3", value: "deepseek/deepseek-chat" },
+    // { label: "DeepSeek Reasoner v3", value: "deepseek/deepseek-reasoner" },
+    { label: "Google Gemini 2.0 Flash", value: "google/gemini-2.0-flash-001" },
+  ];
+
+  const [selectedModel, setSelectedModel] = useState(MODELS[0]?.value);
 
   const handleSaveApiKey = (keys: Record<string, string>) => {
     for (const provider in keys) {
@@ -47,19 +62,31 @@ export default function ChatPage() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
     useChat({
       api: "/api/chat",
-      headers: {
-        "x-google-ai-api-key": apiKeys.google ?? "",
-      },
       body: {
-        apiKey: apiKeys.google!, // Use non-null assertion
+        apiKeys: apiKeys, // Pass all apiKeys
+        model: selectedModel,
       },
     });
+
+  const [currentProvider] = (selectedModel ?? "").split("/");
 
   return (
     <div className="flex h-full flex-col p-4">
       <Card className="flex flex-grow flex-col">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>AI Chat</CardTitle>
+          <Select value={selectedModel} onValueChange={setSelectedModel}>
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Select a model" />
+            </SelectTrigger>
+            <SelectContent>
+              {MODELS.map((model) => (
+                <SelectItem key={model.value} value={model.value}>
+                  {model.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </CardHeader>
         <CardContent className="flex-grow overflow-hidden">
           <ScrollArea className="h-full pr-4">
@@ -106,9 +133,12 @@ export default function ChatPage() {
               value={input}
               onChange={handleInputChange}
               className="flex-grow"
-              disabled={isLoading || !apiKeys.google}
+              disabled={isLoading || !apiKeys[currentProvider ?? ""]!}
             />
-            <Button type="submit" disabled={isLoading || !apiKeys.google}>
+            <Button
+              type="submit"
+              disabled={isLoading || !apiKeys[currentProvider ?? ""]!}
+            >
               Send
             </Button>
           </form>
