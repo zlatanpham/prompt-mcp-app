@@ -18,6 +18,7 @@ import Tool from "./_components/tool";
 import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
 import ExportToolsDialog from "./_components/export-tools-dialog";
 import { ImportToolsDialog } from "./_components/import-tools-dialog";
+import { MoveToolsDialog } from "./_components/move-tools-dialog";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -26,6 +27,7 @@ export default function ProjectDetailPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isMoveToolsDialogOpen, setIsMoveToolsDialogOpen] = useState(false);
 
   const {
     data: project,
@@ -135,9 +137,21 @@ export default function ProjectDetailPage() {
                   onOpenChange={setIsImportDialogOpen}
                 />
               </Dialog>
+              <Dialog
+                open={isMoveToolsDialogOpen}
+                onOpenChange={setIsMoveToolsDialogOpen}
+              >
+                <DialogTrigger asChild>
+                  <Button variant="outline">Move Tools</Button>
+                </DialogTrigger>
+                <MoveToolsDialog
+                  isOpen={isMoveToolsDialogOpen}
+                  onOpenChange={setIsMoveToolsDialogOpen}
+                  currentProjectId={projectId!}
+                />
+              </Dialog>
             </div>
           </div>
-
           <Tool />
         </>
       )}

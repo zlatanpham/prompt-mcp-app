@@ -64,6 +64,11 @@ const toolImportInputSchema = z.object({
   tools: z.array(toolBaseSchema),
 });
 
+const toolMoveSchema = z.object({
+  toolIds: z.array(z.string().uuid()),
+  targetProjectId: z.string().uuid(),
+});
+
 export const toolRouter = createTRPCRouter({
   create: protectedProcedure
     .input(toolCreateSchema)
@@ -291,4 +296,66 @@ export const toolRouter = createTRPCRouter({
 
     return tools;
   }),
+
+  moveTools: protectedProcedure
+    .input(toolMoveSchema)
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id;
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      // Verify user has access to the target project
+      const targetProject = await db.project.findUnique({
+        where: { id: input.targetProjectId },
+        select: { created_by_user_id: true },
+      });
+
+      if (!targetProject || targetProject.created_by_user_id !== userId) {
+        throw new Error(
+          "Unauthorized: Target project not found or not owned by user.",
+        );
+      }
+
+      // Verify user has access to all tools and they belong to the same original project
+      // This is important to prevent moving tools from projects the user doesn't own
+      const toolsToMove = await db.tool.findMany({
+        where: {
+          id: { in: input.toolIds },
+        },
+        select: { id: true, project_id: true },
+      });
+
+      if (toolsToMove.length !== input.toolIds.length) {
+        throw new Error("One or more tools not found.");
+      }
+
+      // Ensure all tools belong to projects owned by the user
+      const projectIdsOfTools = new Set(toolsToMove.map((t) => t.project_id));
+      const projectsOwnedByUser = await db.project.findMany({
+        where: {
+          id: { in: Array.from(projectIdsOfTools) },
+          created_by_user_id: userId,
+        },
+        select: { id: true },
+      });
+
+      if (projectsOwnedByUser.length !== projectIdsOfTools.size) {
+        throw new Error(
+          "Unauthorized: One or more tools belong to projects not owned by the user.",
+        );
+      }
+
+      // Perform the update in a transaction
+      await db.$transaction(
+        input.toolIds.map((toolId) =>
+          db.tool.update({
+            where: { id: toolId },
+            data: { project_id: input.targetProjectId },
+          }),
+        ),
+      );
+
+      return { success: true, movedCount: input.toolIds.length };
+    }),
 });

@@ -1,25 +1,31 @@
 ---
 
 Date: 2025-06-05
-TaskRef: "Implement lazy data fetching for tools export on account page"
+TaskRef: "Implement 'Move Tools' function for project detail page"
 
 Learnings:
 
-- Successfully implemented lazy data fetching using `api.tool.getAllByUserId.useQuery(undefined, { enabled: false })` and `refetch` in a Next.js component with tRPC.
-- The `refetch` function from `useQuery` can be awaited to get the fetched data directly (e.g., `const { data: fetchedTools } = await refetchTools();`).
-- Updated the logic to use the `fetchedTools` data after the `refetch` call to ensure the export functionality operates on the newly fetched data.
+- Successfully implemented a tRPC mutation (`tool.moveTools`) to transfer tools between projects by updating their `projectId`.
+- Learned to filter projects in the UI to exclude the current project when selecting a target for tool movement.
+- Gained experience in creating a complex Shadcn UI dialog with `react-hook-form`, `zod` validation, and dynamic data fetching (tools and projects).
+- Confirmed the process for adding new Shadcn UI components (`pnpm ui:add [component]`) and handling their integration.
+- Reinforced the importance of using `useQueryClient().invalidateQueries` for proper cache invalidation after data mutations in tRPC/React Query, specifically for `getByProjectId` queries for both source and target projects.
+- Understood the need to use `void` operator for unawaited promises from `queryClient.invalidateQueries` to satisfy ESLint rules.
 
 Difficulties:
 
-- Initially considered `useLazyQuery` but realized `useQuery` with `enabled: false` and `refetch` is the standard and more direct approach for tRPC/React Query for manual data fetching.
+- Initial TypeScript errors due to missing `ScrollArea` component, resolved by adding it via Shadcn CLI.
+- ESLint errors regarding unawaited promises from `queryClient.invalidateQueries`, resolved by explicitly using the `void` operator.
 
 Successes:
 
-- Achieved the user's requirement of not prefetching data on page load and fetching only on button click.
-- Maintained the loading state and confirmation dialog logic correctly, adapting it to the manual fetch pattern.
+- Successfully implemented the end-to-end "move tools" feature, including backend mutation, frontend dialog, and UI integration.
+- All identified errors (TypeScript and ESLint) were resolved efficiently.
+- The solution adheres to the T3 stack principles and uses existing patterns (tRPC, Shadcn UI, React Hook Form, Zod).
 
 Improvements_Identified_For_Consolidation:
 
-- General pattern: Lazy data fetching in tRPC/React Query using `enabled: false` and `refetch()`.
-- Specific: How to integrate `refetch()` with existing logic that depends on the fetched data, ensuring the correct data is used after the manual fetch.
+- General pattern: Handling tRPC query invalidation for multiple related queries after a mutation.
+- General pattern: Integrating new Shadcn UI components and resolving associated import/type issues.
+- Specific: `tool.moveTools` mutation logic for secure tool transfer.
 ---

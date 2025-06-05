@@ -48,6 +48,7 @@ export default function ToolComponent() {
   );
 
   const isLoading = isLoadingTools;
+  console.log("ToolComponent isLoading:", isLoading, "tools:", tools);
 
   // Fetch single tool for editing
   const { data: tool } = api.tool.getById.useQuery(
