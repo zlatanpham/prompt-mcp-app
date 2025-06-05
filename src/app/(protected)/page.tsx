@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useChat, type Message } from "@ai-sdk/react";
-import { type ToolInvocation } from "ai"; // Correct import for ToolInvocation
 import { Input } from "@/components/ui/input";
+import { ChatMessageDisplay } from "@/app/(protected)/page/_components/chat-message-display";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -64,17 +64,52 @@ export default function ChatPage() {
 
   const [enabledTools, setEnabledTools] = useState<Tool[]>([]);
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } =
-    useChat({
-      api: "/api/chat",
-      body: {
-        apiKeys: apiKeys, // Pass all apiKeys
-        model: selectedModel,
-        tools: enabledTools, // Pass enabled tools
-      },
-    });
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    error,
+    append,
+  } = useChat({
+    api: "/api/chat",
+    body: {
+      apiKeys: apiKeys, // Pass all apiKeys
+      model: selectedModel,
+      tools: enabledTools, // Pass enabled tools
+    },
+  });
 
   const [currentProvider] = (selectedModel ?? "").split("/");
+  console.log(messages);
+
+  useEffect(() => {
+    if (messages.length > 0 && !isLoading) {
+      const lastMessage = messages[messages.length - 1];
+      console.log(lastMessage);
+      if (
+        Array.isArray(lastMessage?.toolInvocations) &&
+        lastMessage?.toolInvocations[0]
+      ) {
+        try {
+          console.log("submit tool output");
+          console.log(lastMessage.toolInvocations[0].result);
+          // addToolResult({ result: lastMessage.toolInvocations[0].result });
+          append({
+            annotations: {
+              toolName: lastMessage?.toolInvocations[0].toolName,
+              toolCallId: lastMessage?.toolInvocations[0].toolCallId,
+            },
+            content: lastMessage.toolInvocations[0].result,
+            role: "user",
+          });
+        } catch (error) {
+          console.error("Error handling tool invocation result:", error);
+        }
+      }
+    }
+  }, [messages, handleSubmit, isLoading]);
 
   return (
     <div className="flex h-full flex-col p-4">
@@ -105,31 +140,7 @@ export default function ChatPage() {
               </div>
             ) : (
               messages.map((message: Message) => (
-                <div
-                  key={message.id}
-                  className={`mb-4 ${
-                    message.role === "user" ? "text-right" : "text-left"
-                  }`}
-                >
-                  {message.content}
-                  {message.toolInvocations?.map(
-                    (toolInvocation: ToolInvocation) => (
-                      <div key={toolInvocation.toolCallId}>
-                        {"result" in toolInvocation ? (
-                          <div className="inline-block rounded-lg bg-green-200 p-2 text-sm text-green-800">
-                            Tool result for `{toolInvocation.toolName}`: `
-                            {JSON.stringify(toolInvocation.result)}`
-                          </div>
-                        ) : (
-                          <div className="inline-block rounded-lg bg-purple-200 p-2 text-sm text-purple-800">
-                            Calling tool: `{toolInvocation.toolName}` with args:
-                            `{JSON.stringify(toolInvocation.args)}`
-                          </div>
-                        )}
-                      </div>
-                    ),
-                  )}
-                </div>
+                <ChatMessageDisplay key={message.id} message={message} />
               ))
             )}
             {isLoading && (

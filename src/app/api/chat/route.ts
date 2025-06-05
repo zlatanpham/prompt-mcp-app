@@ -19,8 +19,8 @@ export async function POST(req: Request) {
     (acc, tool) => {
       acc[tool.name] = aiTool({
         description: tool.description ?? "",
-        execute: async (args) => {
-          return tool.prompt.replace(/{(\w+)}/g, (_, key) => {
+        execute: async (args: Record<string, any>): Promise<string> => {
+          const resultString = tool.prompt.replace(/{(\w+)}/g, (_, key) => {
             if (key in args) {
               if (Array.isArray(args[key])) {
                 return args[key].map((item: string) => `"${item}"`).join(", ");
@@ -29,6 +29,7 @@ export async function POST(req: Request) {
             }
             return `{${key}}`;
           });
+          return resultString;
         },
         parameters: z.object(
           (tool.args || []).reduce(
