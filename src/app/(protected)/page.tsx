@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useChat } from "@ai-sdk/react";
+import { useChat, type Message } from "@ai-sdk/react";
+import { type ToolInvocation } from "ai"; // Correct import for ToolInvocation
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -103,22 +104,31 @@ export default function ChatPage() {
                 Start a conversation...
               </div>
             ) : (
-              messages.map((message) => (
+              messages.map((message: Message) => (
                 <div
                   key={message.id}
                   className={`mb-4 ${
                     message.role === "user" ? "text-right" : "text-left"
                   }`}
                 >
-                  <div
-                    className={`inline-block rounded-lg p-2 ${
-                      message.role === "user"
-                        ? "bg-blue-500 text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {message.content}
-                  </div>
+                  {message.content}
+                  {message.toolInvocations?.map(
+                    (toolInvocation: ToolInvocation) => (
+                      <div key={toolInvocation.toolCallId}>
+                        {"result" in toolInvocation ? (
+                          <div className="inline-block rounded-lg bg-green-200 p-2 text-sm text-green-800">
+                            Tool result for `{toolInvocation.toolName}`: `
+                            {JSON.stringify(toolInvocation.result)}`
+                          </div>
+                        ) : (
+                          <div className="inline-block rounded-lg bg-purple-200 p-2 text-sm text-purple-800">
+                            Calling tool: `{toolInvocation.toolName}` with args:
+                            `{JSON.stringify(toolInvocation.args)}`
+                          </div>
+                        )}
+                      </div>
+                    ),
+                  )}
                 </div>
               ))
             )}
