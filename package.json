@@ -30,6 +30,7 @@
     "@ai-sdk/react": "^1.2.12",
     "@ai-sdk/xai": "^1.2.16",
     "@auth/prisma-adapter": "^2.7.2",
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.5.0",
     "@radix-ui/react-alert-dialog": "^1.1.14",
