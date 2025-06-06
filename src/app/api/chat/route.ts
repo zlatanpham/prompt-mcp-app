@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { streamText, type CoreMessage, tool as aiTool } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createDeepSeek } from "@ai-sdk/deepseek"; // Import DeepSeek
@@ -17,6 +20,7 @@ export async function POST(req: Request) {
 
   const aiTools = tools.reduce(
     (acc, tool) => {
+      // @ts-ignore
       acc[tool.name] = aiTool({
         description: tool.description ?? "",
         execute: async (args: Record<string, any>): Promise<string> => {
