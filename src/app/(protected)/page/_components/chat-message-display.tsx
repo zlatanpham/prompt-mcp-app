@@ -80,10 +80,10 @@ export function ChatMessageDisplay({ message }: ChatMessageDisplayProps) {
       >
         <CollapsibleTrigger className="flex w-full items-center justify-between">
           <div className="flex items-center gap-2">
-            <Badge className="rounded-full px-2 py-1">
+            <Badge variant="secondary" className="rounded-full px-2 py-1">
               {toolName.charAt(0).toUpperCase()}
             </Badge>
-            <span className="font-semibold">Calling tool {toolName}</span>
+            <span className="font-mono text-sm font-medium">{toolName}</span>
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -102,19 +102,23 @@ export function ChatMessageDisplay({ message }: ChatMessageDisplayProps) {
         </CollapsibleTrigger>
         <CollapsibleContent className="mt-2 space-y-2">
           {toolArgs && (
-            <div className="rounded-md bg-gray-50 p-2">
-              <h3 className="font-semibold">Request</h3>
-              <pre className="overflow-auto text-sm whitespace-pre-wrap">
-                <code>{JSON.stringify(toolArgs, null, 2)}</code>
-              </pre>
+            <div className="rounded-md p-2">
+              <h3 className="mb-2 text-sm font-medium">Request</h3>
+              <div className="max-h-[300px] overflow-auto">
+                <pre className="rounded-md bg-gray-100 p-4 text-xs whitespace-pre-wrap">
+                  <code>{JSON.stringify(toolArgs, null, 2)}</code>
+                </pre>
+              </div>
             </div>
           )}
           {toolResult && (
-            <div className="rounded-md bg-gray-50 p-2">
-              <h3 className="font-semibold">Response</h3>
-              <pre className="overflow-auto text-sm whitespace-pre-wrap">
-                <code>{toolResult}</code>
-              </pre>
+            <div className="rounded-md p-2">
+              <h3 className="mb-2 text-sm font-medium">Response</h3>
+              <div className="max-h-[300px] overflow-auto">
+                <pre className="rounded-md bg-gray-100 p-4 text-xs whitespace-pre-wrap">
+                  <code>{toolResult}</code>
+                </pre>
+              </div>
             </div>
           )}
         </CollapsibleContent>
@@ -122,13 +126,18 @@ export function ChatMessageDisplay({ message }: ChatMessageDisplayProps) {
     );
   }
 
+  if (message.role === "user") {
+    return (
+      <div className="rounded-lg bg-gray-100 p-3">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {message.content}
+        </ReactMarkdown>
+      </div>
+    );
+  }
+
   return (
-    <div
-      key={message.id}
-      className={`mb-4 rounded-lg p-3 text-left ${
-        message.role === "user" ? "bg-gray-100" : ""
-      }`}
-    >
+    <div key={message.id} className="prose px-3">
       <ReactMarkdown remarkPlugins={[remarkGfm]}>
         {message.content}
       </ReactMarkdown>

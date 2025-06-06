@@ -147,7 +147,7 @@ export function ToolSelectorDropdown({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[320px] p-1">
+      <PopoverContent align="start" className="w-[320px] p-1">
         {!selectedProjectId ? (
           <>
             {activeProjects.map((project) => (

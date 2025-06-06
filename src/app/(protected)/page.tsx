@@ -120,24 +120,24 @@ export default function ChatPage() {
   }, [messages, handleSubmit, isLoading, append]);
 
   return (
-    <div className="flex h-screen flex-col p-4">
-      <Card className="flex flex-grow flex-col rounded-b-none border-b-0">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>AI Chat</CardTitle>
-        </CardHeader>
-        <CardContent className="flex-grow overflow-hidden">
-          <ScrollArea className="h-full pr-4">
+    <div className="flex h-[calc(100dvh-16px)] flex-col py-4">
+      <div className="flex flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
+        <h2 className="px-4 text-lg font-semibold">Chat playground</h2>
+        <div className="max-h-[calc(100dvh-150px)] pt-2">
+          <ScrollArea className="h-full px-4">
             {messages.length === 0 && !isLoading && !error ? (
-              <div className="text-muted-foreground flex h-full items-center justify-center">
-                Start a conversation...
+              <div className="text-muted-foreground mx-auto flex h-[calc(100dvh-400px)] max-w-2xl items-center justify-center text-center text-2xl">
+                👋 Hello there! Start to test your tools by typing a message.
               </div>
             ) : (
-              messages.map((message: Message) => (
-                <ChatMessageDisplay key={message.id} message={message} />
-              ))
+              <div className="space-y-3">
+                {messages.map((message: Message) => (
+                  <ChatMessageDisplay key={message.id} message={message} />
+                ))}
+              </div>
             )}
             {isLoading && (
-              <div className="text-muted-foreground text-center">
+              <div className="text-muted-foreground py-1 text-sm">
                 AI is thinking...
               </div>
             )}
@@ -147,9 +147,9 @@ export default function ChatPage() {
               </div>
             )}
           </ScrollArea>
-        </CardContent>
-      </Card>
-      <div className="flex items-center space-x-2 rounded-t-none border-2 border-t-0 p-4">
+        </div>
+      </div>
+      <div className="mx-4 flex items-center space-x-2 rounded-xl border p-4 shadow-2xl">
         <ToolSelectorDropdown onToolsChange={setEnabledTools} />
         <form
           onSubmit={(e) => {
@@ -162,7 +162,7 @@ export default function ChatPage() {
           className="flex flex-grow space-x-2"
         >
           <Input
-            placeholder="Reply to Claude..."
+            placeholder="Type your message here..."
             value={input}
             onChange={handleInputChange}
             className="flex-grow rounded-full"
