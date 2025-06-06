@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 "use client";
 
@@ -94,14 +95,13 @@ export default function ChatPage() {
         lastMessage?.toolInvocations[0]
       ) {
         try {
-          console.log("submit tool output");
-          console.log(lastMessage.toolInvocations[0].result);
-          // addToolResult({ result: lastMessage.toolInvocations[0].result });
           append({
             annotations: {
+              // @ts-ignore
               toolName: lastMessage?.toolInvocations[0].toolName,
               toolCallId: lastMessage?.toolInvocations[0].toolCallId,
             },
+            // @ts-ignore
             content: lastMessage.toolInvocations[0].result,
             role: "user",
           });
