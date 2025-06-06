@@ -174,8 +174,10 @@ export default function ChatPage() {
                 variant="outline"
                 className="w-[180px] justify-between rounded-full"
               >
-                {MODELS.find((model) => model.value === selectedModel)?.label ??
-                  "Select a model"}
+                <span className="truncate">
+                  {MODELS.find((model) => model.value === selectedModel)
+                    ?.label ?? "Select a model"}
+                </span>
                 <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </DropdownMenuTrigger>
