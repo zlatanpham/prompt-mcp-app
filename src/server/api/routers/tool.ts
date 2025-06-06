@@ -297,7 +297,7 @@ export const toolRouter = createTRPCRouter({
     // Explicitly cast args to Argument[]
     const parsedTools = tools.map((tool) => ({
       ...tool,
-      args: (tool.args || []) as Argument[],
+      args: (tool.args ?? []) as Argument[],
     }));
 
     return parsedTools;

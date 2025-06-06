@@ -31,6 +31,16 @@ export function ToolSelectorDropdown({
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null,
   );
+
+  const activeProjects = useMemo(() => {
+    if (!projects || !allTools) return [];
+    const projectsWithActiveTools = new Set(
+      allTools.filter((tool) => tool.is_active).map((tool) => tool.project_id),
+    );
+    return projects.filter((project) =>
+      projectsWithActiveTools.has(project.id),
+    );
+  }, [projects, allTools]);
   const [toolSearchQuery, setToolSearchQuery] = useState("");
   const [enabledToolIds, setEnabledToolIds] = useState<Set<string>>(() => {
     if (typeof window !== "undefined") {
@@ -48,6 +58,22 @@ export function ToolSelectorDropdown({
     }
     return new Set();
   });
+
+  const allProjectsEnabledToolCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    if (projects && allTools) {
+      projects.forEach((project) => {
+        const projectTools = allTools.filter(
+          (tool) => tool.project_id === project.id,
+        );
+        const enabledCount = projectTools.filter((tool) =>
+          enabledToolIds.has(tool.id),
+        ).length;
+        counts[project.id] = enabledCount;
+      });
+    }
+    return counts;
+  }, [projects, allTools, enabledToolIds]);
 
   useEffect(() => {
     if (allTools) {
@@ -79,9 +105,14 @@ export function ToolSelectorDropdown({
       (tool) => tool.project_id === selectedProjectId,
     );
 
+    // Only disable tools that are currently enabled
+    const enabledToolsInSelectedProject = toolsInSelectedProject.filter(
+      (tool) => enabledToolIds.has(tool.id),
+    );
+
     setEnabledToolIds((prev) => {
       const newSet = new Set(prev);
-      toolsInSelectedProject.forEach((tool) => {
+      enabledToolsInSelectedProject.forEach((tool) => {
         newSet.delete(tool.id);
         localStorage.setItem(`${LOCAL_STORAGE_PREFIX}${tool.id}`, "false");
       });
@@ -101,49 +132,49 @@ export function ToolSelectorDropdown({
     );
   }, [toolSearchQuery, currentProjectTools]);
 
-  if (isLoadingProjects || isLoadingTools) {
-    return (
-      <Button variant="outline" size="sm" className="h-8 gap-1">
-        <Settings2 className="h-3.5 w-3.5" />
-        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-          Loading Tools...
-        </span>
-      </Button>
-    );
-  }
-
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1"
+          disabled={isLoadingProjects || isLoadingTools}
+        >
           <Settings2 className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             Tools
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="end" className="w-[250px] p-0">
+      <PopoverContent align="end" className="w-[320px] p-1">
         {!selectedProjectId ? (
           <>
-            <div className="px-4 py-2 text-sm font-semibold">
-              Select Project
-            </div>
-            <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
-            {/* Separator */}
-            {projects?.map((project) => (
+            {activeProjects.map((project) => (
               <div
                 key={project.id}
                 onClick={() => setSelectedProjectId(project.id)}
-                className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
               >
                 <div className="flex items-center gap-2">
-                  <Badge className="flex h-5 w-5 items-center justify-center rounded-full p-0">
+                  <Badge variant="outline" className="h-6 w-6 flex-shrink-0">
                     {project.name.charAt(0).toUpperCase()}
                   </Badge>
                   <span>{project.name}</span>
                 </div>
-                <span className="text-muted-foreground ml-auto text-sm">
-                  {project._count.Tool}
+                <span className="ml-auto text-sm">
+                  {allProjectsEnabledToolCounts[project.id] === 0 ? (
+                    <span className="text-muted-foreground text-xs">
+                      Disabled
+                    </span>
+                  ) : (
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 text-blue-700"
+                    >
+                      {allProjectsEnabledToolCounts[project.id]}
+                    </Badge>
+                  )}
                 </span>
               </div>
             ))}
@@ -152,39 +183,31 @@ export function ToolSelectorDropdown({
           <>
             <div
               onClick={() => setSelectedProjectId(null)}
-              className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+              className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
             >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Back to Projects
             </div>
             <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
             {/* Separator */}
-            <div className="flex items-center justify-between px-4 py-2 text-sm font-semibold">
+            <div className="flex items-center justify-between px-2 py-2 text-sm font-semibold">
               <span>
                 Tools for{" "}
                 {projects?.find((p) => p.id === selectedProjectId)?.name}
               </span>
-              <div className="flex items-center space-x-2">
-                <span className="text-muted-foreground text-xs">
-                  Disable All
-                </span>
-                <Switch
-                  checked={currentProjectTools.every(
-                    (tool) => !enabledToolIds.has(tool.id),
-                  )}
-                  onCheckedChange={handleDisableAllTools}
-                />
-              </div>
-            </div>
-            <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
-            {/* Separator */}
-            <div className="px-2 py-1">
-              <Input
-                placeholder="Search tools..."
-                value={toolSearchQuery}
-                onChange={(e) => setToolSearchQuery(e.target.value)}
-                className="h-8"
-              />
+              {currentProjectTools.length > 1 && (
+                <div className="flex items-center space-x-2">
+                  <span className="text-muted-foreground text-xs">
+                    Disable All
+                  </span>
+                  <Switch
+                    checked={currentProjectTools.every(
+                      (tool) => !enabledToolIds.has(tool.id),
+                    )}
+                    onCheckedChange={handleDisableAllTools}
+                  />
+                </div>
+              )}
             </div>
             <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
             {/* Separator */}
@@ -192,9 +215,11 @@ export function ToolSelectorDropdown({
               filteredTools.map((tool) => (
                 <div
                   key={tool.id}
-                  className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                  className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                 >
-                  <span>{tool.name}</span>
+                  <span className="truncate overflow-hidden whitespace-nowrap">
+                    {tool.name}
+                  </span>
                   <Switch
                     checked={enabledToolIds.has(tool.id)}
                     onCheckedChange={(checked) =>
@@ -205,10 +230,20 @@ export function ToolSelectorDropdown({
                 </div>
               ))
             ) : (
-              <div className="text-muted-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+              <div className="text-muted-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
                 No tools found
               </div>
             )}
+            <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
+            {/* Separator */}
+            <div className="px-2 pt-2 pb-1">
+              <Input
+                placeholder="Search tools..."
+                value={toolSearchQuery}
+                onChange={(e) => setToolSearchQuery(e.target.value)}
+                className="h-8"
+              />
+            </div>
           </>
         )}
       </PopoverContent>
