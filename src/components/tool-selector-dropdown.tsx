@@ -2,13 +2,10 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -116,25 +113,28 @@ export function ToolSelectorDropdown({
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <Popover>
+      <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 gap-1">
           <Settings2 className="h-3.5 w-3.5" />
           <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
             Tools
           </span>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[250px]">
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-[250px] p-0">
         {!selectedProjectId ? (
           <>
-            <DropdownMenuLabel>Select Project</DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            <div className="px-4 py-2 text-sm font-semibold">
+              Select Project
+            </div>
+            <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
+            {/* Separator */}
             {projects?.map((project) => (
-              <DropdownMenuItem
+              <div
                 key={project.id}
                 onClick={() => setSelectedProjectId(project.id)}
-                className="flex items-center justify-between"
+                className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
               >
                 <div className="flex items-center gap-2">
                   <Badge className="flex h-5 w-5 items-center justify-center rounded-full p-0">
@@ -142,20 +142,24 @@ export function ToolSelectorDropdown({
                   </Badge>
                   <span>{project.name}</span>
                 </div>
-                <span className="text-muted-foreground text-sm">
+                <span className="text-muted-foreground ml-auto text-sm">
                   {project._count.Tool}
                 </span>
-              </DropdownMenuItem>
+              </div>
             ))}
           </>
         ) : (
           <>
-            <DropdownMenuItem onClick={() => setSelectedProjectId(null)}>
+            <div
+              onClick={() => setSelectedProjectId(null)}
+              className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+            >
               <ChevronLeft className="mr-2 h-4 w-4" />
               Back to Projects
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="flex items-center justify-between">
+            </div>
+            <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
+            {/* Separator */}
+            <div className="flex items-center justify-between px-4 py-2 text-sm font-semibold">
               <span>
                 Tools for{" "}
                 {projects?.find((p) => p.id === selectedProjectId)?.name}
@@ -171,8 +175,9 @@ export function ToolSelectorDropdown({
                   onCheckedChange={handleDisableAllTools}
                 />
               </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
+            </div>
+            <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
+            {/* Separator */}
             <div className="px-2 py-1">
               <Input
                 placeholder="Search tools..."
@@ -181,13 +186,13 @@ export function ToolSelectorDropdown({
                 className="h-8"
               />
             </div>
-            <DropdownMenuSeparator />
+            <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
+            {/* Separator */}
             {filteredTools.length > 0 ? (
               filteredTools.map((tool) => (
-                <DropdownMenuItem
+                <div
                   key={tool.id}
-                  className="flex items-center justify-between"
-                  onSelect={(e) => e.preventDefault()} // Prevent menu close on switch click
+                  className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                 >
                   <span>{tool.name}</span>
                   <Switch
@@ -195,15 +200,18 @@ export function ToolSelectorDropdown({
                     onCheckedChange={(checked) =>
                       handleToggleTool(tool.id, checked)
                     }
+                    className="ml-auto"
                   />
-                </DropdownMenuItem>
+                </div>
               ))
             ) : (
-              <DropdownMenuItem disabled>No tools found</DropdownMenuItem>
+              <div className="text-muted-foreground relative flex cursor-default items-center rounded-sm px-4 py-1.5 text-sm outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                No tools found
+              </div>
             )}
           </>
         )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </PopoverContent>
+    </Popover>
   );
 }
