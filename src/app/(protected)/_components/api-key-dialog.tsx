@@ -24,15 +24,19 @@ const API_KEY_STORAGE_KEYS = {
 
 interface ApiKeyDialogProps {
   onSave: (keys: Record<string, string>) => void;
-  onClose: () => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function ApiKeyDialog({ onSave, onClose }: ApiKeyDialogProps) {
+export function ApiKeyDialog({
+  onSave,
+  isOpen,
+  onOpenChange,
+}: ApiKeyDialogProps) {
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({});
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (isOpen) {
       const loadedKeys: Record<string, string> = {};
       for (const provider in API_KEY_STORAGE_KEYS) {
         const key = localStorage.getItem(
@@ -44,11 +48,11 @@ export function ApiKeyDialog({ onSave, onClose }: ApiKeyDialogProps) {
       }
       setApiKeys(loadedKeys);
     }
-  }, [open]);
+  }, [isOpen]);
 
   const handleSave = () => {
     onSave(apiKeys);
-    setOpen(false); // Close dialog after saving
+    onOpenChange(false); // Close dialog after saving
   };
 
   const handleInputChange = (provider: string, value: string) => {
@@ -59,11 +63,8 @@ export function ApiKeyDialog({ onSave, onClose }: ApiKeyDialogProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">Enter API Keys</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Enter AI API Keys</DialogTitle>
           <DialogDescription>

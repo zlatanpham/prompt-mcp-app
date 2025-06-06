@@ -7,24 +7,20 @@ import { useChat, type Message } from "@ai-sdk/react";
 import { Input } from "@/components/ui/input";
 import { ChatMessageDisplay } from "@/app/(protected)/page/_components/chat-message-display";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
 import { ToolSelectorDropdown } from "@/components/tool-selector-dropdown";
 import { type Tool } from "@/types/tool";
+import { ArrowUpIcon } from "lucide-react";
+import { ChevronDown } from "lucide-react"; // For dropdown indicator
 
 const API_KEY_STORAGE_KEYS = {
   google: "google_ai_api_key",
@@ -33,21 +29,38 @@ const API_KEY_STORAGE_KEYS = {
   anthropic: "anthropic_api_key",
 };
 
+const MODELS = [
+  { label: "DeepSeek Chat v3", value: "deepseek/deepseek-chat" },
+  { label: "Google Gemini 2.0 Flash", value: "google/gemini-2.0-flash-001" },
+  { label: "OpenAI GPT 4.1 mini", value: "openai/gpt-4.1-mini" },
+  { label: "Anthropic Claude 4 Sonnet", value: "anthropic/claude-4-sonnet" },
+  {
+    label: "Anthropic Claude 3.7 Sonnet",
+    value: "anthropic/claude-3.7-sonnet",
+  },
+];
+
 export default function ChatPage() {
-  const [apiKeys, setApiKeys] = useState<Record<string, string>>({
-    google: localStorage.getItem(API_KEY_STORAGE_KEYS.google ?? "") ?? "",
-    openai: localStorage.getItem(API_KEY_STORAGE_KEYS.openai ?? "") ?? "",
-    deepseek: localStorage.getItem(API_KEY_STORAGE_KEYS.deepseek ?? "") ?? "",
-    anthropic: localStorage.getItem(API_KEY_STORAGE_KEYS.anthropic ?? "") ?? "",
+  const [apiKeys, setApiKeys] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") {
+      return {
+        google: "",
+        openai: "",
+        deepseek: "",
+        anthropic: "",
+      };
+    }
+    return {
+      google: localStorage.getItem(API_KEY_STORAGE_KEYS.google ?? "") ?? "",
+      openai: localStorage.getItem(API_KEY_STORAGE_KEYS.openai ?? "") ?? "",
+      deepseek: localStorage.getItem(API_KEY_STORAGE_KEYS.deepseek ?? "") ?? "",
+      anthropic:
+        localStorage.getItem(API_KEY_STORAGE_KEYS.anthropic ?? "") ?? "",
+    };
   });
 
-  const MODELS = [
-    { label: "DeepSeek Chat v3", value: "deepseek/deepseek-chat" },
-    // { label: "DeepSeek Reasoner v3", value: "deepseek/deepseek-reasoner" },
-    { label: "Google Gemini 2.0 Flash", value: "google/gemini-2.0-flash-001" },
-  ];
-
   const [selectedModel, setSelectedModel] = useState(MODELS[0]?.value);
+  const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
 
   const handleSaveApiKey = (keys: Record<string, string>) => {
     for (const provider in keys) {
@@ -57,11 +70,6 @@ export default function ChatPage() {
       );
     }
     setApiKeys(keys);
-  };
-
-  const handleCloseApiKeyDialog = () => {
-    // No action needed here as the dialog manages its own open/close state
-    // This function is just to satisfy the onClose prop type
   };
 
   const [enabledTools, setEnabledTools] = useState<Tool[]>([]);
@@ -84,7 +92,6 @@ export default function ChatPage() {
   });
 
   const [currentProvider] = (selectedModel ?? "").split("/");
-  console.log(messages);
 
   useEffect(() => {
     if (messages.length > 0 && !isLoading) {
@@ -110,28 +117,13 @@ export default function ChatPage() {
         }
       }
     }
-  }, [messages, handleSubmit, isLoading]);
+  }, [messages, handleSubmit, isLoading, append]);
 
   return (
-    <div className="flex h-full flex-col p-4">
-      <Card className="flex flex-grow flex-col">
+    <div className="flex h-screen flex-col p-4">
+      <Card className="flex flex-grow flex-col rounded-b-none border-b-0">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>AI Chat</CardTitle>
-          <div className="flex items-center gap-2">
-            <ToolSelectorDropdown onToolsChange={setEnabledTools} />
-            <Select value={selectedModel} onValueChange={setSelectedModel}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent>
-                {MODELS.map((model) => (
-                  <SelectItem key={model.value} value={model.value}>
-                    {model.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
         </CardHeader>
         <CardContent className="flex-grow overflow-hidden">
           <ScrollArea className="h-full pr-4">
@@ -156,27 +148,61 @@ export default function ChatPage() {
             )}
           </ScrollArea>
         </CardContent>
-        <CardFooter>
-          <form onSubmit={handleSubmit} className="flex w-full space-x-2">
-            <Input
-              placeholder="Type your message..."
-              value={input}
-              onChange={handleInputChange}
-              className="flex-grow"
-              disabled={isLoading || !apiKeys[currentProvider ?? ""]!}
-            />
-            <Button
-              type="submit"
-              disabled={isLoading || !apiKeys[currentProvider ?? ""]!}
-            >
-              Send
-            </Button>
-          </form>
-        </CardFooter>
       </Card>
+      <div className="flex items-center space-x-2 rounded-t-none border-2 border-t-0 p-4">
+        <ToolSelectorDropdown onToolsChange={setEnabledTools} />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!apiKeys[currentProvider ?? ""]) {
+              setIsApiKeyDialogOpen(true);
+            }
+            handleSubmit(e);
+          }}
+          className="flex flex-grow space-x-2"
+        >
+          <Input
+            placeholder="Reply to Claude..."
+            value={input}
+            onChange={handleInputChange}
+            className="flex-grow rounded-full"
+            disabled={isLoading}
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-[180px] justify-between rounded-full"
+              >
+                {MODELS.find((model) => model.value === selectedModel)?.label ??
+                  "Select a model"}
+                <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[240px]">
+              {MODELS.map((model) => (
+                <DropdownMenuItem
+                  key={model.value}
+                  onSelect={() => setSelectedModel(model.value)}
+                >
+                  {model.label}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onSelect={() => setIsApiKeyDialogOpen(true)}>
+                Config API Keys
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button type="submit" disabled={isLoading} className="rounded-full">
+            <ArrowUpIcon className="h-4 w-4" />
+          </Button>
+        </form>
+      </div>
       <ApiKeyDialog
         onSave={handleSaveApiKey}
-        onClose={handleCloseApiKeyDialog}
+        isOpen={isApiKeyDialogOpen}
+        onOpenChange={setIsApiKeyDialogOpen}
       />
     </div>
   );
