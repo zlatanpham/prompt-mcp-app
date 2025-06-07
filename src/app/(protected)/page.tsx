@@ -125,7 +125,7 @@ export default function ChatPage() {
         <div className="max-h-[calc(100dvh-150px)] pt-2">
           <ScrollArea className="h-full px-4">
             {messages.length === 0 && !isLoading && !error ? (
-              <div className="text-muted-foreground mx-auto flex h-[calc(100dvh-400px)] max-w-2xl items-center justify-center text-center text-2xl">
+              <div className="text-muted-foreground mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
                 👋 Hello there! Start to test your tools by typing a message.
               </div>
             ) : (
