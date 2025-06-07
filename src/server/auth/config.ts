@@ -1,8 +1,6 @@
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import {
   type DefaultSession,
-  type DefaultUser,
-  type SessionStrategy,
   type Account, // Import Account
   type Profile, // Import Profile
   type User, // Import User from next-auth
@@ -31,7 +29,7 @@ declare module "next-auth" {
     } & DefaultSession["user"];
   }
 
-  interface User extends DefaultUser {
+  interface User {
     // Extend DefaultUser
     password?: string | null | undefined; // Allow undefined
     emailVerified?: Date | null; // Allow undefined
@@ -45,7 +43,6 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
-import { type AuthOptions } from "next-auth"; // Import AuthOptions
 
 export const authConfig = {
   providers: [
@@ -92,13 +89,12 @@ export const authConfig = {
   ],
   adapter: PrismaAdapter(db),
   session: {
-    strategy: "jwt" as SessionStrategy, // Credentials provider requires JWT strategy
+    strategy: "jwt", // Credentials provider requires JWT strategy
   },
   callbacks: {
     async signIn({
       user,
       account,
-      profile,
     }: {
       user: AdapterUser | User; // Use AdapterUser | User from next-auth
       account: Account | null;
@@ -181,4 +177,4 @@ export const authConfig = {
       }
     },
   },
-} as unknown as AuthOptions;
+} as unknown;
