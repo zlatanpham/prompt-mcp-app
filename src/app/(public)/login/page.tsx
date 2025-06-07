@@ -1,5 +1,4 @@
 import { ComponentIcon } from "lucide-react";
-import Link from "next/link";
 
 import { LoginForm } from "@/components/login-form";
 
@@ -14,12 +13,6 @@ export default function LoginPage() {
           Prompt MCP
         </a>
         <LoginForm />
-        <div className="mt-4 text-center text-sm">
-          Don't have an account?{" "}
-          <Link href="/signup" className="underline">
-            Sign up
-          </Link>
-        </div>
       </div>
     </div>
   );

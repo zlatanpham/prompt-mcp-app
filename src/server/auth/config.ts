@@ -95,6 +95,25 @@ export const authConfig = {
     strategy: "jwt" as SessionStrategy, // Credentials provider requires JWT strategy
   },
   callbacks: {
+    async signIn({
+      user,
+      account,
+      profile,
+    }: {
+      user: AdapterUser | User; // Use AdapterUser | User from next-auth
+      account: Account | null;
+      profile?: Profile;
+    }) {
+      // Check if the user is signing in with GitHub
+      if (account?.provider === "credentials") {
+        console.log("User signed in with credentials:", user);
+        // You can add additional logic here if needed
+        return true; // Allow sign-in
+      }
+
+      // For other providers, you can add your own logic
+      return true; // Allow sign-in by default
+    },
     jwt: async ({
       token,
       user,

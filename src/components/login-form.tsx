@@ -1,5 +1,3 @@
-"use client";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,61 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Github } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-
-const formSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
-});
+import { Label } from "@/components/ui/label";
+import { Github } from "lucide-react";
+import { signIn } from "@/server/auth";
+import { redirect } from "next/navigation";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      console.log("Logging in with values:", values);
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (response.ok) {
-        toast.success("Login successful!");
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || "Login failed. Please try again.");
-      }
-    } catch (error) {
-      console.error("Login error:", error);
-      toast.error("An unexpected error occurred. Please try again.");
-    }
-  }
-
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -72,43 +25,45 @@ export function LoginForm({
           <CardDescription>Login with your email and password</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
+          <form
+            action={async (formData) => {
+              "use server";
+              const email = formData.get("email") as string;
+              const password = formData.get("password") as string;
+
+              await signIn("credentials", {
+                email,
+                password,
+                redirect: false,
+              });
+              redirect("/");
+            }}
+            className="space-y-4"
+          >
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
                 name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="your@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                type="email"
+                placeholder="your@email.com"
+                required
               />
-              <FormField
-                control={form.control}
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
                 name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="********"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                type="password"
+                placeholder="********"
+                required
               />
-              <Button type="submit" className="w-full">
-                Sign in with Email
-              </Button>
-            </form>
-          </Form>
+            </div>
+            <Button type="submit" className="w-full">
+              Sign in with Email
+            </Button>
+          </form>
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -119,13 +74,9 @@ export function LoginForm({
               </span>
             </div>
           </div>
-          {/* Keep GitHub sign-in as a server action if desired, or convert to API route as well */}
-          {/* <form
+          <form
             action={async () => {
-              // This still uses the server action directly for GitHub.
-              // If you want to use an API route for GitHub as well,
-              // you would create a new API route for it similar to /api/login.
-              const { signIn } = await import("@/server/auth");
+              "use server";
               await signIn("github", {
                 redirectTo: "/",
               });
@@ -134,7 +85,7 @@ export function LoginForm({
             <Button type="submit" className="w-full">
               <Github className="mr-2 h-4 w-4" /> Sign in with GitHub
             </Button>
-          </form> */}
+          </form>
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
