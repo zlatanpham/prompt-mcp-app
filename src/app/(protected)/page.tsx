@@ -18,7 +18,7 @@ import {
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
 import { ToolSelectorDropdown } from "@/components/tool-selector-dropdown";
 import { type Tool } from "@/types/tool";
-import { ArrowUpIcon } from "lucide-react";
+import { ArrowUpIcon, CircleDotIcon } from "lucide-react";
 import { ChevronDown } from "lucide-react"; // For dropdown indicator
 
 const API_KEY_STORAGE_KEYS = {
@@ -81,6 +81,7 @@ export default function ChatPage() {
     isLoading,
     error,
     append,
+    stop, // Destructure stop from useChat
   } = useChat({
     api: "/api/chat",
     body: {
@@ -136,7 +137,7 @@ export default function ChatPage() {
               </div>
             )}
             {isLoading && (
-              <div className="text-muted-foreground py-1 text-sm">
+              <div className="text-muted-foreground px-2 py-1 text-sm">
                 AI is thinking...
               </div>
             )}
@@ -196,8 +197,28 @@ export default function ChatPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button type="submit" disabled={isLoading} className="rounded-full">
-            <ArrowUpIcon className="h-4 w-4" />
+          <Button
+            type="submit"
+            variant={isLoading ? "secondary" : "default"}
+            className="w-9 cursor-pointer rounded-full"
+            onClick={(e) => {
+              e.preventDefault();
+              if (isLoading) {
+                stop();
+              } else {
+                if (!apiKeys[currentProvider ?? ""]) {
+                  setIsApiKeyDialogOpen(true);
+                  return;
+                }
+                handleSubmit(e);
+              }
+            }}
+          >
+            {isLoading ? (
+              <CircleDotIcon className="h-4 w-4" />
+            ) : (
+              <ArrowUpIcon className="h-4 w-4" />
+            )}
           </Button>
         </form>
       </div>
