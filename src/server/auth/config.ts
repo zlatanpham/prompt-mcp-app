@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { type DefaultSession } from "next-auth";
 import { type AdapterUser } from "next-auth/adapters";
@@ -48,8 +49,12 @@ export const authConfig = {
           return null;
         }
 
+        if (typeof credentials.email !== "string") {
+          return null;
+        }
+
         const user: User | null = await db.user.findUnique({
-          where: { email: credentials.email as string },
+          where: { email: credentials.email },
         });
 
         if (!user?.password) {
@@ -57,7 +62,7 @@ export const authConfig = {
         }
 
         const isPasswordValid = await bcrypt.compare(
-          credentials.password as string,
+          String(credentials.password),
           user.password,
         );
 
