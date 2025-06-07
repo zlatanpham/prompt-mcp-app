@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,14 +12,37 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Github } from "lucide-react";
-import { signIn } from "@/server/auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { login, githubSignIn } from "@/app/actions/auth";
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = async (formData: FormData) => {
+    startTransition(async () => {
+      try {
+        await login(formData);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Login failed. Please check your credentials.";
+        toast.error(errorMessage);
+      }
+    });
+  };
+
+  const handleGithubSignIn = async () => {
+    startTransition(async () => {
+      await githubSignIn();
+    });
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -26,26 +51,7 @@ export function LoginForm({
           <CardDescription>Login with your email and password</CardDescription>
         </CardHeader>
         <CardContent>
-          <form
-            action={async (formData) => {
-              "use server";
-              const email = formData.get("email") as string;
-              const password = formData.get("password") as string;
-
-              try {
-                await signIn("credentials", {
-                  email,
-                  password,
-                  redirect: false,
-                });
-                redirect("/");
-              } catch (error) {
-                console.error("Login failed:", error);
-                throw new Error("Login failed. Please check your credentials.");
-              }
-            }}
-            className="space-y-4"
-          >
+          <form action={handleSubmit} className="space-y-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -66,8 +72,8 @@ export function LoginForm({
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
-              Sign in with Email
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Signing in..." : "Sign in with Email"}
             </Button>
           </form>
           <div className="relative my-6">
@@ -80,15 +86,13 @@ export function LoginForm({
               </span>
             </div>
           </div>
-          <form
-            action={async () => {
-              "use server";
-              await signIn("github", {
-                redirectTo: "/",
-              });
-            }}
-          >
-            <Button type="submit" variant="secondary" className="w-full">
+          <form action={handleGithubSignIn}>
+            <Button
+              type="submit"
+              variant="secondary"
+              className="w-full"
+              disabled={isPending}
+            >
               <Github className="mr-2 h-4 w-4" /> Sign in with GitHub
             </Button>
           </form>

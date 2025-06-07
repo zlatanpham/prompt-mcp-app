@@ -1,18 +1,30 @@
 ---
+
 Date: 2025-06-07
-TaskRef: "Customize Skeleton to resemble NavUser component"
+TaskRef: "Implement client-side toast for login failures"
 
 Learnings:
-  - Successfully replicated the visual structure of a complex React component (`NavUser`) using `Skeleton` components and Tailwind CSS utility classes.
-  - The process involved analyzing the target component's layout (avatar, text blocks, icon) and translating those visual elements into corresponding `Skeleton` components with appropriate sizing and spacing classes.
-  - Specifically, used `h-8 w-8 rounded-lg` for avatar, `h-4 w-24` and `h-3 w-32` for text lines, and `h-4 w-4` for icons, combined with `flex`, `items-center`, `gap-2`, `px-1`, `py-1.5`, `grid`, `flex-1`, `text-left`, `text-sm`, `leading-tight`, and `ml-auto` for layout.
+
+- Next.js Server Actions called directly in client components can lead to bundling server-side code (like Prisma Client) into client chunks, causing "Code generation for chunk item errored" errors.
+- `signIn` from `next-auth` with `redirect: false` returns a `SignInResponse` object, which contains an `error` property on authentication failure. It does not throw an error directly in a `try...catch` block in the same way a standard function might.
+- Explicitly checking `result?.error` from `signIn` and then throwing a new `Error` with a string message is the correct way to propagate authentication errors from server actions to client components for toast display.
+- Type casting `result.error as string | undefined` and using nullish coalescing (`??`) helps satisfy TypeScript and ESLint when handling potentially `any` types from external libraries.
 
 Difficulties:
-  - No significant difficulties encountered. The task was straightforward once the `NavUser` component's structure was understood.
+
+- Initial attempt to handle `signIn` errors directly in client component's `try...catch` failed due to server-side bundling of Prisma.
+- Misunderstanding of `signIn`'s `redirect: false` behavior led to incorrect error propagation, resulting in unexpected redirects to GitHub login page instead of client-side error handling.
+- ESLint/TypeScript errors related to `any` type from `result.error` required explicit type handling.
 
 Successes:
-  - The `Skeleton` component now accurately mimics the `NavUser` component's appearance, providing a better loading state experience.
+
+- Successfully refactored login logic into a dedicated server action (`src/app/actions/auth.ts`) to prevent server-side code bundling on the client.
+- Correctly implemented error propagation from the server action to the client component using `SignInResponse`'s `error` property.
+- Integrated `sonner` toast notifications for client-side display of login errors.
+- Added `Toaster` component to `src/app/(public)/layout.tsx` for toast rendering.
 
 Improvements_Identified_For_Consolidation:
-  - General pattern: Replicating component loading states with `Skeleton` by mapping visual elements to `Skeleton` components and applying corresponding layout/sizing classes.
+
+- General pattern: Handling server action errors in client components, especially with `next-auth`'s `signIn` function.
+- Specific: Correct usage of `signIn` with `redirect: false` and checking `result.error`.
 ---
