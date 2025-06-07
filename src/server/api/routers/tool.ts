@@ -294,7 +294,13 @@ export const toolRouter = createTRPCRouter({
       orderBy: { updated_at: "desc" },
     });
 
-    return tools;
+    // Explicitly cast args to Argument[]
+    const parsedTools = tools.map((tool) => ({
+      ...tool,
+      args: (tool.args ?? []) as Argument[],
+    }));
+
+    return parsedTools;
   }),
 
   moveTools: protectedProcedure

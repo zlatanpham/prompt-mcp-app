@@ -125,3 +125,28 @@
     @apply bg-background text-foreground;
   }
 }
+
+.prose {
+  max-width: 100%;
+  line-height: 1.5rem;
+  hr {
+    @apply my-3;
+  }
+  p {
+    @apply my-2;
+  }
+
+  *:last-child {
+    margin-bottom: 0;
+  }
+  li p {
+    @apply m-0;
+  }
+  li {
+    @apply my-2;
+  }
+  ul,
+  ol {
+    @apply my-2;
+  }
+}

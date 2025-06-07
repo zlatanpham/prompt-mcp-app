@@ -204,7 +204,7 @@ export default function ApiKeysPage() {
               <TableHead>Name</TableHead>
               <TableHead>Key</TableHead>
               <TableHead>Projects</TableHead>
-              <TableHead>Tools</TableHead> {/* Changed label to "Tools" */}
+              <TableHead>Tools</TableHead>
               <TableHead>Created At</TableHead>
               <TableHead>Updated At</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -233,7 +233,7 @@ export default function ApiKeysPage() {
                         className="h-6 w-6 p-0"
                       >
                         {copiedKeyId === apiKey.id ? (
-                          <Check className="h-4 w-4 text-green-500" />
+                          <Check className="h-4 w-4 text-green-600" />
                         ) : (
                           <Copy className="h-4 w-4" />
                         )}
@@ -257,7 +257,7 @@ export default function ApiKeysPage() {
                   <TableCell>
                     <Button
                       variant="link"
-                      className="h-auto p-0"
+                      className="h-auto cursor-pointer p-0"
                       onClick={() => {
                         setApiKeyIdForTools(apiKey.id);
                         setIsToolsDrawerOpen(true);
