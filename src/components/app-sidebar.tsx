@@ -24,6 +24,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { Skeleton } from "./ui/skeleton";
 
 const data = {
   navMain: [
@@ -58,7 +59,7 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
 
   const user = React.useMemo(() => {
     if (!session?.user) {
@@ -102,7 +103,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} />
+        {status == "loading" ? (
+          <div className="flex items-center gap-2 px-1 py-2">
+            <Skeleton className="h-8 w-8 rounded-lg bg-gray-200" />
+            <div className="grid flex-1 gap-1 text-left text-sm leading-tight">
+              <Skeleton className="h-4 w-24 bg-gray-200" />
+              <Skeleton className="h-3 w-32 bg-gray-200" />
+            </div>
+            <Skeleton className="ml-auto h-4 w-4" />
+          </div>
+        ) : (
+          <NavUser user={user} />
+        )}
       </SidebarFooter>
     </Sidebar>
   );
