@@ -10,7 +10,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Github } from "lucide-react";
-import { signIn } from "@/server/auth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -45,14 +44,23 @@ export function LoginForm({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
       console.log("Logging in with values:", values);
-      await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        redirectTo: "/",
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
       });
-      toast.success("Login successful!");
+
+      if (response.ok) {
+        toast.success("Login successful!");
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData.message || "Login failed. Please try again.");
+      }
     } catch (error) {
-      toast.error("Invalid credentials. Please try again.");
+      console.error("Login error:", error);
+      toast.error("An unexpected error occurred. Please try again.");
     }
   }
 
@@ -111,8 +119,13 @@ export function LoginForm({
               </span>
             </div>
           </div>
-          <form
+          {/* Keep GitHub sign-in as a server action if desired, or convert to API route as well */}
+          {/* <form
             action={async () => {
+              // This still uses the server action directly for GitHub.
+              // If you want to use an API route for GitHub as well,
+              // you would create a new API route for it similar to /api/login.
+              const { signIn } = await import("@/server/auth");
               await signIn("github", {
                 redirectTo: "/",
               });
@@ -121,7 +134,7 @@ export function LoginForm({
             <Button type="submit" className="w-full">
               <Github className="mr-2 h-4 w-4" /> Sign in with GitHub
             </Button>
-          </form>
+          </form> */}
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">

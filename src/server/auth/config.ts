@@ -45,6 +45,7 @@ export const authConfig = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
+        console.log("Credentials trigger");
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
@@ -56,6 +57,7 @@ export const authConfig = {
         const user: User | null = await db.user.findUnique({
           where: { email: credentials.email },
         });
+        console.log("User found:", user);
 
         if (!user?.password) {
           return null;
@@ -69,6 +71,8 @@ export const authConfig = {
         if (!isPasswordValid) {
           return null;
         }
+
+        console.log("Password is valid for user:", user.email);
 
         return user;
       },
