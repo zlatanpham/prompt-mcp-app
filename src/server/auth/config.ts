@@ -3,7 +3,8 @@ import {
   type DefaultSession,
   type Account, // Import Account
   type Profile, // Import Profile
-  type User, // Import User from next-auth
+  type User,
+  type NextAuthConfig, // Import User from next-auth
 } from "next-auth";
 import { type AdapterUser } from "next-auth/adapters"; // Import AdapterUser
 import GithubProvider from "next-auth/providers/github";
@@ -177,4 +178,4 @@ export const authConfig = {
       }
     },
   },
-} as unknown;
+} as unknown as NextAuthConfig;
