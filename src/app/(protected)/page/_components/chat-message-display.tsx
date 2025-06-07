@@ -11,6 +11,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { CopyIcon } from "lucide-react";
 
 interface ToolInvocationLike {
   toolName: string;
@@ -45,10 +48,24 @@ function isAnnotationLike(value: unknown): value is AnnotationLike {
 
 interface ChatMessageDisplayProps {
   message: Message;
+  isLoading?: boolean;
 }
 
-export function ChatMessageDisplay({ message }: ChatMessageDisplayProps) {
+export function ChatMessageDisplay({
+  message,
+  isLoading,
+}: ChatMessageDisplayProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(message.content);
+      toast.success("Message copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy message: ", err);
+      toast.error("Failed to copy message.");
+    }
+  };
 
   // Hide the message if it has toolName annotation
   // which indicates previous message was a tool invocation
@@ -141,6 +158,18 @@ export function ChatMessageDisplay({ message }: ChatMessageDisplayProps) {
       <ReactMarkdown remarkPlugins={[remarkGfm]}>
         {message.content}
       </ReactMarkdown>
+      {isLoading ? null : (
+        <div className="flex justify-end">
+          <Button
+            onClick={handleCopy}
+            variant="secondary"
+            size="sm"
+            className="cursor-pointer"
+          >
+            <CopyIcon className="!h-4 !w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

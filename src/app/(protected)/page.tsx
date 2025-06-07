@@ -138,35 +138,43 @@ export default function ChatPage() {
   return (
     <div className="flex h-[calc(100dvh-16px)] flex-col py-4">
       <div className="flex flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
-        <h2 className="px-4 text-lg font-semibold">Chat playground</h2>
-        <div className="max-h-[calc(100dvh-150px)] pt-2">
+        <h2 className="border-b px-4 pb-4 text-lg font-semibold">
+          Chat playground
+        </h2>
+        <div className="max-h-[calc(100dvh-200px)]">
           <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
-            {messages.length === 0 && !isLoading && !error ? (
-              <div className="text-muted-foreground mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
-                👋 Hello there! Start to test your tools by typing a message.
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {messages.map((message: Message) => (
-                  <ChatMessageDisplay key={message.id} message={message} />
-                ))}
-              </div>
-            )}
-            {isLoading && (
-              <div className="text-muted-foreground px-2 py-1 text-sm">
-                AI is thinking...
-              </div>
-            )}
-            {error && (
-              <div className="text-center text-red-500">
-                Error: {error.message}
-              </div>
-            )}
+            <div className="mx-auto max-w-3xl">
+              {messages.length === 0 && !isLoading && !error ? (
+                <div className="text-muted-foreground mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
+                  👋 Hello there! Start to test your tools by typing a message.
+                </div>
+              ) : (
+                <div className="space-y-3 py-4">
+                  {messages.map((message: Message, index) => (
+                    <ChatMessageDisplay
+                      key={message.id}
+                      message={message}
+                      isLoading={index === messages.length - 1 && isLoading}
+                    />
+                  ))}
+                </div>
+              )}
+              {isLoading && (
+                <div className="text-muted-foreground px-2 py-1 text-sm">
+                  AI is thinking...
+                </div>
+              )}
+              {error && (
+                <div className="text-center text-red-500">
+                  Error: {error.message}
+                </div>
+              )}
+            </div>
           </ScrollArea>
         </div>
       </div>
-      <div className="mx-4 flex items-center space-x-2 rounded-xl border p-4 shadow-2xl">
-        <ToolSelectorDropdown onToolsChange={setEnabledTools} />
+
+      <div className="mx-4 flex w-full max-w-3xl items-center rounded-xl border p-2 shadow-2xl sm:mx-auto">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -176,66 +184,77 @@ export default function ChatPage() {
             }
             handleSubmit(e);
           }}
-          className="flex flex-grow space-x-2"
+          className="flex w-full flex-col space-y-2"
         >
-          <Input
-            placeholder="Type your message here..."
-            value={input}
-            onChange={handleInputChange}
-            className="flex-grow rounded-full"
-            disabled={isLoading}
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+          <div>
+            <Input
+              placeholder="Type your message here..."
+              value={input}
+              onChange={handleInputChange}
+              className="flex-grow border-none shadow-none"
+              disabled={isLoading}
+            />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <ToolSelectorDropdown onToolsChange={setEnabledTools} />
+            </div>
+            <div className="flex items-center space-x-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-[180px] justify-between rounded-full"
+                  >
+                    <span className="truncate">
+                      {MODELS.find((model) => model.value === selectedModel)
+                        ?.label ?? "Select a model"}
+                    </span>
+                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[240px]">
+                  {MODELS.map((model) => (
+                    <DropdownMenuItem
+                      key={model.value}
+                      onSelect={() => setSelectedModel(model.value)}
+                    >
+                      {model.label}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => setIsApiKeyDialogOpen(true)}
+                  >
+                    Config API Keys
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Button
-                variant="outline"
-                className="w-[180px] justify-between rounded-full"
+                type="submit"
+                variant={isLoading ? "secondary" : "default"}
+                className="w-9 cursor-pointer rounded-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (isLoading) {
+                    stop();
+                  } else {
+                    if (!apiKeys[currentProvider ?? ""]) {
+                      setIsApiKeyDialogOpen(true);
+                      return;
+                    }
+                    handleSubmit(e);
+                  }
+                }}
               >
-                <span className="truncate">
-                  {MODELS.find((model) => model.value === selectedModel)
-                    ?.label ?? "Select a model"}
-                </span>
-                <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                {isLoading ? (
+                  <CircleDotIcon className="h-4 w-4" />
+                ) : (
+                  <ArrowUpIcon className="h-4 w-4" />
+                )}
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[240px]">
-              {MODELS.map((model) => (
-                <DropdownMenuItem
-                  key={model.value}
-                  onSelect={() => setSelectedModel(model.value)}
-                >
-                  {model.label}
-                </DropdownMenuItem>
-              ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => setIsApiKeyDialogOpen(true)}>
-                Config API Keys
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Button
-            type="submit"
-            variant={isLoading ? "secondary" : "default"}
-            className="w-9 cursor-pointer rounded-full"
-            onClick={(e) => {
-              e.preventDefault();
-              if (isLoading) {
-                stop();
-              } else {
-                if (!apiKeys[currentProvider ?? ""]) {
-                  setIsApiKeyDialogOpen(true);
-                  return;
-                }
-                handleSubmit(e);
-              }
-            }}
-          >
-            {isLoading ? (
-              <CircleDotIcon className="h-4 w-4" />
-            ) : (
-              <ArrowUpIcon className="h-4 w-4" />
-            )}
-          </Button>
+            </div>
+          </div>
         </form>
       </div>
       <ApiKeyDialog
