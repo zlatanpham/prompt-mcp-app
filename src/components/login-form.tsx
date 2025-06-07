@@ -32,12 +32,17 @@ export function LoginForm({
               const email = formData.get("email") as string;
               const password = formData.get("password") as string;
 
-              await signIn("credentials", {
-                email,
-                password,
-                redirect: false,
-              });
-              redirect("/");
+              try {
+                await signIn("credentials", {
+                  email,
+                  password,
+                  redirect: false,
+                });
+                redirect("/");
+              } catch (error) {
+                console.error("Login failed:", error);
+                throw new Error("Login failed. Please check your credentials.");
+              }
             }}
             className="space-y-4"
           >
