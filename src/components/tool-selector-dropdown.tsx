@@ -232,7 +232,7 @@ export function ToolSelectorDropdown({
             </div>
             <div className="h-px bg-gray-200 dark:bg-gray-700" />{" "}
             {/* Separator */}
-            <div className="flex items-center justify-between px-2 py-2 text-sm font-semibold">
+            <div className="flex items-center justify-between px-2 py-2 text-sm font-medium">
               <span>
                 Tools for{" "}
                 {projects?.find((p) => p.id === selectedProjectId)?.name}

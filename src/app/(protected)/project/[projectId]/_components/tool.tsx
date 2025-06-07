@@ -131,7 +131,7 @@ export default function ToolComponent() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h4 className="text-lg font-semibold">Project tools</h4>
+        <h4 className="text-lg font-medium">Project tools</h4>
         <Button
           variant="default"
           disabled={isLoading}

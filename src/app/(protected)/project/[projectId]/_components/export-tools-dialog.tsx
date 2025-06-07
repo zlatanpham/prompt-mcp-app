@@ -119,7 +119,7 @@ export default function ExportToolsDialog({
                     handleSelectAll(checked)
                   }
                 />
-                <Label htmlFor="selectAll" className="text-base font-semibold">
+                <Label htmlFor="selectAll" className="text-base font-medium">
                   Select All
                 </Label>
               </div>

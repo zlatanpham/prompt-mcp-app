@@ -59,7 +59,7 @@ export function ApiKeyToolsDrawer({
             <div className="space-y-6">
               {groupedTools.map((projectGroup) => (
                 <div key={projectGroup.projectId}>
-                  <h3 className="text-md font-semibold">
+                  <h3 className="text-md font-medium">
                     {projectGroup.projectName} ({projectGroup.tools.length}{" "}
                     tools)
                   </h3>

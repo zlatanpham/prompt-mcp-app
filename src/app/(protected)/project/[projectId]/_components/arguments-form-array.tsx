@@ -41,14 +41,14 @@ export function ArgumentsFormArray({
       {fields.map((field, index) => (
         <div
           key={field.id}
-          className="relative mb-2 rounded-md border bg-gray-50 p-4 pt-5"
+          className="relative rounded-md border bg-gray-50 p-3 pt-3"
         >
           <Button
             type="button"
             variant="ghost"
             size="icon"
             onClick={() => remove(index)}
-            className="absolute top-1 right-1"
+            className="absolute top-0 right-0"
           >
             <Trash2 className="text-destructive h-4 w-4" />
           </Button>

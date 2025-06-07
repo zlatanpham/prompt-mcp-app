@@ -142,7 +142,7 @@ export default function ProjectPage() {
       bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "Projects" }]}
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Projects</h1>
+        <h1 className="text-2xl font-medium">Projects</h1>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
             <Button>Create Project</Button>
@@ -215,7 +215,7 @@ export default function ProjectPage() {
                 <Card className="flex h-full flex-col justify-between p-4 transition-all hover:shadow-md">
                   <div>
                     <div className="flex items-center justify-between">
-                      <h2 className="mb-2 text-lg font-semibold">
+                      <h2 className="mb-2 text-lg font-medium">
                         {project.name}
                       </h2>
                       <DropdownMenu>

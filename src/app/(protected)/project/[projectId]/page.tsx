@@ -98,7 +98,7 @@ export default function ProjectDetailPage() {
       ) : (
         <>
           <div className="flex items-center justify-between">
-            <h1 className="mb-4 text-2xl font-bold">{project.name}</h1>
+            <h1 className="mb-4 text-2xl font-medium">{project.name}</h1>
             <div className="flex items-center gap-2">
               <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogTrigger asChild>

@@ -86,7 +86,7 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto max-w-lg space-y-6 p-8 pb-16">
-      <h2 className="text-2xl font-bold tracking-tight">My Account</h2>
+      <h2 className="text-2xl font-medium tracking-tight">My Account</h2>
 
       <Card className="w-full max-w-2xl p-0">
         <CardContent className="flex items-center space-x-4 p-4">
@@ -96,7 +96,7 @@ export default function AccountPage() {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-lg font-semibold">{user.name ?? ""}</p>
+            <p className="text-lg font-medium">{user.name ?? ""}</p>
             <p className="text-muted-foreground text-sm">{user.email}</p>
           </div>
         </CardContent>

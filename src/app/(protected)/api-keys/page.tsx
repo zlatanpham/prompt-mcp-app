@@ -28,6 +28,7 @@ import DashboardLayout from "@/components/dashboard-layout";
 import { ApiKeyToolsDrawer } from "./_components/api-key-tools-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Wrench } from "lucide-react";
+import { truncate } from "@/utils/string";
 
 export default function ApiKeysPage() {
   const [isToolsDrawerOpen, setIsToolsDrawerOpen] = useState(false);
@@ -176,7 +177,7 @@ export default function ApiKeysPage() {
       bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "API Keys" }]}
     >
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">API Keys</h1>
+        <h1 className="text-2xl font-medium">API Keys</h1>
         <CreateApiKeyDialog
           isOpen={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
@@ -191,11 +192,11 @@ export default function ApiKeysPage() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
         </div>
       ) : (
         <Table>
@@ -221,7 +222,7 @@ export default function ApiKeysPage() {
                   <TableCell className="font-medium">{apiKey.name}</TableCell>
                   <TableCell className="font-mono text-sm">
                     <div className="flex items-center gap-2">
-                      <span>{apiKey.key.substring(0, 8)}...</span>
+                      <span>{truncate(apiKey.key, 10, true)}</span>
                       <Button
                         variant="ghost"
                         size="sm"

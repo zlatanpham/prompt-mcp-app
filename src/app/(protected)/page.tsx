@@ -249,7 +249,7 @@ export default function ChatPage() {
               <Button
                 type="submit"
                 variant={isLoading ? "secondary" : "default"}
-                className="w-9 cursor-pointer rounded-full"
+                className="h-9 w-9 cursor-pointer rounded-full"
                 onClick={(e) => {
                   e.preventDefault();
                   if (isLoading) {
