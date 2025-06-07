@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Github } from "lucide-react";
 import { signIn } from "@/server/auth";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export function LoginForm({
   className,
@@ -82,15 +83,17 @@ export function LoginForm({
               });
             }}
           >
-            <Button type="submit" className="w-full">
+            <Button type="submit" variant="secondary" className="w-full">
               <Github className="mr-2 h-4 w-4" /> Sign in with GitHub
             </Button>
           </form>
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
+        {"Don't have an account? "}
+        <Link href="/signup" className="text-primary">
+          Sign up
+        </Link>
       </div>
     </div>
   );

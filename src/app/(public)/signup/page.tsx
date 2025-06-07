@@ -68,10 +68,10 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+    <div className="flex flex-col gap-6">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Create an account</CardTitle>
+          <CardTitle className="text-xl">Create an account</CardTitle>
           <CardDescription>
             Enter your details below to create your account
           </CardDescription>
@@ -144,14 +144,14 @@ export default function SignUpPage() {
               </Button>
             </form>
           </Form>
-          <div className="mt-4 text-center text-sm">
-            Already have an account?{" "}
-            <Link href="/login" className="underline">
-              Log in
-            </Link>
-          </div>
         </CardContent>
       </Card>
+      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
+        Already have an account?{" "}
+        <Link href="/login" className="text-primary">
+          Log in
+        </Link>
+      </div>
     </div>
   );
 }
