@@ -2,7 +2,8 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat, type Message } from "@ai-sdk/react";
 import { Input } from "@/components/ui/input";
 import { ChatMessageDisplay } from "@/app/(protected)/page/_components/chat-message-display";
@@ -41,6 +42,20 @@ const MODELS = [
 
 export default function ChatPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  const { data: session } = useSession();
+
+  const userAvatarFallback = useMemo(() => {
+    if (!session?.user) {
+      return "U";
+    }
+    const userData = session.user as unknown as {
+      name?: string;
+      avatar?: string;
+    };
+
+    return userData.name?.charAt(0).toUpperCase() ?? "U";
+  }, [session]);
 
   const [apiKeys, setApiKeys] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") {
@@ -154,6 +169,7 @@ export default function ChatPage() {
                     <ChatMessageDisplay
                       key={message.id}
                       message={message}
+                      userAvatarFallback={userAvatarFallback}
                       isLoading={index === messages.length - 1 && isLoading}
                     />
                   ))}

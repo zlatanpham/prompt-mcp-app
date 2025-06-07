@@ -14,6 +14,7 @@ import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { CopyIcon } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface ToolInvocationLike {
   toolName: string;
@@ -49,11 +50,13 @@ function isAnnotationLike(value: unknown): value is AnnotationLike {
 interface ChatMessageDisplayProps {
   message: Message;
   isLoading?: boolean;
+  userAvatarFallback?: string;
 }
 
 export function ChatMessageDisplay({
   message,
   isLoading,
+  userAvatarFallback,
 }: ChatMessageDisplayProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -145,10 +148,17 @@ export function ChatMessageDisplay({
 
   if (message.role === "user") {
     return (
-      <div className="rounded-lg bg-gray-100 p-3">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {message.content}
-        </ReactMarkdown>
+      <div className="flex items-start gap-4 rounded-lg bg-gray-100 p-3">
+        <Avatar className="h-8 w-8">
+          <AvatarFallback className="bg-gray-800 text-white">
+            {userAvatarFallback}
+          </AvatarFallback>
+        </Avatar>
+        <div className="mt-1">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {message.content}
+          </ReactMarkdown>
+        </div>
       </div>
     );
   }
