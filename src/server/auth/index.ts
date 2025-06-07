@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import NextAuth from "next-auth";
 import { cache } from "react";
 

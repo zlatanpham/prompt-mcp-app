@@ -49,7 +49,26 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      // The createUser event in authConfig will handle organization creation
+      const toHyphenCase = (str: string) =>
+        str
+          .trim()
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+
+      const organizationName = toHyphenCase(newUser.name!); // Use ! assertion
+      await ctx.db.organization.create({
+        data: {
+          name: organizationName,
+          owner_user_id: newUser.id,
+          OrganizationMember: {
+            create: {
+              user_id: newUser.id,
+              role: "owner",
+            },
+          },
+        },
+      });
 
       return newUser;
     }),

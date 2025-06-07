@@ -1,19 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import {
   type DefaultSession,
   type DefaultUser,
   type SessionStrategy,
-} from "next-auth"; // Add DefaultUser, SessionStrategy
-import { type AdapterUser } from "next-auth/adapters";
+  type Account, // Import Account
+  type Profile, // Import Profile
+  type User, // Import User from next-auth
+} from "next-auth";
+import { type AdapterUser } from "next-auth/adapters"; // Import AdapterUser
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { encode, decode, type JWT } from "next-auth/jwt"; // Import JWT
-import { type Account, type Profile } from "next-auth";
+import { type JWT } from "next-auth/jwt";
 
 import { db } from "@/server/db";
-import type { PrismaClient, User as PrismaUser } from "@prisma/client"; // Alias User to PrismaUser
+import type { PrismaClient, User as PrismaUser } from "@prisma/client";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -32,9 +33,10 @@ declare module "next-auth" {
 
   interface User extends DefaultUser {
     // Extend DefaultUser
-    password?: string | null;
-    emailVerified: Date | null; // Explicitly set to Date | null
-    email: string | null; // Explicitly set to string | null
+    password?: string | null | undefined; // Allow undefined
+    emailVerified?: Date | null; // Allow undefined
+    email?: string | null; // Allow undefined
+    name?: string | null; // Allow undefined
   }
 }
 
@@ -43,10 +45,11 @@ declare module "next-auth" {
  *
  * @see https://next-auth.js.org/configuration/options
  */
+import { type AuthOptions } from "next-auth"; // Import AuthOptions
+
 export const authConfig = {
-  secret: process.env.NEXTAUTH_SECRET, // Explicitly set secret
   providers: [
-    // GithubProvider,
+    GithubProvider,
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -85,67 +88,48 @@ export const authConfig = {
 
         return user;
       },
-    }) as any, // Temporarily cast to any to bypass type issues with CredentialsProvider
+    }),
   ],
   adapter: PrismaAdapter(db),
   session: {
     strategy: "jwt" as SessionStrategy, // Credentials provider requires JWT strategy
   },
   callbacks: {
-    signIn: async ({
+    jwt: async ({
+      token,
       user,
-      account,
-      profile,
-      email,
-      credentials,
     }: {
-      user: any; // Cast to any to bypass persistent type issues
+      token: JWT;
+      user: AdapterUser | User; // Use AdapterUser | User from next-auth
       account: Account | null;
       profile?: Profile;
-      email?: { verificationRequest?: boolean }; // Change this line
-      credentials?: Record<string, unknown>;
+      trigger?: "signIn" | "signUp" | "update";
     }) => {
-      // Check if the sign-in is triggered by the Credentials provider
-      if (account?.provider === "credentials") {
-        console.log("signIn callback: Credentials provider, allowing sign-in.");
-        return true; // Allow sign-in
-      }
-      console.log(
-        "signIn callback: Non-credentials provider, allowing sign-in.",
-      );
-      return true; // Or return false to prevent sign-in
-    },
-    jwt: async ({ token, user }: { token: JWT; user: any }) => {
-      // Explicitly type token and user
-      // Add jwt callback
-      console.log("testing jwt callback");
       if (user) {
-        token.id = user.id; // Add user ID to the token
+        token.id = user.id;
       }
       return token;
     },
     session: ({
       session,
-      token, // Session callback receives token, not user, with JWT strategy
+      token,
     }: {
       session: DefaultSession;
-      token: any; // Cast to any for token
+      token: JWT; // Use JWT type
     }) => {
       console.log("testing session callback");
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.id, // Get ID from token
+          id: token.id,
         },
       };
     },
   },
   events: {
-    async createUser({ user }: { user: any }) {
-      // Cast to any
+    async createUser({ user }: { user: User }) {
       if (!user.name || !user.id) return;
-      if (typeof user.name !== "string") return; // Add this type guard
       // Convert user.name to hyphen case (kebab case)
       const toHyphenCase = (str: string) =>
         str
@@ -154,8 +138,10 @@ export const authConfig = {
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/^-+|-+$/g, "");
 
-      const organizationName = toHyphenCase(user.name as string); // Explicitly cast here
+      const organizationName = toHyphenCase(user.name); // user.name is string | null | undefined, but checked above
 
+      // Ensure email is not null or undefined before using it if needed elsewhere
+      // if (!user.email) return;
       try {
         // Create organization and organizationMember
         const prisma = db as PrismaClient;
@@ -176,4 +162,4 @@ export const authConfig = {
       }
     },
   },
-};
+} as unknown as AuthOptions;
