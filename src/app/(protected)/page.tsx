@@ -155,6 +155,7 @@ export default function ChatPage() {
             e.preventDefault();
             if (!apiKeys[currentProvider ?? ""]) {
               setIsApiKeyDialogOpen(true);
+              return;
             }
             handleSubmit(e);
           }}

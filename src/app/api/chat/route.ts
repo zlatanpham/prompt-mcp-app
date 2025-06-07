@@ -3,6 +3,8 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { streamText, type CoreMessage, tool as aiTool } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createOpenAI } from "@ai-sdk/openai";
+import { createAnthropic } from "@ai-sdk/anthropic";
 import { createDeepSeek } from "@ai-sdk/deepseek"; // Import DeepSeek
 import { type Tool } from "@/types/tool";
 import * as z from "zod";
@@ -88,6 +90,24 @@ export async function POST(req: Request) {
       }
       selectedModel = createDeepSeek({ apiKey: selectedApiKey })(
         modelCode as "deepseek-chat",
+      );
+      break;
+    case "openai":
+      selectedApiKey = apiKeys.openai;
+      if (!selectedApiKey) {
+        return new Response("OpenAI API Key is missing.", { status: 400 });
+      }
+      selectedModel = createOpenAI({ apiKey: selectedApiKey })(
+        modelCode as "gpt-4.1-mini",
+      );
+      break;
+    case "anthropic":
+      selectedApiKey = apiKeys.anthropic;
+      if (!selectedApiKey) {
+        return new Response("Anthropic API Key is missing.", { status: 400 });
+      }
+      selectedModel = createAnthropic({ apiKey: selectedApiKey })(
+        modelCode as "claude-4-sonnet",
       );
       break;
     default:
