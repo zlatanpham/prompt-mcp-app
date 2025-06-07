@@ -7,6 +7,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { SessionProvider } from "next-auth/react";
 
 import { HydrateClient } from "@/trpc/server";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Prompt MCP",
@@ -30,6 +31,7 @@ export default function RootLayout({
             <HydrateClient>{children}</HydrateClient>
           </TRPCReactProvider>
         </SessionProvider>
+        <Toaster />
       </body>
     </html>
   );
