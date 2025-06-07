@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useChat, type Message } from "@ai-sdk/react";
 import { Input } from "@/components/ui/input";
 import { ChatMessageDisplay } from "@/app/(protected)/page/_components/chat-message-display";
@@ -40,6 +40,8 @@ const MODELS = [
 ];
 
 export default function ChatPage() {
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
   const [apiKeys, setApiKeys] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") {
       return {
@@ -119,12 +121,26 @@ export default function ChatPage() {
     }
   }, [messages, handleSubmit, isLoading, append]);
 
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+      const viewport = scrollAreaRef.current.querySelector(
+        "[data-radix-scroll-area-viewport]",
+      ) as HTMLDivElement | null;
+
+      if (viewport) {
+        viewport.scrollTop = viewport.scrollHeight; // Scroll to the very bottom
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages[messages.length - 1]?.content]);
+
   return (
     <div className="flex h-[calc(100dvh-16px)] flex-col py-4">
       <div className="flex flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
         <h2 className="px-4 text-lg font-semibold">Chat playground</h2>
         <div className="max-h-[calc(100dvh-150px)] pt-2">
-          <ScrollArea className="h-full px-4">
+          <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
             {messages.length === 0 && !isLoading && !error ? (
               <div className="text-muted-foreground mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
                 👋 Hello there! Start to test your tools by typing a message.
