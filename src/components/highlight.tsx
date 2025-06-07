@@ -10,10 +10,7 @@ const Highlight = React.forwardRef<HTMLSpanElement, HighlightProps>(
     return (
       <span
         ref={ref}
-        className={cn(
-          "inline-block rounded-sm border border-rose-200 bg-rose-100 px-1 py-0.25 font-mono text-xs text-rose-700",
-          className,
-        )}
+        className={cn("inline-block px-1 font-mono text-sm", className)}
         {...props}
       >
         {children}

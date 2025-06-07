@@ -139,14 +139,26 @@
   *:last-child {
     margin-bottom: 0;
   }
+
   li p {
     @apply m-0;
   }
+
   li {
     @apply my-2;
   }
+
   ul,
   ol {
     @apply my-2;
+  }
+
+  pre {
+    @apply w-full;
+  }
+
+  pre code {
+    @apply text-white;
+    text-shadow: none;
   }
 }
