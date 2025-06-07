@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Popover,
   PopoverContent,
@@ -31,6 +32,10 @@ export function ToolSelectorDropdown({
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null,
   );
+  const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
+
+  const projectListRef = React.useRef<HTMLDivElement>(null);
+  const toolListRef = React.useRef<HTMLDivElement>(null);
 
   const activeProjects = useMemo(() => {
     if (!projects || !allTools) return [];
@@ -75,6 +80,18 @@ export function ToolSelectorDropdown({
     return counts;
   }, [projects, allTools, enabledToolIds]);
 
+  const currentProjectTools = useMemo(() => {
+    if (!selectedProjectId || !allTools) return [];
+    return allTools.filter((tool) => tool.project_id === selectedProjectId);
+  }, [selectedProjectId, allTools]);
+
+  const filteredTools = useMemo(() => {
+    if (!toolSearchQuery) return currentProjectTools;
+    return currentProjectTools.filter((tool) =>
+      tool.name.toLowerCase().includes(toolSearchQuery.toLowerCase()),
+    );
+  }, [toolSearchQuery, currentProjectTools]);
+
   useEffect(() => {
     if (allTools) {
       const activeTools = allTools.filter((tool) =>
@@ -83,6 +100,33 @@ export function ToolSelectorDropdown({
       onToolsChange(activeTools);
     }
   }, [enabledToolIds, allTools, onToolsChange]);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      if (selectedProjectId) {
+        // Tool list is active
+        if (toolListRef.current) {
+          setContentHeight(toolListRef.current.offsetHeight);
+          console.log("tools", toolListRef.current.offsetHeight);
+        }
+      } else {
+        // Project list is active
+        if (projectListRef.current) {
+          setContentHeight(projectListRef.current.offsetHeight);
+          console.log("projects", projectListRef.current.offsetHeight);
+        }
+      }
+    };
+
+    // Update height on mount and when selectedProjectId changes
+    updateHeight();
+
+    // Add a small delay to ensure content is rendered before measuring
+    const timeoutId = setTimeout(updateHeight, 50);
+
+    // Clean up timeout
+    return () => clearTimeout(timeoutId);
+  }, [selectedProjectId, projects, allTools, filteredTools]); // Re-run when data or filtered tools change
 
   const handleToggleTool = (toolId: string, isEnabled: boolean) => {
     setEnabledToolIds((prev) => {
@@ -120,18 +164,6 @@ export function ToolSelectorDropdown({
     });
   };
 
-  const currentProjectTools = useMemo(() => {
-    if (!selectedProjectId || !allTools) return [];
-    return allTools.filter((tool) => tool.project_id === selectedProjectId);
-  }, [selectedProjectId, allTools]);
-
-  const filteredTools = useMemo(() => {
-    if (!toolSearchQuery) return currentProjectTools;
-    return currentProjectTools.filter((tool) =>
-      tool.name.toLowerCase().includes(toolSearchQuery.toLowerCase()),
-    );
-  }, [toolSearchQuery, currentProjectTools]);
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -147,9 +179,18 @@ export function ToolSelectorDropdown({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[320px] p-1">
-        {!selectedProjectId ? (
-          <>
+      <PopoverContent align="start" className="w-[320px] overflow-hidden p-0">
+        <motion.div
+          initial={false}
+          animate={{
+            x: selectedProjectId ? -320 : 0,
+          }}
+          style={{ height: contentHeight }}
+          transition={{ duration: 0.2 }}
+          className="flex w-[640px] items-start"
+        >
+          {/* Pane 1: Project List */}
+          <div ref={projectListRef} className="w-[320px] p-1">
             {activeProjects.map((project) => (
               <div
                 key={project.id}
@@ -178,9 +219,10 @@ export function ToolSelectorDropdown({
                 </span>
               </div>
             ))}
-          </>
-        ) : (
-          <>
+          </div>
+
+          {/* Pane 2: Tool List */}
+          <div ref={toolListRef} className="w-[320px] p-1">
             <div
               onClick={() => setSelectedProjectId(null)}
               className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
@@ -244,8 +286,8 @@ export function ToolSelectorDropdown({
                 className="h-8"
               />
             </div>
-          </>
-        )}
+          </div>
+        </motion.div>
       </PopoverContent>
     </Popover>
   );
