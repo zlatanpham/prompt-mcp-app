@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import Link from "next/link";
 import { Fragment, type PropsWithChildren } from "react";
 
 interface BreadcrumbItem {
@@ -37,8 +38,8 @@ export default function DashboardLayout(props: Props) {
                     className={item.href ? "md:block" : "hidden md:block"}
                   >
                     {item.href ? (
-                      <BreadcrumbLink href={item.href}>
-                        {item.label}
+                      <BreadcrumbLink asChild>
+                        <Link href={item.href}>{item.label}</Link>
                       </BreadcrumbLink>
                     ) : (
                       <BreadcrumbPage>{item.label}</BreadcrumbPage>
