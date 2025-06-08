@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -41,6 +42,7 @@ export default function LoginPage({
 }: React.ComponentProps<"div">) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { update } = useSession();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -57,6 +59,7 @@ export default function LoginPage({
         formData.append("email", data.email);
         formData.append("password", data.password);
         await login(formData);
+        await update();
         router.replace("/");
       } catch (error) {
         console.log(error);
