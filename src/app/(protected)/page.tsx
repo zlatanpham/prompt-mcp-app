@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
-import { ToolSelectorDropdown } from "@/components/tool-selector-dropdown";
+import { ToolSelectorPopover } from "@/components/tool-selector-popover";
 import { type Tool } from "@/types/tool";
 import { ArrowUpIcon, CircleDotIcon } from "lucide-react";
 import { ChevronDown } from "lucide-react"; // For dropdown indicator
@@ -213,7 +213,7 @@ export default function ChatPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <ToolSelectorDropdown onToolsChange={setEnabledTools} />
+              <ToolSelectorPopover onToolsChange={setEnabledTools} />
             </div>
             <div className="flex items-center space-x-2">
               <DropdownMenu>

@@ -28,6 +28,7 @@ import { api } from "@/trpc/react";
 import { useOrganization } from "../_context/organization";
 import DashboardLayout from "@/components/dashboard-layout";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { Project } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -58,12 +59,21 @@ type ProjectWithToolCount = Project & {
 
 export default function ProjectPage() {
   const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
   const { organization } = useOrganization();
   const { data: projects, isLoading } =
     api.project.getAll.useQuery<ProjectWithToolCount[]>();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  React.useEffect(() => {
+    if (searchParams.get("showCreateProject") === "true") {
+      setIsCreateOpen(true);
+      // Optionally, remove the query param from the URL to prevent re-opening on refresh
+      // This would require using useRouter and shallow routing, but for simplicity, we'll just open it once.
+    }
+  }, [searchParams]);
   const [selectedProject, setSelectedProject] =
     useState<ProjectWithToolCount | null>(null);
 
@@ -223,17 +233,25 @@ export default function ProjectPage() {
                           <Button
                             variant="ghost"
                             className="h-8 w-8 p-0"
-                            onClick={(e) => e.stopPropagation()} // Stop propagation to prevent card click
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                            }}
                           >
                             <span className="sr-only">Open menu</span>
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent
+                          align="end"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                          }}
+                        >
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem
                             onClick={(e) => {
-                              e.stopPropagation(); // Stop propagation for dropdown items
+                              e.stopPropagation();
                               setSelectedProject(project);
                               setIsEditOpen(true);
                             }}
@@ -243,8 +261,8 @@ export default function ProjectPage() {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onSelect={(e) => {
-                              e.preventDefault(); // Prevent dropdown from closing
-                              e.stopPropagation(); // Stop propagation for dropdown items
+                              e.preventDefault();
+                              e.stopPropagation();
                               handleDeleteClick(project.id);
                             }}
                             className="text-red-600"

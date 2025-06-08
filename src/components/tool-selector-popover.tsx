@@ -14,16 +14,20 @@ import { Input } from "@/components/ui/input";
 import { ChevronLeft, Settings2 } from "lucide-react";
 import { api } from "@/trpc/react";
 import { type Tool } from "@/types/tool";
+import { useRouter } from "next/navigation";
 
-interface ToolSelectorDropdownProps {
+interface ToolSelectorPopoverProps {
   onToolsChange: (tools: Tool[]) => void;
 }
 
 const LOCAL_STORAGE_PREFIX = "tool_enabled_";
 
-export function ToolSelectorDropdown({
+export function ToolSelectorPopover({
   onToolsChange,
-}: ToolSelectorDropdownProps) {
+}: ToolSelectorPopoverProps) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
   const { data: projects, isLoading: isLoadingProjects } =
     api.project.getAll.useQuery();
   const { data: allTools, isLoading: isLoadingTools } =
@@ -32,20 +36,11 @@ export function ToolSelectorDropdown({
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null,
   );
-  const [contentHeight, setContentHeight] = useState<number | "auto">("auto");
+  const [contentHeight, setContentHeight] = useState<number>(0);
 
   const projectListRef = React.useRef<HTMLDivElement>(null);
   const toolListRef = React.useRef<HTMLDivElement>(null);
 
-  const activeProjects = useMemo(() => {
-    if (!projects || !allTools) return [];
-    const projectsWithActiveTools = new Set(
-      allTools.filter((tool) => tool.is_active).map((tool) => tool.project_id),
-    );
-    return projects.filter((project) =>
-      projectsWithActiveTools.has(project.id),
-    );
-  }, [projects, allTools]);
   const [toolSearchQuery, setToolSearchQuery] = useState("");
   const [enabledToolIds, setEnabledToolIds] = useState<Set<string>>(() => {
     if (typeof window !== "undefined") {
@@ -126,7 +121,7 @@ export function ToolSelectorDropdown({
 
     // Clean up timeout
     return () => clearTimeout(timeoutId);
-  }, [selectedProjectId, projects, allTools, filteredTools]); // Re-run when data or filtered tools change
+  }, [selectedProjectId, projects, allTools, filteredTools, open]); // Re-run when data or filtered tools change
 
   const handleToggleTool = (toolId: string, isEnabled: boolean) => {
     setEnabledToolIds((prev) => {
@@ -165,7 +160,7 @@ export function ToolSelectorDropdown({
   };
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -191,34 +186,52 @@ export function ToolSelectorDropdown({
         >
           {/* Pane 1: Project List */}
           <div ref={projectListRef} className="w-[320px] p-1">
-            {activeProjects.map((project) => (
-              <div
-                key={project.id}
-                onClick={() => setSelectedProjectId(project.id)}
-                className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-              >
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="h-6 w-6 flex-shrink-0">
-                    {project.name.charAt(0).toUpperCase()}
-                  </Badge>
-                  <span>{project.name}</span>
-                </div>
-                <span className="ml-auto text-sm">
-                  {allProjectsEnabledToolCounts[project.id] === 0 ? (
-                    <span className="text-muted-foreground text-xs">
-                      Disabled
-                    </span>
-                  ) : (
-                    <Badge
-                      variant="secondary"
-                      className="bg-blue-100 text-blue-700"
-                    >
-                      {allProjectsEnabledToolCounts[project.id]}
-                    </Badge>
-                  )}
-                </span>
+            {projects?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-4 text-center">
+                <p className="text-muted-foreground mb-4 text-sm">
+                  No active projects found.
+                </p>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => {
+                    setOpen(false);
+                    router.push("/project?showCreateProject=true");
+                  }}
+                >
+                  Create a Project
+                </Button>
               </div>
-            ))}
+            ) : (
+              projects?.map((project) => (
+                <div
+                  key={project.id}
+                  onClick={() => setSelectedProjectId(project.id)}
+                  className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+                >
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="h-6 w-6 flex-shrink-0">
+                      {project.name.charAt(0).toUpperCase()}
+                    </Badge>
+                    <span>{project.name}</span>
+                  </div>
+                  <span className="ml-auto text-sm">
+                    {allProjectsEnabledToolCounts[project.id] === 0 ? (
+                      <span className="text-muted-foreground text-xs">
+                        Disabled
+                      </span>
+                    ) : (
+                      <Badge
+                        variant="secondary"
+                        className="bg-blue-100 text-blue-700"
+                      >
+                        {allProjectsEnabledToolCounts[project.id]}
+                      </Badge>
+                    )}
+                  </span>
+                </div>
+              ))
+            )}
           </div>
 
           {/* Pane 2: Tool List */}
