@@ -11,6 +11,7 @@ import { EditNameDialog } from "./_components/edit-name-dialog";
 import { ResetPasswordDialog } from "./_components/reset-password-dialog";
 import { useConfirmAction } from "@/components/confirm-action-dialog";
 import { api } from "@/trpc/react";
+import AccountPageSkeleton from "./_components/page-skeleton";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -25,20 +26,12 @@ export default function AccountPage() {
   const { isLoading: isLoadingTools, refetch: refetchTools } =
     api.tool.getAllByUserId.useQuery(undefined, { enabled: false });
 
-  if (isLoading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <p>Loading account details...</p>
-      </div>
-    );
-  }
-
-  if (isError || !user) {
+  if (!isLoading && (isError || !user)) {
     router.push("/login");
     return null; // Or a loading spinner/message
   }
 
-  const userInitials = user.name
+  const userInitials = user?.name
     ? user.name
         .split(" ")
         .slice(0, 2)
@@ -46,7 +39,7 @@ export default function AccountPage() {
         .map((n: string) => n[0])
         .join("")
         .toUpperCase()
-    : user.email
+    : user?.email
       ? user.email[0]?.toUpperCase()
       : "U"; // Default to 'U' for unknown
 
@@ -91,84 +84,90 @@ export default function AccountPage() {
   };
 
   return (
-    <div className="mx-auto max-w-lg space-y-6 p-8 pb-16">
+    <div className="mx-auto w-full max-w-lg space-y-6 p-8 pb-16">
       <h2 className="text-2xl font-medium tracking-tight">My Account</h2>
 
-      <Card className="w-full max-w-2xl p-0">
-        <CardContent className="flex items-center space-x-4 p-4">
-          <Avatar className="h-14 w-14">
-            <AvatarFallback className="bg-primary text-xl text-white">
-              {userInitials}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-lg font-medium">{user.name ?? ""}</p>
-            <p className="text-muted-foreground text-sm">{user.email}</p>
+      {isLoading ? (
+        <AccountPageSkeleton />
+      ) : (
+        <>
+          <Card className="w-full max-w-2xl p-0">
+            <CardContent className="flex items-center space-x-4 p-4">
+              <Avatar className="h-14 w-14">
+                <AvatarFallback className="bg-primary text-xl text-white">
+                  {userInitials}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-lg font-medium">{user?.name ?? ""}</p>
+                <p className="text-muted-foreground text-sm">{user?.email}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Name</Label>
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="name"
+                  value={user?.name ?? ""}
+                  readOnly
+                  className="flex-1"
+                />
+                <EditNameDialog
+                  currentName={user?.name ?? ""}
+                  onSuccess={async () => {
+                    await refetch();
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                defaultValue={user?.email ?? ""}
+                readOnly
+                className="flex-1"
+              />
+            </div>
+
+            <Separator />
+
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <p className="text-muted-foreground text-sm">
+                You can set a permanent password if you {"don't"} want to use
+                temporary login codes
+              </p>
+              <ResetPasswordDialog
+                onSuccess={async () => {
+                  await refetch();
+                }}
+              />
+            </div>
+
+            <Separator />
+
+            <div className="grid gap-2">
+              <Label htmlFor="export-tools">Export All Tools</Label>
+              <p className="text-muted-foreground text-sm">
+                Export all your tools from all projects in JSON format.
+              </p>
+              <Button
+                variant="outline"
+                className="w-fit"
+                onClick={handleExportAllTools}
+                disabled={isLoadingTools}
+              >
+                {isLoadingTools ? "Exporting Tools..." : "Export All Tools"}
+              </Button>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6">
-        <div className="grid gap-2">
-          <Label htmlFor="name">Name</Label>
-          <div className="flex items-center space-x-2">
-            <Input
-              id="name"
-              value={user.name ?? ""}
-              readOnly
-              className="flex-1"
-            />
-            <EditNameDialog
-              currentName={user.name ?? ""}
-              onSuccess={async () => {
-                await refetch();
-              }}
-            />
-          </div>
-        </div>
-
-        <div className="grid gap-2">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            defaultValue={user.email ?? ""}
-            readOnly
-            className="flex-1"
-          />
-        </div>
-
-        <Separator />
-
-        <div className="grid gap-2">
-          <Label htmlFor="password">Password</Label>
-          <p className="text-muted-foreground text-sm">
-            You can set a permanent password if you {"don't"} want to use
-            temporary login codes
-          </p>
-          <ResetPasswordDialog
-            onSuccess={async () => {
-              await refetch();
-            }}
-          />
-        </div>
-
-        <Separator />
-
-        <div className="grid gap-2">
-          <Label htmlFor="export-tools">Export All Tools</Label>
-          <p className="text-muted-foreground text-sm">
-            Export all your tools from all projects in JSON format.
-          </p>
-          <Button
-            variant="outline"
-            className="w-fit"
-            onClick={handleExportAllTools}
-            disabled={isLoadingTools}
-          >
-            {isLoadingTools ? "Exporting Tools..." : "Export All Tools"}
-          </Button>
-        </div>
-      </div>
+        </>
+      )}
       {ConfirmActionDialog}
     </div>
   );

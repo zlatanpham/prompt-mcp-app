@@ -28,8 +28,9 @@
 - **Implementation Steps:**
   1. Import the `Skeleton` component: `import { Skeleton } from "@/components/ui/skeleton";`.
   2. In the loading conditional block, replace the simple loading text with `Skeleton` components.
-  3. Apply Tailwind CSS utility classes to the `Skeleton` components (e.g., `h-`, `w-`, `flex`, `gap-`) to match the dimensions and layout of the content that will eventually load.
-  4. **Important:** If rendering a `Skeleton` component (or any React element) in a prop that previously expected a `string`, update the prop's type definition to `React.ReactNode` to avoid TypeScript errors.
+  3. Mimic the structure of the loaded content (e.g., using `div` with `space-y` and `grid` classes, `Card`, `CardContent`, `Avatar`, `Input`, `Label`, `Button` components) with `Skeleton` placeholders.
+  4. Apply Tailwind CSS utility classes to the `Skeleton` components (e.g., `h-`, `w-`, `flex`, `gap-`) to match the dimensions and layout of the content that will eventually load.
+  5. **Important:** If rendering a `Skeleton` component (or any React element) in a prop that previously expected a `string`, update the prop's type definition to `React.ReactNode` to avoid TypeScript errors.
 
 ### Nested Clickable Elements
 
