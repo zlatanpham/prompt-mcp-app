@@ -117,6 +117,7 @@ model User {
     email              String?              @unique
     emailVerified      DateTime?
     image              String?
+    password           String? // Added for email/password authentication
     Account            Account[]
     Organization       Organization[]
     OrganizationMember OrganizationMember[]

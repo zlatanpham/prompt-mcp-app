@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -14,14 +13,18 @@ import { api } from "@/trpc/react";
 
 export default function AccountPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
-  const user = session?.user;
+  const {
+    data: user,
+    isLoading,
+    isError,
+    refetch,
+  } = api.user.getUser.useQuery();
 
   const { confirm, ConfirmActionDialog } = useConfirmAction();
   const { isLoading: isLoadingTools, refetch: refetchTools } =
     api.tool.getAllByUserId.useQuery(undefined, { enabled: false });
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <p>Loading account details...</p>
@@ -29,7 +32,7 @@ export default function AccountPage() {
     );
   }
 
-  if (status === "unauthenticated" || !user) {
+  if (isError || !user) {
     router.push("/login");
     return null; // Or a loading spinner/message
   }
@@ -37,6 +40,8 @@ export default function AccountPage() {
   const userInitials = user.name
     ? user.name
         .split(" ")
+        .slice(0, 2)
+        .filter(Boolean) // Get first two words
         .map((n: string) => n[0])
         .join("")
         .toUpperCase()
@@ -108,11 +113,16 @@ export default function AccountPage() {
           <div className="flex items-center space-x-2">
             <Input
               id="name"
-              defaultValue={user.name ?? ""}
+              value={user.name ?? ""}
               readOnly
               className="flex-1"
             />
-            <EditNameDialog currentName={user.name ?? ""} />
+            <EditNameDialog
+              currentName={user.name ?? ""}
+              onSuccess={async () => {
+                await refetch();
+              }}
+            />
           </div>
         </div>
 

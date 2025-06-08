@@ -1,39 +1,40 @@
 ## Current Work Focus
 
-The primary focus has been on enhancing the API Keys management page. This involved adding a new "Tools" column to the API keys table, which displays a count of associated tools. Clicking this count opens a side drawer that lists all tools grouped by their respective projects.
+The primary focus is on implementing client-side toast notifications for login failures in the `LoginForm` component. This involves refactoring server action calls and ensuring proper error propagation from the server to the client.
 
 ## Recent Changes
 
-- **Backend (`src/server/api/routers/apiKey.ts`):**
-  - Modified the `getAll` tRPC procedure to include nested `_count` for tools within projects.
-  - Added a new `getToolsByApiKeyId` tRPC procedure to fetch detailed tool information grouped by project.
-- **Frontend (`src/app/(protected)/api-keys/page.tsx`):**
-  - Updated the table header to "Tools".
-  - Implemented the tool count display using a Shadcn `Badge` component with a `Wrench` icon, making it clickable to open the tool list drawer.
-- **New Component (`src/app/(protected)/api-keys/_components/api-key-tools-drawer.tsx`):**
-  - Created a new `Sheet`-based component to display tools grouped by project.
-  - Ensured tool names are wrapped in the `Highlight` component.
-  - Made the tool listing container scrollable.
-  - Removed redundant close button.
+- **`src/components/login-form.tsx`:**
+  - Converted to a client component (`"use client"`).
+  - Implemented `useTransition` for pending state.
+  - Integrated `toast` from `sonner` for displaying error messages.
+  - Refactored `handleSubmit` to call a new server action (`login`) instead of directly calling `signIn`.
+  - Removed local `error` state and its display in JSX, relying solely on toasts.
+- **`src/app/actions/auth.ts` (New File):**
+  - Created a new server action file to encapsulate `signIn` logic for credentials and GitHub.
+  - The `login` function now explicitly checks the `result?.error` from `signIn` and throws a new `Error` with a user-friendly message if authentication fails. This ensures errors are properly propagated to the client.
+- **`src/app/(public)/layout.tsx`:**
+  - Added the `Toaster` component from `sonner` to the public layout to enable toast notifications across public pages.
 
 ## Next Steps
 
-The current task of enhancing the API keys table with tool count and a detailed tool list drawer is complete.
+- Verify the toast functionality by attempting to log in with invalid credentials.
+- Ensure no unexpected redirects occur on login failure.
 
 ## Active Decisions and Considerations
 
-- The decision to use nested `_count` in Prisma and a separate tRPC procedure for detailed data ensures efficient data fetching.
-- The use of Shadcn UI's `Sheet` component provides a consistent and user-friendly experience for side drawers.
-- Adherence to existing UI patterns (like the badge for counts) maintains application consistency.
+- Moving `signIn` logic to a dedicated server action (`src/app/actions/auth.ts`) is crucial to prevent bundling server-side code (like Prisma Client) into client components, which caused "Code generation for chunk item errored" build errors.
+- Using `signIn` with `redirect: false` and explicitly checking `result?.error` is the correct pattern for handling authentication failures in server actions and propagating them to the client.
+- `sonner` is used for consistent and user-friendly toast notifications.
 
 ## Important Patterns and Preferences
 
-- **Data Fetching:** Prioritize efficient data fetching by only loading detailed information when explicitly requested (lazy loading).
-- **UI Consistency:** Maintain a consistent look and feel across the application by reusing Shadcn UI components and established styling patterns.
-- **Component Design:** Create reusable and focused components for specific UI elements (e.g., `ApiKeyToolsDrawer`).
+- **Server Actions:** Encapsulate server-side logic that interacts with the database or sensitive operations within dedicated server actions to maintain separation of concerns and prevent client-side bundling issues.
+- **Error Handling:** Implement robust error handling in server actions and propagate meaningful error messages to the client for user feedback (e.g., via toasts).
+- **UI Consistency:** Utilize existing UI component libraries (Shadcn UI, Sonner) for a consistent user experience.
 
 ## Learnings and Project Insights
 
-- Successfully implemented complex data aggregation and display across backend and frontend.
-- Reinforced the importance of verifying component props to avoid TypeScript errors.
-- Learned to effectively troubleshoot frontend rendering issues by inspecting data received from the backend.
+- Deepened understanding of Next.js Server Actions, client/server component boundaries, and `next-auth`'s `signIn` behavior with `redirect: false`.
+- Learned to diagnose and resolve "Code generation for chunk item errored" errors related to server-side dependencies in client bundles.
+- Reinforced the importance of careful error propagation from server to client in Next.js applications.
