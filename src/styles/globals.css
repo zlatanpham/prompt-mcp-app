@@ -126,6 +126,13 @@
   }
 }
 
+/**
+ * Fix issue when dropdown close https://github.com/shadcn-ui/ui/issues/1859
+ */
+body {
+  pointer-events: auto !important;
+}
+
 .prose {
   max-width: 100%;
   line-height: 1.5rem;
