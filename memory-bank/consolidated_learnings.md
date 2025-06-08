@@ -40,6 +40,16 @@
   1. Wrap the parent element with `Next/Link` or add an `onClick` handler for the main navigation.
   2. For any interactive child elements (buttons, dropdown triggers, menu items), add an `onClick` handler that calls `e.stopPropagation()`. For `onSelect` events in dropdowns, also call `e.stopPropagation()`.
 
+### Displaying Table Headers for Empty Tables
+
+- **Pattern:** When a table might have no data, always render the `Table` and `TableHeader` components unconditionally. Conditionally render the `TableBody` content: either map over the data to display rows, or display a single `TableRow` with a `TableCell` that spans all columns (`colSpan`) and contains a "no data found" message, optionally with a relevant icon.
+- **Benefits:** Provides consistent user experience by always showing the table's context (what data would be there), even when empty. Avoids UI shifts and ensures a predictable layout.
+- **Implementation Steps:**
+  1. Ensure `Table` and `TableHeader` are outside any conditional rendering blocks.
+  2. Inside `TableBody`, use a conditional check (`data && data.length > 0 ? ... : ...`).
+  3. For the empty state, render a `TableRow` with a `TableCell` that has `colSpan` set to the number of columns in the table.
+  4. Place the "no data found" message and any relevant icon inside this `TableCell`.
+
 ### Date Formatting for User Experience
 
 - **Pattern:** Display relative time (e.g., "5 minutes ago", "2 days ago") for timestamps instead of exact dates and times, especially for "last edited" or "created at" fields.

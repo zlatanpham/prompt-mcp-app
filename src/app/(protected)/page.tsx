@@ -151,8 +151,8 @@ export default function ChatPage() {
   }, [messages[messages.length - 1]?.content]);
 
   return (
-    <div className="flex h-[calc(100dvh-16px)] flex-col py-4">
-      <div className="flex flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
+    <div className="flex h-[calc(100dvh-16px)] flex-col items-center py-4">
+      <div className="flex w-full flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
         <h2 className="border-b px-4 pb-4 text-lg font-semibold">
           Chat playground
         </h2>
@@ -160,8 +160,8 @@ export default function ChatPage() {
           <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
             <div className="mx-auto max-w-3xl">
               {messages.length === 0 && !isLoading && !error ? (
-                <div className="text-muted-foreground mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
-                  👋 Hello there! Start to test your tools by typing a message.
+                <div className="mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
+                  👋 Hello! Start chatting with your tools here.
                 </div>
               ) : (
                 <div className="space-y-3 py-4">
@@ -190,7 +190,7 @@ export default function ChatPage() {
         </div>
       </div>
 
-      <div className="mx-4 flex w-full max-w-3xl items-center rounded-xl border p-2 shadow-2xl sm:mx-auto">
+      <div className="flex w-full max-w-3xl items-center px-2">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -200,7 +200,7 @@ export default function ChatPage() {
             }
             handleSubmit(e);
           }}
-          className="flex w-full flex-col space-y-2"
+          className="flex w-full flex-col space-y-2 rounded-xl border p-2 shadow-2xl"
         >
           <div>
             <Input

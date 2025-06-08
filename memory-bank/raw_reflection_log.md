@@ -90,3 +90,31 @@ Improvements_Identified_For_Consolidation:
 - Specific: Using Shadcn UI's `Skeleton` component to mimic complex layouts.
 
 ---
+
+---
+
+Date: 2025-06-08
+TaskRef: "Display table head with empty message and avoid duplicate TableHeader"
+
+Learnings:
+
+- When displaying a table with potentially no data, it's good UX to still show the `TableHeader` to provide context for what data would be displayed.
+- To avoid duplicating the `TableHeader` when conditionally rendering content, the `Table` and `TableHeader` components should be rendered unconditionally.
+- The `TableBody` content can then be conditionally rendered: either map over the data to display rows, or display a single `TableRow` with a `TableCell` that spans all columns (`colSpan`) and contains the "no data found" message.
+- Using a relevant icon (e.g., `HardDriveUpload` for tools, `Wrench` for API keys) alongside the "no data found" message enhances clarity.
+
+Difficulties:
+
+- Initially introduced a duplicate `TableHeader` by placing the entire `Table` component inside the conditional rendering for the "no data found" state. This was corrected by refactoring.
+
+Successes:
+
+- Successfully updated `src/app/(protected)/project/[projectId]/_components/tool.tsx` to display the table header with an empty message without duplication.
+- Successfully applied the same pattern to `src/app/(protected)/api-keys/page.tsx` for the API keys table.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Handling empty table states by displaying a consistent `TableHeader` and a `TableCell` with `colSpan` for the "no data found" message.
+- Specific: Conditional rendering within `TableBody` to avoid `TableHeader` duplication.
+
+---
