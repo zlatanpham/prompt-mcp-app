@@ -36,10 +36,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export default function LoginPage() {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { update } = useSession();
@@ -75,7 +72,7 @@ export default function LoginPage({
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
