@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { EditNameDialog } from "./_components/edit-name-dialog";
+import { ResetPasswordDialog } from "./_components/reset-password-dialog";
 import { useConfirmAction } from "@/components/confirm-action-dialog";
 import { api } from "@/trpc/react";
 
@@ -144,9 +145,11 @@ export default function AccountPage() {
             You can set a permanent password if you {"don't"} want to use
             temporary login codes
           </p>
-          <Button variant="outline" className="w-fit">
-            Reset password
-          </Button>
+          <ResetPasswordDialog
+            onSuccess={async () => {
+              await refetch();
+            }}
+          />
         </div>
 
         <Separator />

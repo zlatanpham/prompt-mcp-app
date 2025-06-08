@@ -86,4 +86,46 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+
+  resetPassword: protectedProcedure
+    .input(
+      z.object({
+        currentPassword: z.string().min(1, "Current password is required"),
+        newPassword: z
+          .string()
+          .min(8, "New password must be at least 8 characters long"),
+        confirmPassword: z.string().min(1, "Confirm password is required"),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const { currentPassword, newPassword } = input;
+
+      const user = await ctx.db.user.findUnique({
+        where: { id: userId },
+        select: { password: true },
+      });
+
+      if (!user?.password) {
+        throw new Error("User not found or password not set.");
+      }
+
+      const isPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password,
+      );
+
+      if (!isPasswordValid) {
+        throw new Error("Invalid current password.");
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await ctx.db.user.update({
+        where: { id: userId },
+        data: { password: hashedPassword },
+      });
+
+      return { success: true };
+    }),
 });

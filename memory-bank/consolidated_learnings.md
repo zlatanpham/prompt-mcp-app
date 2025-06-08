@@ -89,6 +89,20 @@
   5. For forms/content within the sheet, ensure the main content area is scrollable using `flex-1 overflow-y-auto p-4` to handle long content.
   6. **Refinement:** Remove redundant close buttons if the `Sheet` component already provides one in the header.
 
+### Dialogs for User Actions (Shadcn UI, React Hook Form, Zod)
+
+- **Pattern:** Implement interactive dialogs for user actions (e.g., editing user details, resetting passwords) using Shadcn UI's `Dialog` component, `react-hook-form` for state management, and `zod` for robust client-side validation.
+- **Benefits:** Provides a consistent and validated user input experience for critical actions, improving data integrity and user feedback.
+- **Implementation Steps:**
+  1. Create a dedicated component for the dialog (e.g., `ResetPasswordDialog.tsx`).
+  2. Use `Dialog`, `DialogTrigger`, `DialogContent`, `DialogHeader`, `DialogTitle`, `DialogDescription` from Shadcn UI.
+  3. Integrate `useForm` from `react-hook-form` with `zodResolver` for form state and validation.
+  4. Define a Zod schema for input validation, including specific rules (e.g., min length, password matching).
+  5. Use `FormField`, `FormItem`, `FormLabel`, `FormControl`, `FormMessage` from Shadcn UI's `Form` components for structured form fields.
+  6. Connect form submission to a tRPC mutation (e.g., `api.user.resetPassword.useMutation`).
+  7. Handle loading states using `mutation.status === "pending"` to disable submit buttons.
+  8. Provide `onSuccess` and `onError` callbacks for toast notifications and form reset.
+
 ## Data Fetching & Aggregation
 
 ### Handling Nested Counts and Aggregations (tRPC/Prisma)
@@ -149,6 +163,21 @@
 - **Example:** Instead of `const { push } = useRouter();`, use `const router = useRouter();` and then call `router.push(...)`.
 - **Benefits:** Resolves ESLint warnings by ensuring the method is called with its correct `this` context, leading to cleaner code and preventing potential runtime issues related to `this` binding.
 
+### Secure Password Handling (`bcryptjs`)
+
+- **Pattern:** For secure password management, always hash passwords before storing them in the database using a strong hashing algorithm like `bcryptjs`. When verifying a user's password, compare the provided plaintext password with the stored hash using `bcrypt.compare`.
+- **Benefits:** Protects user data by preventing plaintext password storage, making it resilient against database breaches.
+- **Implementation Steps:**
+  1. Import `bcrypt` from `bcryptjs`.
+  2. When registering or updating a password, use `await bcrypt.hash(password, saltRounds)` (e.g., `10` salt rounds) to hash the password.
+  3. When verifying a password, use `await bcrypt.compare(plaintextPassword, hashedPassword)` to check for a match.
+
+### Optional Chaining for Null/Undefined Checks
+
+- **Pattern:** Use optional chaining (`?.`) for accessing properties on potentially null or undefined objects. This is more concise and readable than traditional `&&` checks or `if (!obj || !obj.prop)` statements.
+- **Benefits:** Improves code readability and reduces verbosity, especially for deeply nested object access, while preventing runtime errors.
+- **Example:** Instead of `if (!user || !user.password)`, use `if (!user?.password)`.
+
 ## Development Workflow & Troubleshooting
 
 ### Handling `replace_in_file` Failures
@@ -184,30 +213,6 @@
 
 - **Pattern:** When defining the `onError` callback for `api.yourRouter.yourMutation.useMutation()`, if `TRPCClientError<AppRouter>` causes type incompatibility issues, consider using `any` for the `error` parameter as a pragmatic solution.
 - **Benefits:** Unblocks development when precise tRPC error typing is complex or unclear, allowing for continued progress while still providing error messages to the user. Note this as an area for future refinement if a more specific tRPC utility type becomes available or is identified.
-
-## New Learnings from "Export All Tools" Task
-
-### Pattern: Using `write_to_file` as a fallback for complex `replace_in_file` operations
-
-- **Description:** When `replace_in_file` repeatedly fails due to inexact `SEARCH` block matches (e.g., after file content reverts or auto-formatting), using `write_to_file` to overwrite the entire file can be a more robust solution.
-- **Benefits:** Ensures task completion even when targeted edits are problematic, providing a reliable recovery mechanism.
-
-### Pattern: Implementing client-side session fetching and state management for pages that need interactive UI elements in Next.js App Router
-
-- **Description:** For Next.js App Router pages that require client-side interactivity (e.g., `useState`, `onClick` handlers), they must be converted to Client Components (`"use client";`). Session data, if previously fetched server-side, needs to be fetched client-side using `useSession` from `next-auth/react`.
-- **Benefits:** Enables dynamic UI interactions and state management on pages that were initially designed as Server Components.
-
-### Pattern: Enhancing generic UI hooks (like `useConfirmAction`) to return Promises for better asynchronous flow control
-
-- **Description:** Modifying generic UI hooks that trigger dialogs (e.g., confirmation dialogs) to return a Promise allows for `await`ing user interaction (confirm/cancel) directly in the calling function.
-- **Benefits:** Simplifies asynchronous control flow, making code cleaner and more readable by avoiding nested callbacks or complex state management for dialog results.
-
-### Prisma: Correctly identifying and using foreign key relationships
-
-- **Description:** When querying related data in Prisma, it's crucial to correctly identify the foreign key field in the schema (e.g., `created_by_user_id` on the `Project` model linking to `User.id`) to ensure accurate data retrieval.
-- **Benefits:** Prevents query errors and ensures the correct data relationships are leveraged for efficient database operations.
-
-## Data Fetching Patterns
 
 ### Lazy Data Fetching with tRPC/React Query
 
