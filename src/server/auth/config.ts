@@ -113,7 +113,7 @@ export const authConfig = {
         ...session,
         user: {
           ...session.user,
-          id: token.id,
+          id: token.id as string,
         },
       };
     },
@@ -153,4 +153,4 @@ export const authConfig = {
       }
     },
   },
-} as unknown as NextAuthConfig;
+} satisfies NextAuthConfig;
