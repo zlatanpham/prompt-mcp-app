@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { api } from "@/trpc/react";
-import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -37,11 +36,14 @@ type EditNameFormValues = z.infer<typeof formSchema>;
 
 interface EditNameDialogProps {
   currentName: string;
+  onSuccess?: () => Promise<void>;
 }
 
-export function EditNameDialog({ currentName }: EditNameDialogProps) {
+export function EditNameDialog({
+  currentName,
+  onSuccess,
+}: EditNameDialogProps) {
   const [open, setOpen] = useState(false);
-  const router = useRouter();
 
   const form = useForm<EditNameFormValues>({
     resolver: zodResolver(formSchema),
@@ -51,10 +53,10 @@ export function EditNameDialog({ currentName }: EditNameDialogProps) {
   });
 
   const updateNameMutation = api.user.updateName.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("Name updated successfully!");
+      await onSuccess?.();
       setOpen(false);
-      router.refresh(); // Refresh the page to show the updated name
     },
     onError: (error) => {
       toast.error("Failed to update name.", {

@@ -72,4 +72,18 @@ export const userRouter = createTRPCRouter({
 
       return newUser;
     }),
+
+  getUser: protectedProcedure.query(async ({ ctx }) => {
+    const userId = ctx.session.user.id;
+    return ctx.db.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        emailVerified: true,
+        image: true,
+      },
+    });
+  }),
 });
