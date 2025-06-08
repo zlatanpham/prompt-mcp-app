@@ -1,7 +1,6 @@
 "use server";
 
 import { signIn } from "@/server/auth";
-import { redirect } from "next/navigation";
 
 export async function login(formData: FormData) {
   const email = formData.get("email") as string;
@@ -18,10 +17,7 @@ export async function login(formData: FormData) {
       (result.error as string | undefined) ??
       "Login failed. Please check your credentials.";
     throw new Error(errorMessage);
-    return;
   }
-
-  redirect("/");
 }
 
 export async function githubSignIn() {

@@ -26,6 +26,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -39,6 +40,7 @@ export default function LoginPage({
   ...props
 }: React.ComponentProps<"div">) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -55,12 +57,10 @@ export default function LoginPage({
         formData.append("email", data.email);
         formData.append("password", data.password);
         await login(formData);
+        router.replace("/");
       } catch (error) {
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : "Login failed. Please check your credentials.";
-        toast.error(errorMessage);
+        console.log(error);
+        toast.error("Login failed. Please check your credentials.");
       }
     });
   };

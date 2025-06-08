@@ -72,7 +72,7 @@ export const authConfig = {
         });
 
         if (!user?.password) {
-          return null;
+          throw new Error("Invalid credentials");
         }
 
         const isPasswordValid = await bcrypt.compare(
@@ -81,7 +81,7 @@ export const authConfig = {
         );
 
         if (!isPasswordValid) {
-          return null;
+          throw new Error("Invalid credentials");
         }
 
         return user;
@@ -108,14 +108,7 @@ export const authConfig = {
       }
       return token;
     },
-    session: ({
-      session,
-      token,
-    }: {
-      session: DefaultSession;
-      token: JWT; // Use JWT type
-    }) => {
-      console.log("testing session callback");
+    session: ({ session, token }: { session: DefaultSession; token: JWT }) => {
       return {
         ...session,
         user: {
