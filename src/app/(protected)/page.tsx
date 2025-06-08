@@ -31,6 +31,10 @@ const API_KEY_STORAGE_KEYS = {
 
 const MODELS = [
   { label: "DeepSeek Chat v3", value: "deepseek/deepseek-chat" },
+  {
+    label: "Google Gemini 2.5 Flash",
+    value: "google/gemini-2.5-flash-preview-05-20",
+  },
   { label: "Google Gemini 2.0 Flash", value: "google/gemini-2.0-flash-001" },
   { label: "OpenAI GPT 4.1 mini", value: "openai/gpt-4.1-mini" },
   { label: "Anthropic Claude 4 Sonnet", value: "anthropic/claude-4-sonnet" },
