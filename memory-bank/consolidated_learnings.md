@@ -31,6 +31,7 @@
   3. Mimic the structure of the loaded content (e.g., using `div` with `space-y` and `grid` classes, `Card`, `CardContent`, `Avatar`, `Input`, `Label`, `Button` components) with `Skeleton` placeholders.
   4. Apply Tailwind CSS utility classes to the `Skeleton` components (e.g., `h-`, `w-`, `flex`, `gap-`) to match the dimensions and layout of the content that will eventually load.
   5. **Important:** If rendering a `Skeleton` component (or any React element) in a prop that previously expected a `string`, update the prop's type definition to `React.ReactNode` to avoid TypeScript errors.
+  6. **For Data-Dependent Forms/Dialogs:** When a form or dialog fetches data (e.g., for editing an existing item), use the `isLoading` state from the data-fetching hook (e.g., `useQuery`) to conditionally render the skeleton. This ensures the skeleton is displayed while the specific item's data is being loaded.
 
 ### Nested Clickable Elements
 

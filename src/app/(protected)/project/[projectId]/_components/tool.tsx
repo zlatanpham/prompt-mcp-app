@@ -51,10 +51,12 @@ export default function ToolComponent() {
   console.log("ToolComponent isLoading:", isLoading, "tools:", tools);
 
   // Fetch single tool for editing
-  const { data: tool } = api.tool.getById.useQuery(
-    { id: selectedToolId ?? "" },
-    { enabled: !!selectedToolId },
-  );
+  const { data: tool, isLoading: isLoadingSelectedTool } =
+    api.tool.getById.useQuery(
+      // Destructure isLoadingSelectedTool
+      { id: selectedToolId ?? "" },
+      { enabled: !!selectedToolId },
+    );
 
   // Mutations
   const createTool = api.tool.create.useMutation({
@@ -157,6 +159,7 @@ export default function ToolComponent() {
               : null
           }
           isSubmitting={createTool.isPending || updateTool.isPending}
+          isLoading={isLoadingSelectedTool} // Pass isLoadingSelectedTool
         />
 
         <ConfirmActionDialog

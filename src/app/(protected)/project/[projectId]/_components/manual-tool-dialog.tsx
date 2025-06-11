@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton import
 import type { Tool } from "@prisma/client";
 
 const manualToolFormSchema = z
@@ -65,6 +66,7 @@ interface Props {
   selectedToolId: string | null;
   tool?: ToolWithArguments | null; // Use the extended type
   isSubmitting: boolean;
+  isLoading: boolean; // Added isLoading prop
 }
 
 const ManualToolDialog = (props: Props) => {
@@ -75,6 +77,7 @@ const ManualToolDialog = (props: Props) => {
     selectedToolId,
     tool,
     isSubmitting,
+    isLoading, // Destructure isLoading
   } = props;
 
   const form = useForm<ManualToolFormValues>({
@@ -157,75 +160,98 @@ const ManualToolDialog = (props: Props) => {
               className="space-y-4"
               noValidate
             >
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Tool name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Briefly describe the tool..."
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="prompt"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Prompt (Markdown)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Write markdown prompt here..."
-                        className="max-h-[400px] min-h-40"
-                        rows={8}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <FormLabel>Arguments (Optional)</FormLabel>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      append({
-                        name: "",
-                        description: "",
-                        type: "string",
-                      } as Argument)
-                    }
-                  >
-                    Add Argument
-                  </Button>
+              {isLoading ? (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-20 w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-40 w-full" />
+                  </div>
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
                 </div>
-                <ArgumentsFormArray fields={fields} remove={remove} />
-              </div>
+              ) : (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Tool name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Briefly describe the tool..."
+                            rows={3}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="prompt"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Prompt (Markdown)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Write markdown prompt here..."
+                            className="max-h-[400px] min-h-40"
+                            rows={8}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Arguments (Optional)</FormLabel>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          append({
+                            name: "",
+                            description: "",
+                            type: "string",
+                          } as Argument)
+                        }
+                      >
+                        Add Argument
+                      </Button>
+                    </div>
+                    <ArgumentsFormArray fields={fields} remove={remove} />
+                  </div>
+                </>
+              )}
             </form>
           </Form>
         </div>
