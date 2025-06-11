@@ -12,9 +12,9 @@ import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import { CopyIcon } from "lucide-react";
+import { CopyIcon, CheckIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { motion } from "framer-motion";
 
 interface ToolInvocationLike {
   toolName: string;
@@ -59,14 +59,15 @@ export function ChatMessageDisplay({
   userAvatarFallback,
 }: ChatMessageDisplayProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(message.content);
-      toast.success("Message copied to clipboard!");
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Revert after 2 seconds
     } catch (err) {
       console.error("Failed to copy message: ", err);
-      toast.error("Failed to copy message.");
     }
   };
 
@@ -169,16 +170,25 @@ export function ChatMessageDisplay({
         {message.content}
       </ReactMarkdown>
       {isLoading ? null : (
-        <div className="flex justify-end">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, backgroundColor: "transparent" }}
+          transition={{ duration: 0.5 }}
+          className="flex"
+        >
           <Button
             onClick={handleCopy}
-            variant="secondary"
+            variant="link"
             size="sm"
             className="cursor-pointer"
           >
-            <CopyIcon className="!h-4 !w-4" />
+            {copied ? (
+              <CheckIcon className="!h-4 !w-4" />
+            ) : (
+              <CopyIcon className="!h-4 !w-4" />
+            )}
           </Button>
-        </div>
+        </motion.div>
       )}
     </div>
   );
