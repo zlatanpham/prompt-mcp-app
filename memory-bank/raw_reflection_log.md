@@ -17,3 +17,28 @@ Successes:
 Improvements_Identified_For_Consolidation:
   - General pattern: Using icon changes with `useState` and `setTimeout` for transient visual feedback instead of toast notifications for simple actions.
 ---
+
+---
+
+Date: 2025-06-11
+TaskRef: "Replace SVG icon with lucide-react icon and update memory"
+
+Learnings:
+
+- Successfully replaced a raw SVG icon with its `lucide-react` equivalent (`ChevronDown`).
+- User feedback emphasizes the importance of prioritizing `lucide-react` icons over raw SVGs for consistency and maintainability.
+
+Difficulties:
+
+- None.
+
+Successes:
+
+- Icon replacement was successful.
+- Received clear guidance from the user regarding icon usage preference.
+
+Improvements_Identified_For_Consolidation:
+
+- General guideline: Always prioritize `lucide-react` icons over raw SVG elements when available, for consistency and ease of maintenance within the Shadcn UI context.
+
+---

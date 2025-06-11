@@ -21,6 +21,15 @@
      - Utilize Shadcn UI components like `Badge` and `lucide-react` icons (e.g., `Wrench`) to visually represent the count.
      - Apply appropriate Tailwind CSS classes for styling to ensure consistency with the overall design system.
 
+### Prioritizing Lucide React Icons
+
+- **Pattern:** Always prioritize using `lucide-react` icons over raw SVG elements or other icon libraries when available.
+- **Benefits:** Ensures consistency in icon design and usage across the application, leverages the `lucide-react` library's optimizations and accessibility features, and simplifies maintenance by centralizing icon management.
+- **Implementation Steps:**
+  1. Before adding a new icon or replacing an existing one, check if a suitable icon exists in `lucide-react`.
+  2. Import the icon component from `lucide-react` (e.g., `import { ChevronDown } from "lucide-react";`).
+  3. Use the `lucide-react` component directly in JSX, applying necessary `className` for styling (e.g., `h-4 w-4`).
+
 ### Skeleton Loading State
 
 - **Pattern:** Utilize Shadcn UI's `Skeleton` component to replace text-based or simple loading indicators with a visual representation of the content structure.
