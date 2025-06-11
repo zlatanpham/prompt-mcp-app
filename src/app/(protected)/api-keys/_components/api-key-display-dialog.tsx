@@ -82,7 +82,9 @@ export function ApiKeyDisplayDialog({
             </div>
           </div>
         </div>
-        <Button onClick={handleCopyConfig}>Copy Config to Clipboard</Button>
+        <Button size="lg" onClick={handleCopyConfig}>
+          Copy Config to Clipboard
+        </Button>
       </DialogContent>
     </Dialog>
   );

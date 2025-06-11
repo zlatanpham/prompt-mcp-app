@@ -180,7 +180,7 @@ export default function ChatPage() {
                 </div>
               )}
               {isLoading && (
-                <div className="text-muted-foreground px-2 py-1 text-sm">
+                <div className="loading-flash text-muted-foreground px-2 py-1 text-sm">
                   AI is thinking...
                 </div>
               )}

@@ -169,3 +169,34 @@ body {
     text-shadow: none;
   }
 }
+
+/* Loading flash animation */
+@keyframes loading-flash-animation {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+.loading-flash {
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-flash::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%; /* Start off-screen to the left */
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    /* Adjust opacity for desired flash intensity */ transparent
+  );
+  animation: loading-flash-animation 2.5s infinite; /* Adjust duration as needed */
+}
