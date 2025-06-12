@@ -157,8 +157,8 @@ export default function ChatPage() {
   return (
     <div className="flex h-[calc(100dvh-16px)] flex-col items-center pb-4">
       <div className="flex w-full flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
-        <div className="border-b px-4 py-4">
-          <h2 className="text-lg font-semibold">Chat playground</h2>
+        <div className="border-b px-4 py-3">
+          <h2 className="text-normal font-medium">Chat playground</h2>
         </div>
         <div className="max-h-[calc(100dvh-200px)]">
           <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
