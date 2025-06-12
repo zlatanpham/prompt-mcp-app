@@ -84,25 +84,29 @@ export default function ProjectDetailPage() {
       ]}
     >
       {isLoading || !project ? (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 py-4">
           <div className="flex items-center justify-between">
-            <Skeleton className="h-8 w-1/3" />
+            <Skeleton className="h-6 w-1/4" />
             <div className="flex items-center gap-2">
-              <Skeleton className="h-9 w-24" />
-              <Skeleton className="h-9 w-28" />
-              <Skeleton className="h-9 w-28" />
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-6 w-28" />
+              <Skeleton className="h-6 w-28" />
             </div>
           </div>
-          <Skeleton className="h-[calc(100vh-200px)] w-full" />
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full" />
+          </div>
         </div>
       ) : (
         <>
-          <div className="flex items-center justify-between">
-            <h1 className="mb-4 text-2xl font-medium">{project.name}</h1>
+          <div className="-mx-4 flex items-center justify-between border-b px-4 py-2">
+            <h1 className="text-md font-medium">{project.name}</h1>
             <div className="flex items-center gap-2">
               <Dialog open={isEditing} onOpenChange={setIsEditing}>
                 <DialogTrigger asChild>
-                  <Button>Edit Project</Button>
+                  <Button variant="outline">Edit Project</Button>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[425px]">
                   <DialogHeader>

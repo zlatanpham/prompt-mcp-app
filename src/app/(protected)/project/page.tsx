@@ -20,7 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { Card, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,7 +41,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { MoreHorizontal, Wrench } from "lucide-react";
+import { MoreHorizontal, Wrench, Pencil, Trash2 } from "lucide-react";
 import { ProjectForm, type ProjectFormValues } from "@/components/project-form";
 import { Badge } from "@/components/ui/badge"; // Import Badge component
 
@@ -151,15 +151,15 @@ export default function ProjectPage() {
     <DashboardLayout
       bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "Projects" }]}
     >
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium">Projects</h1>
+      <div className="-mx-4 flex items-center justify-between border-b px-4 py-2">
+        <h1 className="text-md font-medium">Projects</h1>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button>Create Project</Button>
+            <Button variant="outline">New Project</Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Create new Project</DialogTitle>
+              <DialogTitle>New Project</DialogTitle>
             </DialogHeader>
             <Form {...form}>
               <form
@@ -210,22 +210,22 @@ export default function ProjectPage() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2">
           {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="mb-2 h-40 w-full" />
           ))}
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mx-auto grid w-full max-w-4xl grid-cols-1 gap-4 sm:grid-cols-2">
           {projects?.map((project: ProjectWithToolCount) => {
             const date = project.updated_at ?? project.created_at;
             const timeAgoString = date ? timeAgo(date) : "N/A";
             return (
               <Link key={project.id} href={`/project/${project.id}`}>
-                <Card className="flex h-full flex-col justify-between p-4 transition-all hover:shadow-md">
+                <Card className="flex h-full w-full flex-col justify-between p-3 transition-all">
                   <div>
                     <div className="flex items-center justify-between">
-                      <h2 className="mb-2 text-lg font-medium">
+                      <h2 className="mb-2 text-base font-normal">
                         {project.name}
                       </h2>
                       <DropdownMenu>
@@ -248,7 +248,6 @@ export default function ProjectPage() {
                             e.stopPropagation();
                           }}
                         >
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.stopPropagation();
@@ -256,27 +255,28 @@ export default function ProjectPage() {
                               setIsEditOpen(true);
                             }}
                           >
+                            <Pencil className="mr-2 h-4 w-4" />
                             Edit
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
                           <DropdownMenuItem
                             onSelect={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
                               handleDeleteClick(project.id);
                             }}
-                            className="text-red-600"
+                            className="text-red-700 focus:bg-red-100 focus:text-red-900 data-[state=open]:bg-red-100 data-[state=open]:text-red-900"
                           >
+                            <Trash2 className="mr-2 h-4 w-4 text-inherit" />
                             Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </div>
-                    <p className="text-muted-foreground mb-4 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       {project.description ?? "No description"}
                     </p>
                   </div>
-                  <div className="flex items-center justify-between pt-4">
+                  <div className="flex items-center justify-between border-t pt-3">
                     <Badge
                       variant="secondary"
                       className="flex items-center gap-1"
@@ -284,7 +284,7 @@ export default function ProjectPage() {
                       <Wrench className="h-3 w-3" />
                       <span>{project._count.Tool} Tools</span>
                     </Badge>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-muted-foreground text-sm">
                       Last edited {timeAgoString}
                     </p>
                   </div>

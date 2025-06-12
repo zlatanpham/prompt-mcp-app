@@ -16,7 +16,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Check, Copy, MoreHorizontal } from "lucide-react";
+import {
+  Check,
+  Copy,
+  MoreHorizontal,
+  Pencil,
+  RefreshCw,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { CreateApiKeyDialog } from "./_components/create-api-key-dialog";
@@ -176,8 +183,8 @@ export default function ApiKeysPage() {
     <DashboardLayout
       bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "API Keys" }]}
     >
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium">API Keys</h1>
+      <div className="-mx-4 flex items-center justify-between border-b px-4 py-2">
+        <h1 className="text-md font-medium">API Keys</h1>
         <CreateApiKeyDialog
           isOpen={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
@@ -199,173 +206,182 @@ export default function ApiKeysPage() {
           <Skeleton className="h-8 w-full" />
         </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Key</TableHead>
-              <TableHead>Projects</TableHead>
-              <TableHead>Tools</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead>Updated At</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {apiKeys && apiKeys.length > 0 ? (
-              apiKeys.map((apiKey) => {
-                const totalToolCount = apiKey.projects.reduce(
-                  (sum, ap) => sum + (ap.project._count?.Tool || 0),
-                  0,
-                );
-                return (
-                  <TableRow key={apiKey.id}>
-                    <TableCell className="font-medium">{apiKey.name}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      <div className="flex items-center gap-2">
-                        <span>{truncate(apiKey.key, 10, true)}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            void navigator.clipboard.writeText(apiKey.key);
-                            setCopiedKeyId(apiKey.id);
-                            setTimeout(() => setCopiedKeyId(null), 2000);
-                          }}
-                          className="h-6 w-6 p-0"
-                        >
-                          {copiedKeyId === apiKey.id ? (
-                            <Check className="h-4 w-4 text-green-600" />
-                          ) : (
-                            <Copy className="h-4 w-4" />
-                          )}
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-x-1">
-                        {apiKey.projects.map((p, index) => (
-                          <Link
-                            key={p.project.id}
-                            href={`/project/${p.project.id}`}
-                            className="text-blue-600 hover:underline"
-                          >
-                            {p.project.name}
-                            {index < apiKey.projects.length - 1 ? "," : ""}
-                          </Link>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="link"
-                        className="h-auto cursor-pointer p-0"
-                        onClick={() => {
-                          setApiKeyIdForTools(apiKey.id);
-                          setIsToolsDrawerOpen(true);
-                        }}
-                      >
-                        <Badge
-                          variant="secondary"
-                          className="flex items-center gap-1"
-                        >
-                          <Wrench className="h-3 w-3" />
-                          <span>{totalToolCount} Tools</span>
-                        </Badge>
-                      </Button>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(apiKey.createdAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(apiKey.updatedAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Key</TableHead>
+                <TableHead>Projects</TableHead>
+                <TableHead>Tools</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Updated At</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {apiKeys && apiKeys.length > 0 ? (
+                apiKeys.map((apiKey) => {
+                  const totalToolCount = apiKey.projects.reduce(
+                    (sum, ap) => sum + (ap.project._count?.Tool || 0),
+                    0,
+                  );
+                  return (
+                    <TableRow key={apiKey.id}>
+                      <TableCell className="font-medium">
+                        {apiKey.name}
+                      </TableCell>
+                      <TableCell className="font-mono text-sm">
+                        <div className="flex items-center gap-2">
+                          <span>{truncate(apiKey.key, 10, true)}</span>
+                          <Button
+                            variant="ghost"
+                            size="sm"
                             onClick={() => {
-                              setApiKeyToEditProjects({
-                                id: apiKey.id,
-                                name: apiKey.name,
-                                currentProjectIds: apiKey.projects.map(
-                                  (p) => p.projectId,
-                                ),
-                              });
-                              setEditSelectedProjectIds(
-                                apiKey.projects
-                                  .map((p) => p.projectId)
-                                  .filter(
-                                    (id): id is string => id !== undefined,
-                                  ),
-                              );
-                              setIsEditProjectsDialogOpen(true);
+                              void navigator.clipboard.writeText(apiKey.key);
+                              setCopiedKeyId(apiKey.id);
+                              setTimeout(() => setCopiedKeyId(null), 2000);
                             }}
+                            className="h-6 w-6 p-0"
                           >
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              handleRegenerateApiKeyClick(apiKey.id)
-                            }
+                            {copiedKeyId === apiKey.id ? (
+                              <Check className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <Copy className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-x-1">
+                          {apiKey.projects.map((p, index) => (
+                            <Link
+                              key={p.project.id}
+                              href={`/project/${p.project.id}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {p.project.name}
+                              {index < apiKey.projects.length - 1 ? "," : ""}
+                            </Link>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          variant="link"
+                          className="h-auto cursor-pointer p-0"
+                          onClick={() => {
+                            setApiKeyIdForTools(apiKey.id);
+                            setIsToolsDrawerOpen(true);
+                          }}
+                        >
+                          <Badge
+                            variant="secondary"
+                            className="flex items-center gap-1"
                           >
-                            Regenerate Key
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              const mcpConfig = {
-                                mcpServers: {
-                                  [formatApiKeyNameForMcp(apiKey.name)]: {
-                                    command: "npx",
-                                    args: ["-y", "@x-mcp/prompt@latest"],
-                                    env: {
-                                      API_URL: `${window.location.origin}/api/tools`,
-                                      API_KEY: apiKey.key,
+                            <Wrench className="h-3 w-3" />
+                            <span>{totalToolCount} Tools</span>
+                          </Badge>
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(apiKey.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(apiKey.updatedAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setApiKeyToEditProjects({
+                                  id: apiKey.id,
+                                  name: apiKey.name,
+                                  currentProjectIds: apiKey.projects.map(
+                                    (p) => p.projectId,
+                                  ),
+                                });
+                                setEditSelectedProjectIds(
+                                  apiKey.projects
+                                    .map((p) => p.projectId)
+                                    .filter(
+                                      (id): id is string => id !== undefined,
+                                    ),
+                                );
+                                setIsEditProjectsDialogOpen(true);
+                              }}
+                            >
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                handleRegenerateApiKeyClick(apiKey.id)
+                              }
+                            >
+                              <RefreshCw className="mr-2 h-4 w-4" />
+                              Regenerate Key
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                const mcpConfig = {
+                                  mcpServers: {
+                                    [formatApiKeyNameForMcp(apiKey.name)]: {
+                                      command: "npx",
+                                      args: ["-y", "@x-mcp/prompt@latest"],
+                                      env: {
+                                        API_URL: `${window.location.origin}/api/tools`,
+                                        API_KEY: apiKey.key,
+                                      },
                                     },
                                   },
-                                },
-                              };
-                              void navigator.clipboard.writeText(
-                                JSON.stringify(mcpConfig, null, 2),
-                              );
-                            }}
-                          >
-                            Copy Config
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => {
-                              setApiKeyToDelete(apiKey.id);
-                              setIsConfirmDeleteDialogOpen(true);
-                            }}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell colSpan={7}>
-                  <div className="flex w-full flex-col items-center justify-center space-y-2 py-5">
-                    <Wrench className="text-muted-foreground" />
-                    <p className="text-muted-foreground text-sm">
-                      No API Keys found.
-                    </p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                                };
+                                void navigator.clipboard.writeText(
+                                  JSON.stringify(mcpConfig, null, 2),
+                                );
+                              }}
+                            >
+                              <Copy className="mr-2 h-4 w-4" />
+                              Copy Config
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setApiKeyToDelete(apiKey.id);
+                                setIsConfirmDeleteDialogOpen(true);
+                              }}
+                              className="text-red-600 hover:bg-red-50 focus:bg-red-50 focus:text-red-600"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4 text-inherit" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <div className="flex w-full flex-col items-center justify-center space-y-2 py-5">
+                      <Wrench className="text-muted-foreground" />
+                      <p className="text-muted-foreground text-sm">
+                        No API Keys found.
+                      </p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       )}
 
       <ApiKeyDisplayDialog

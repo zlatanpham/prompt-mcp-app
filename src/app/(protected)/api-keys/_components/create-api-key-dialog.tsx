@@ -50,11 +50,11 @@ export function CreateApiKeyDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button className="mb-4">Create New API Key</Button>
+        <Button variant="outline">New API Key</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create New API Key</DialogTitle>
+          <DialogTitle>New API Key</DialogTitle>
           <DialogDescription>
             Generate a new API key and select projects it can access.
           </DialogDescription>
@@ -98,7 +98,9 @@ export function CreateApiKeyDialog({
             </div>
           </div>
         </div>
-        <Button onClick={handleCreateApiKey}>Create API Key</Button>
+        <Button size="lg" onClick={handleCreateApiKey}>
+          Create API Key
+        </Button>
       </DialogContent>
     </Dialog>
   );

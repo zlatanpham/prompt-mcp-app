@@ -133,7 +133,7 @@ export default function ToolComponent() {
   return (
     <div>
       <div className="mb-4 flex items-center justify-between">
-        <h4 className="text-lg font-medium">Project tools</h4>
+        <h4 className="text-md font-medium">Tools</h4>
         <Button
           variant="default"
           disabled={isLoading}
@@ -142,7 +142,7 @@ export default function ToolComponent() {
             setIsDialogOpen(true);
           }}
         >
-          Create tool
+          New Tool
         </Button>
 
         <ManualToolDialog
@@ -175,79 +175,81 @@ export default function ToolComponent() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
         </div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Active</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tools && tools.length > 0 ? (
-              tools.map((tool) => (
-                <TableRow key={tool.id}>
-                  <TableCell className="font-medium">
-                    <Highlight>{tool.name}</Highlight>
-                  </TableCell>
-                  <TableCell>
-                    <div className="max-w-[500px] truncate">
-                      {tool.description}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={tool.is_active}
-                      onCheckedChange={(checked) =>
-                        toggleToolActive.mutate({
-                          id: tool.id,
-                          is_active: checked,
-                        })
-                      }
-                    />
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onEdit(tool.id)}
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => onDelete(tool.id)}
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </Button>
+        <div className="rounded-lg border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Active</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tools && tools.length > 0 ? (
+                tools.map((tool) => (
+                  <TableRow key={tool.id}>
+                    <TableCell className="font-medium">
+                      <Highlight>{tool.name}</Highlight>
+                    </TableCell>
+                    <TableCell>
+                      <div className="max-w-[500px] truncate">
+                        {tool.description}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={tool.is_active}
+                        onCheckedChange={(checked) =>
+                          toggleToolActive.mutate({
+                            id: tool.id,
+                            is_active: checked,
+                          })
+                        }
+                      />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onEdit(tool.id)}
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => onDelete(tool.id)}
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4}>
+                    <div className="flex w-full flex-col items-center justify-center space-y-2 py-5">
+                      <HardDriveUpload className="text-muted-foreground" />
+                      <p className="text-muted-foreground text-sm">
+                        No tools found.
+                      </p>
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4}>
-                  <div className="flex w-full flex-col items-center justify-center space-y-2 py-5">
-                    <HardDriveUpload className="text-muted-foreground" />
-                    <p className="text-muted-foreground text-sm">
-                      No tools found.
-                    </p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       )}
     </div>
   );
