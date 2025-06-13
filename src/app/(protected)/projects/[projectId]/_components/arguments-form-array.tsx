@@ -39,10 +39,7 @@ export function ArgumentsFormArray({
   return (
     <div className="space-y-4">
       {fields.map((field, index) => (
-        <div
-          key={field.id}
-          className="relative rounded-md border bg-gray-50 p-3 pt-3"
-        >
+        <div key={field.id} className="relative rounded-md border p-2 pt-3">
           <Button
             type="button"
             variant="ghost"

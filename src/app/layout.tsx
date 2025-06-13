@@ -25,6 +25,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable}`}>
+      <head>
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="64x64" />
+      </head>
       <body>
         <SessionProvider>
           <TRPCReactProvider>

@@ -125,9 +125,9 @@ const ManualToolDialog = (props: Props) => {
   return (
     <Drawer open={isOpen} onOpenChange={onDialogClose} direction="right">
       <DrawerContent className="sm:max-w-lg">
-        <DrawerHeader>
-          <div className="flex items-center justify-between">
-            <DrawerTitle>
+        <DrawerHeader className="pt-2 pb-0">
+          <div className="-mx-4 flex items-center justify-between border-b px-4 pb-2">
+            <DrawerTitle className="!text-base">
               {selectedToolId ? "Edit Tool" : "New Tool"}
             </DrawerTitle>
             <div className="flex items-center space-x-2">
@@ -216,10 +216,10 @@ const ManualToolDialog = (props: Props) => {
                     name="prompt"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Prompt (Markdown)</FormLabel>
+                        <FormLabel>Prompt</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Write markdown prompt here..."
+                            placeholder="Write prompt here..."
                             className="max-h-[400px] min-h-40"
                             rows={8}
                             {...field}
@@ -232,7 +232,7 @@ const ManualToolDialog = (props: Props) => {
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <FormLabel>Arguments (Optional)</FormLabel>
+                      <FormLabel>Arguments</FormLabel>
                       <Button
                         type="button"
                         variant="outline"

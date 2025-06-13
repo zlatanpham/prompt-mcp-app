@@ -7,11 +7,18 @@ import {
   HardDriveUpload,
   Pencil as PencilIcon,
   Trash as TrashIcon,
+  MoreHorizontal,
 } from "lucide-react";
 
 import { api } from "@/trpc/react";
 
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch"; // Import Switch component
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
 import type { Argument } from "@/types/tool";
@@ -182,7 +189,7 @@ export default function ToolComponent() {
           <Skeleton className="h-8 w-full" />
         </div>
       ) : (
-        <div className="rounded-lg border">
+        <div className="overflow-hidden rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -216,22 +223,27 @@ export default function ToolComponent() {
                       />
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onEdit(tool.id)}
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onDelete(tool.id)}
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </Button>
-                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => onEdit(tool.id)}>
+                            <PencilIcon className="h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600 hover:bg-red-50 focus:bg-red-50 focus:text-red-600"
+                            onClick={() => onDelete(tool.id)}
+                          >
+                            <TrashIcon className="h-4 w-4 text-inherit" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))

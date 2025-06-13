@@ -206,7 +206,7 @@ export default function ApiKeysPage() {
           <Skeleton className="h-8 w-full" />
         </div>
       ) : (
-        <div className="rounded-lg border">
+        <div className="overflow-hidden rounded-md border">
           <Table>
             <TableHeader>
               <TableRow>
@@ -228,9 +228,7 @@ export default function ApiKeysPage() {
                   );
                   return (
                     <TableRow key={apiKey.id}>
-                      <TableCell className="font-medium">
-                        {apiKey.name}
-                      </TableCell>
+                      <TableCell>{apiKey.name}</TableCell>
                       <TableCell className="font-mono text-sm">
                         <div className="flex items-center gap-2">
                           <span>{truncate(apiKey.key, 10, true)}</span>
