@@ -154,6 +154,13 @@ export default function ChatPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages[messages.length - 1]?.content]);
 
+  const isThinking =
+    isLoading &&
+    (!messages[messages.length - 1] ||
+      messages[messages.length - 1]?.role === "user" ||
+      (messages[messages.length - 1]?.role === "assistant" &&
+        messages[messages.length - 1]?.content === ""));
+
   return (
     <div className="flex h-[calc(100dvh-16px)] flex-col items-center pb-4">
       <div className="flex w-full flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
@@ -174,12 +181,12 @@ export default function ChatPage() {
                       key={message.id}
                       message={message}
                       userAvatarFallback={userAvatarFallback}
-                      isLoading={index === messages.length - 1 && isLoading}
+                      isLoading={index === messages.length - 1 && isThinking}
                     />
                   ))}
                 </div>
               )}
-              {isLoading && (
+              {isThinking && (
                 <div className="loading-flash text-muted-foreground px-2 py-1 text-sm">
                   AI is thinking...
                 </div>
