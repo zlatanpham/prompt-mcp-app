@@ -1,20 +1,25 @@
 ---
 Date: 2025-06-13
-TaskRef: "Fix compile error: useSearchParams() should be wrapped in a suspense boundary"
+TaskRef: "Maintain UI order of projects, API keys, and tools after updates"
 
 Learnings:
-  - The `useSearchParams` hook in Next.js App Router client components requires a Suspense boundary in the parent layout to prevent compile errors related to streaming and server-side rendering.
-  - The error message "useSearchParams() should be wrapped in a suspense boundary" directly indicates the need for a `Suspense` component.
-  - Placing the `Suspense` component around `children` in the relevant `layout.tsx` file is the correct approach for page-level components.
+  - Default sorting in tRPC queries (without explicit `orderBy`) can lead to inconsistent UI order, especially when `updated_at` is implicitly used or when no order is specified.
+  - Explicitly sorting by `created_at` (or `createdAt` for `ApiKey` model) provides a stable order for UI elements that should maintain their position regardless of updates.
+  - Prisma field naming conventions (camelCase vs. snake_case) must be carefully verified against `schema.prisma` to avoid TypeScript errors in `orderBy` clauses.
+  - Strict adherence to tool parameter XML formatting is crucial to avoid tool execution failures.
 
 Difficulties:
-  - None. The error message was clear and the solution straightforward.
+  - Repeated errors with `ask_followup_question` due to incorrect XML formatting (missing `<question>` tag).
+  - Misidentifying the `createdAt` field name for the `ApiKey` model in Prisma (used `created_at` instead of `createdAt`), leading to a TypeScript error.
 
 Successes:
-  - Successfully identified the cause of the compile error.
-  - Correctly implemented the `Suspense` boundary in the appropriate layout file.
-  - Resolved the compile error without introducing new issues.
+  - Successfully identified the root cause of the ordering issue (sorting by `updated_at`).
+  - Implemented the correct stable sorting by `created_at` across projects, API keys, and tools.
+  - Corrected the `ApiKey` field name issue after inspecting `prisma/schema.prisma`.
+  - Successfully updated `.clinerules/writing-effective-cline-rules.md` to improve future interactions based on lessons learned.
 
 Improvements_Identified_For_Consolidation:
-  - General pattern: Handling `useSearchParams` in Next.js App Router client components by wrapping with `Suspense` in the layout.
+  - General pattern: Stable UI ordering by `created_at` for lists that should not reorder on update.
+  - General pattern: Always verify database schema field names (camelCase vs. snake_case) before using them in queries.
+  - General pattern: Double-check tool parameter XML formatting, especially for required tags.
 ---

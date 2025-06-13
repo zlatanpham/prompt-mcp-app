@@ -187,7 +187,7 @@ export const toolRouter = createTRPCRouter({
 
       const tools = await db.tool.findMany({
         where: { project_id: input.project_id },
-        orderBy: { updated_at: "desc" },
+        orderBy: { created_at: "desc" },
       });
       return tools;
     }),
@@ -291,7 +291,7 @@ export const toolRouter = createTRPCRouter({
           in: projectIds,
         },
       },
-      orderBy: { updated_at: "desc" },
+      orderBy: { created_at: "desc" },
     });
 
     // Explicitly cast args to Argument[]

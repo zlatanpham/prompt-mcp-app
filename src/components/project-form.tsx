@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useEffect } from "react";
 
 const projectFormSchema = z.object({
   name: z.string().min(1, "Project name is required"),
@@ -41,12 +40,6 @@ export function ProjectForm({
     resolver: zodResolver(projectFormSchema),
     defaultValues: defaultValues ?? { name: "", description: "" },
   });
-
-  useEffect(() => {
-    if (defaultValues) {
-      form.reset(defaultValues);
-    }
-  }, [defaultValues, form, form.reset]);
 
   return (
     <Form {...form}>

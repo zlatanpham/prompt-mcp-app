@@ -262,7 +262,7 @@ export default function ProjectPage() {
                               e.stopPropagation();
                               handleDeleteClick(project.id);
                             }}
-                            className="text-red-700 focus:bg-red-100 focus:text-red-900 data-[state=open]:bg-red-100 data-[state=open]:text-red-900"
+                            className="text-red-700 focus:bg-red-50 focus:text-red-700 data-[state=open]:bg-red-50 data-[state=open]:text-red-700"
                           >
                             <Trash2 className="mr-2 h-4 w-4 text-inherit" />
                             Delete

@@ -35,6 +35,9 @@ export const apiKeyRouter = createTRPCRouter({
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.apiKey.findMany({
       where: { userId: ctx.session.user.id },
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         projects: {
           include: {

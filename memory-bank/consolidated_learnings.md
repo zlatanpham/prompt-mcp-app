@@ -199,6 +199,12 @@
 - **Benefits:** Improves code readability and reduces verbosity, especially for deeply nested object access, while preventing runtime errors.
 - **Example:** Instead of `if (!user || !user.password)`, use `if (!user?.password)`.
 
+## Data Ordering & Consistency
+
+### Stable UI Ordering by Creation Date
+
+- **Pattern:** For lists of items that should maintain a consistent order on the UI regardless of updates (e.g., projects, API keys, tools), explicitly sort them by their `created_at` (or `createdAt`) timestamp in descending order in backend queries. This prevents items from jumping around due to `updated_at` changes.
+
 ## Development Workflow & Troubleshooting
 
 ### Handling `replace_in_file` Failures
@@ -259,3 +265,11 @@
 - **Pattern:** Even when environment variables are defined as required strings (`z.string()`) in `src/env.js`, TypeScript might still infer them as `string | undefined` in consuming files.
 - **Guidance:** To resolve type errors in consuming files (e.g., `src/lib/email.ts`, `src/server/api/routers/user.ts`), explicitly assert the type as `string` using `as string` where the variable is used.
 - **Benefits:** Satisfies the TypeScript compiler and ensures type safety, preventing potential runtime errors due to undefined environment variables.
+
+### Verify Database Schema Field Names
+
+- **Pattern:** Before using database field names in queries (e.g., `orderBy` clauses), always verify the exact naming convention (camelCase vs. snake_case) by reading the `prisma/schema.prisma` file. This prevents TypeScript errors and ensures correct query execution.
+
+### Strict Tool Parameter XML Formatting
+
+- **Pattern:** Adhere strictly to the XML formatting requirements for tool parameters, ensuring all required parameters are explicitly wrapped in their respective tags. Failure to do so will result in tool execution failures.

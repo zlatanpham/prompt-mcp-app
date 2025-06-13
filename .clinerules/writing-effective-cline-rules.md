@@ -117,6 +117,7 @@ When writing rules intended to directly steer Cline's AI behavior, certain conve
   - Use **MAY** for optional actions.
   - Use **MUST NOT** or **NEVER** for absolute prohibitions.
   - Use **SHOULD NOT** for strong discouragement.
+- **Strict Tool Parameter Formatting:** Always ensure that all required parameters for a tool are explicitly wrapped in their respective XML tags (e.g., `<question>Your question</question>` for `ask_followup_question`). Failure to do so will result in tool execution errors.
 - **Highlight Critical Information:**
   - `next-js-supabase.md` uses "🚨 CRITICAL INSTRUCTIONS FOR AI LANGUAGE MODELS 🚨" and "❌ NEVER GENERATE THIS CODE" / "✅ ALWAYS GENERATE THIS EXACT PATTERN".
   - `mcp-development-protocol.md` uses "⚠️ CRITICAL: DO NOT USE attempt_completion BEFORE TESTING ⚠️" and "BLOCKER ⛔️".
@@ -135,6 +136,7 @@ When writing rules intended to directly steer Cline's AI behavior, certain conve
 - **Use Analogies or Scenarios:** If explaining a complex concept, an analogy or a use-case scenario can be helpful.
 - **Define Terminology:** If your rule introduces specific terms or acronyms, define them.
 - **Anticipate Questions:** Try to think about what questions a user (or Cline itself) might have and address them proactively.
+- **Verify Schema Details for Field Names:** Before making assumptions about database field names (e.g., `created_at` vs `createdAt`), always verify the exact naming convention by reading the relevant schema file (e.g., `prisma/schema.prisma`). This prevents errors due to case sensitivity or different naming conventions across models.
 - **Keep it Updated:** As systems or processes change, ensure the relevant `.clinerules` are updated to reflect those changes. The `self-improving-cline.md` rule encourages this.
 
 ## 7. Referencing Other Rules

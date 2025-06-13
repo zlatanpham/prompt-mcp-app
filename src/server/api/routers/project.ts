@@ -6,7 +6,7 @@ export const projectRouter = createTRPCRouter({
   getAll: publicProcedure.query(async () => {
     const projects = await db.project.findMany({
       orderBy: {
-        updated_at: "desc",
+        created_at: "desc",
       },
       include: {
         _count: {
