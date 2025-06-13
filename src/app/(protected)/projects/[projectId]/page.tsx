@@ -18,7 +18,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Download, Upload, SendToBackIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import DashboardLayout from "@/components/dashboard-layout";
 import Tool from "./_components/tool";
@@ -71,8 +71,8 @@ export default function ProjectDetailPage() {
   return (
     <DashboardLayout
       bredcrumb={[
-        { label: "Dashboard", href: "/" },
-        { label: "Projects", href: "/project" },
+        { label: "Playground", href: "/" },
+        { label: "Projects", href: "/projects" },
         {
           label:
             !isLoading || project ? (
@@ -134,16 +134,19 @@ export default function ProjectDetailPage() {
                   <DropdownMenuItem
                     onSelect={() => setIsExportDialogOpen(true)}
                   >
+                    <Download className="h-4 w-4" />
                     Export Tools
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setIsImportDialogOpen(true)}
                   >
+                    <Upload className="h-4 w-4" />
                     Import Tools
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setIsMoveToolsDialogOpen(true)}
                   >
+                    <SendToBackIcon className="h-4 w-4" />
                     Move Tools
                   </DropdownMenuItem>
                 </DropdownMenuContent>

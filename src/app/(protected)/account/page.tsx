@@ -85,7 +85,7 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto w-full max-w-lg space-y-6 p-8 pb-16">
-      <h2 className="text-2xl font-medium tracking-tight">My Account</h2>
+      <h2 className="text-xl font-medium tracking-tight">My Account</h2>
 
       {isLoading ? (
         <AccountPageSkeleton />

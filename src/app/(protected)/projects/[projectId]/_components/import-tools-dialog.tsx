@@ -176,7 +176,7 @@ export function ImportToolsDialog({
               )}
             />
             <DialogFooter>
-              <Button type="submit" disabled={isLoading}>
+              <Button size="lg" type="submit" disabled={isLoading}>
                 {isLoading ? "Importing..." : "Import"}
               </Button>
             </DialogFooter>

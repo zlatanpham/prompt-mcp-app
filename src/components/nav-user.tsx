@@ -1,4 +1,4 @@
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
+import { User2Icon, ChevronsUpDown, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
@@ -77,7 +77,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => router.push("/account")}>
-                <BadgeCheck />
+                <User2Icon />
                 Account
               </DropdownMenuItem>
             </DropdownMenuGroup>

@@ -117,7 +117,7 @@ export function MoveToolsDialog({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-4">
               {/* Tool Selection */}
               <div>
                 <FormLabel>Select Tools</FormLabel>
@@ -210,6 +210,7 @@ export function MoveToolsDialog({
             </div>
             <DialogFooter>
               <Button
+                size="lg"
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
@@ -218,6 +219,7 @@ export function MoveToolsDialog({
                 Cancel
               </Button>
               <Button
+                size="lg"
                 type="submit"
                 disabled={
                   moveToolsMutation.status === "pending" ||

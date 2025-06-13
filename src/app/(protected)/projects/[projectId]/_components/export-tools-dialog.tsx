@@ -106,7 +106,7 @@ export default function ExportToolsDialog({
         <DialogHeader>
           <DialogTitle>Export Tools</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4">
           {isLoadingTools ? (
             <p>Loading tools...</p>
           ) : tools && tools.length > 0 ? (
@@ -145,12 +145,14 @@ export default function ExportToolsDialog({
         <DialogFooter>
           <Button
             type="button"
+            size="lg"
             variant="outline"
             onClick={() => onOpenChange(false)}
           >
             Cancel
           </Button>
           <Button
+            size="lg"
             type="button"
             onClick={handleExport}
             disabled={selectedToolIds.size === 0}

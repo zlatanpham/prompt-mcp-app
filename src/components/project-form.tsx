@@ -56,7 +56,7 @@ export function ProjectForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Project Name</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input placeholder="Project name" {...field} />
               </FormControl>
@@ -82,11 +82,16 @@ export function ProjectForm({
           )}
         />
         <div className="flex justify-end space-x-2">
-          <Button type="submit" disabled={isPending}>
+          <Button size="lg" type="submit" disabled={isPending}>
             Save
           </Button>
           {onCancel && (
-            <Button type="button" variant="secondary" onClick={onCancel}>
+            <Button
+              size="lg"
+              type="button"
+              variant="secondary"
+              onClick={onCancel}
+            >
               Cancel
             </Button>
           )}

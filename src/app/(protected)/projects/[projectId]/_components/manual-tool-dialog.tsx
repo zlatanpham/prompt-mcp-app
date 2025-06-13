@@ -144,7 +144,7 @@ const ManualToolDialog = (props: Props) => {
                 type="submit"
                 variant="default"
                 disabled={isSubmitting}
-                size="sm"
+                size="lg"
                 form="manual-tool-form"
               >
                 {selectedToolId ? "Update" : "Create"}

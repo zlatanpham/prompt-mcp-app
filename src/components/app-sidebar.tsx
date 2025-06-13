@@ -3,12 +3,12 @@
 import * as React from "react";
 import { useSession } from "next-auth/react";
 import {
-  Briefcase,
   Send,
   Settings2,
   SquareTerminal,
   GithubIcon,
   ComponentIcon,
+  LayoutGridIcon,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -35,8 +35,8 @@ const data = {
     },
     {
       title: "Projects",
-      url: "/project",
-      icon: Briefcase,
+      url: "/projects",
+      icon: LayoutGridIcon,
     },
     {
       title: "API Keys",
@@ -47,12 +47,12 @@ const data = {
   navSecondary: [
     {
       title: "Github",
-      url: "https://github.com/zlatanpham/prompt-mcp",
+      url: "https://github.com/zlatanpham/prompt-mcp-app",
       icon: GithubIcon,
     },
     {
       title: "Feedback",
-      url: "https://github.com/zlatanpham/prompt-mcp/issues",
+      url: "https://github.com/zlatanpham/prompt-mcp-app/issues",
       icon: Send,
     },
   ],

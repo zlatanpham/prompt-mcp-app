@@ -181,7 +181,7 @@ export default function ApiKeysPage() {
 
   return (
     <DashboardLayout
-      bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "API Keys" }]}
+      bredcrumb={[{ label: "Playground", href: "/" }, { label: "API Keys" }]}
     >
       <div className="-mx-4 flex items-center justify-between border-b px-4 py-2">
         <h1 className="text-md font-medium">API Keys</h1>
@@ -257,7 +257,7 @@ export default function ApiKeysPage() {
                           {apiKey.projects.map((p, index) => (
                             <Link
                               key={p.project.id}
-                              href={`/project/${p.project.id}`}
+                              href={`/projects/${p.project.id}`}
                               className="text-blue-600 hover:underline"
                             >
                               {p.project.name}

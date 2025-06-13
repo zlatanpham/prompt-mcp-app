@@ -19,7 +19,7 @@ import {
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
 import { ToolSelectorPopover } from "@/components/tool-selector-popover";
 import { type Tool } from "@/types/tool";
-import { ArrowUpIcon, CircleDotIcon } from "lucide-react";
+import { ArrowUpIcon, CircleDotIcon, KeyRoundIcon } from "lucide-react";
 import { ChevronDown } from "lucide-react"; // For dropdown indicator
 
 const API_KEY_STORAGE_KEYS = {
@@ -246,7 +246,7 @@ export default function ChatPage() {
                   <DropdownMenuItem
                     onSelect={() => setIsApiKeyDialogOpen(true)}
                   >
-                    Config API Keys
+                    <KeyRoundIcon /> Config API Keys
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

@@ -70,7 +70,7 @@ export function ApiKeyDialog({
             will be saved locally in your browser.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4">
           {Object.entries(API_KEY_STORAGE_KEYS).map(([provider]) => (
             <div className="grid grid-cols-4 items-center gap-4" key={provider}>
               <Label htmlFor={provider} className="text-right capitalize">
@@ -87,7 +87,9 @@ export function ApiKeyDialog({
           ))}
         </div>
         <DialogFooter>
-          <Button onClick={handleSave}>Save Keys</Button>
+          <Button size="lg" onClick={handleSave}>
+            Save Keys
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

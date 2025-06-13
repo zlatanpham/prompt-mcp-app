@@ -196,7 +196,7 @@ export function ToolSelectorPopover({
                   size="sm"
                   onClick={() => {
                     setOpen(false);
-                    router.push("/project?showCreateProject=true");
+                    router.push("/projects?showCreateProject=true");
                   }}
                 >
                   Create a Project
@@ -272,7 +272,7 @@ export function ToolSelectorPopover({
                   key={tool.id}
                   className="hover:bg-accent hover:text-accent-foreground relative flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                 >
-                  <span className="truncate overflow-hidden whitespace-nowrap">
+                  <span className="mr-2 truncate overflow-hidden font-mono text-[13px] whitespace-nowrap">
                     {tool.name}
                   </span>
                   <Switch

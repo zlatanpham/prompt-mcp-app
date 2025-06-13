@@ -82,10 +82,7 @@ export function EditNameDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="grid gap-4 py-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <FormField
               control={form.control}
               name="name"
@@ -101,13 +98,18 @@ export function EditNameDialog({
             />
             <div className="flex justify-end space-x-2">
               <Button
+                size="lg"
                 variant="outline"
                 onClick={() => setOpen(false)}
                 type="button"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={updateNameMutation.isPending}>
+              <Button
+                size="lg"
+                type="submit"
+                disabled={updateNameMutation.isPending}
+              >
                 {updateNameMutation.isPending ? "Saving..." : "Save"}
               </Button>
             </div>

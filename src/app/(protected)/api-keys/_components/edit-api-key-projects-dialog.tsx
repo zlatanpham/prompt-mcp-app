@@ -67,7 +67,7 @@ export function EditApiKeyProjectsDialog({
             Update the API key name and select projects it can access.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="api-key-name" className="text-right">
               API Key Name
@@ -104,7 +104,7 @@ export function EditApiKeyProjectsDialog({
             </div>
           </div>
         </div>
-        <Button onClick={() => handleUpdateProjects(apiName)}>
+        <Button size="lg" onClick={() => handleUpdateProjects(apiName)}>
           Save Changes
         </Button>
       </DialogContent>

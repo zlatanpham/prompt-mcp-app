@@ -135,7 +135,7 @@ export default function ToolComponent() {
       <div className="mb-4 flex items-center justify-between">
         <h4 className="text-md font-medium">Tools</h4>
         <Button
-          variant="default"
+          variant="outline"
           disabled={isLoading}
           onClick={() => {
             setSelectedToolId(null);

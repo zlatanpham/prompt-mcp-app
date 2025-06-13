@@ -87,10 +87,7 @@ export function ResetPasswordDialog({ onSuccess }: ResetPasswordDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="grid gap-4 py-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <FormField
               control={form.control}
               name="currentPassword"
@@ -145,6 +142,7 @@ export function ResetPasswordDialog({ onSuccess }: ResetPasswordDialogProps) {
             <div className="flex justify-end space-x-2 pt-4">
               <Button
                 variant="outline"
+                size="lg"
                 onClick={() => setOpen(false)}
                 type="button"
               >
@@ -152,6 +150,7 @@ export function ResetPasswordDialog({ onSuccess }: ResetPasswordDialogProps) {
               </Button>
               <Button
                 type="submit"
+                size="lg"
                 disabled={resetPasswordMutation.status === "pending"}
               >
                 {resetPasswordMutation.status === "pending"

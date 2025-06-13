@@ -15,12 +15,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Card, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -149,7 +147,7 @@ export default function ProjectPage() {
 
   return (
     <DashboardLayout
-      bredcrumb={[{ label: "Dashboard", href: "/" }, { label: "Projects" }]}
+      bredcrumb={[{ label: "Playground", href: "/" }, { label: "Projects" }]}
     >
       <div className="-mx-4 flex items-center justify-between border-b px-4 py-2">
         <h1 className="text-md font-medium">Projects</h1>
@@ -164,7 +162,7 @@ export default function ProjectPage() {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onCreateSubmit)}
-                className="grid gap-4 py-4"
+                className="grid gap-4"
               >
                 <FormField
                   control={form.control}
@@ -221,7 +219,7 @@ export default function ProjectPage() {
             const date = project.updated_at ?? project.created_at;
             const timeAgoString = date ? timeAgo(date) : "N/A";
             return (
-              <Link key={project.id} href={`/project/${project.id}`}>
+              <Link key={project.id} href={`/projects/${project.id}`}>
                 <Card className="flex h-full w-full flex-col justify-between p-3 transition-all">
                   <div>
                     <div className="flex items-center justify-between">
