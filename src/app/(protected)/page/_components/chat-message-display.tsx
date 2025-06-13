@@ -94,45 +94,53 @@ export function ChatMessageDisplay({
     const toolResult = toolInvocation.result;
 
     return (
-      <Collapsible
-        open={isOpen}
-        onOpenChange={setIsOpen}
-        className="mb-4 w-full rounded-lg border p-2 text-left"
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        exit={{ opacity: 0, height: 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="overflow-hidden"
       >
-        <CollapsibleTrigger className="flex w-full items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge variant="secondary" className="rounded-full px-2 py-1">
-              {toolName.charAt(0).toUpperCase()}
-            </Badge>
-            <span className="font-mono text-sm font-medium">{toolName}</span>
-          </div>
-          <ChevronDown
-            className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
-          />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-2 space-y-2">
-          {toolArgs && (
-            <div className="rounded-md p-2">
-              <h3 className="mb-2 text-sm font-medium">Request</h3>
-              <div className="max-h-[300px] overflow-auto">
-                <pre className="rounded-md bg-gray-100 p-4 text-xs whitespace-pre-wrap">
-                  <code>{JSON.stringify(toolArgs, null, 2)}</code>
-                </pre>
-              </div>
+        <Collapsible
+          open={isOpen}
+          onOpenChange={setIsOpen}
+          className="w-full rounded-lg border p-2 text-left"
+        >
+          <CollapsibleTrigger className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="rounded-full px-2 py-1">
+                {toolName.charAt(0).toUpperCase()}
+              </Badge>
+              <span className="font-mono text-sm font-medium">{toolName}</span>
             </div>
-          )}
-          {toolResult && (
-            <div className="rounded-md p-2">
-              <h3 className="mb-2 text-sm font-medium">Response</h3>
-              <div className="max-h-[300px] overflow-auto">
-                <pre className="rounded-md bg-gray-100 p-4 text-xs whitespace-pre-wrap">
-                  <code>{toolResult}</code>
-                </pre>
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-2 space-y-2">
+            {toolArgs && (
+              <div className="rounded-md p-2">
+                <h3 className="mb-2 text-sm font-medium">Request</h3>
+                <div className="max-h-[300px] overflow-auto">
+                  <pre className="rounded-md bg-gray-100 p-4 text-xs whitespace-pre-wrap">
+                    <code>{JSON.stringify(toolArgs, null, 2)}</code>
+                  </pre>
+                </div>
               </div>
-            </div>
-          )}
-        </CollapsibleContent>
-      </Collapsible>
+            )}
+            {toolResult && (
+              <div className="rounded-md p-2">
+                <h3 className="mb-2 text-sm font-medium">Response</h3>
+                <div className="max-h-[300px] overflow-auto">
+                  <pre className="rounded-md bg-gray-100 p-4 text-xs whitespace-pre-wrap">
+                    <code>{toolResult}</code>
+                  </pre>
+                </div>
+              </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
+      </motion.div>
     );
   }
 

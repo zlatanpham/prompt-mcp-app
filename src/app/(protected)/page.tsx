@@ -181,7 +181,7 @@ export default function ChatPage() {
                       key={message.id}
                       message={message}
                       userAvatarFallback={userAvatarFallback}
-                      isLoading={index === messages.length - 1 && isThinking}
+                      isLoading={index === messages.length - 1 && isLoading}
                     />
                   ))}
                 </div>
