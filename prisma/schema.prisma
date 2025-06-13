@@ -83,24 +83,24 @@ model Tool {
 }
 
 model ApiKey {
-    id        String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-    key       String            @unique @db.Text
-    name      String            @db.VarChar(255)
-    userId    String
-    createdAt DateTime          @default(now()) @db.Timestamptz(6)
-    updatedAt DateTime          @default(now()) @db.Timestamptz(6)
-    user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-    projects  ApiKeyOnProject[]
+    id         String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+    key        String            @unique @db.Text
+    name       String            @db.VarChar(255)
+    user_id    String            @map("userId")
+    created_at DateTime          @default(now()) @map("createdAt") @db.Timestamptz(6)
+    updated_at DateTime          @default(now()) @map("updatedAt") @db.Timestamptz(6)
+    user       User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+    projects   ApiKeyOnProject[]
 }
 
 model ApiKeyOnProject {
-    apiKey     ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
-    apiKeyId   String   @db.Uuid
-    project    Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-    projectId  String   @db.Uuid
-    assignedAt DateTime @default(now()) @db.Timestamptz(6)
+    api_key     ApiKey   @relation(fields: [api_key_id], references: [id], onDelete: Cascade)
+    api_key_id  String   @map("apiKeyId") @db.Uuid
+    project     Project  @relation(fields: [project_id], references: [id], onDelete: Cascade)
+    project_id  String   @map("projectId") @db.Uuid
+    assigned_at DateTime @default(now()) @map("assignedAt") @db.Timestamptz(6)
 
-    @@id([apiKeyId, projectId])
+    @@id([api_key_id, project_id])
 }
 
 model Session {
@@ -112,20 +112,20 @@ model Session {
 }
 
 model User {
-    id                   String               @id @default(cuid())
-    name                 String?
-    email                String?              @unique
-    emailVerified        DateTime?
-    image                String?
-    password             String? // Added for email/password authentication
-    resetPasswordToken   String?
-    resetPasswordExpires DateTime?
-    Account              Account[]
-    Organization         Organization[]
-    OrganizationMember   OrganizationMember[]
-    Project              Project[]
-    Session              Session[]
-    ApiKey               ApiKey[]
+    id                     String               @id @default(cuid())
+    name                   String?
+    email                  String?              @unique
+    emailVerified          DateTime?
+    image                  String?
+    password               String? // Added for email/password authentication
+    reset_password_token   String?              @map("resetPasswordToken")
+    reset_password_expires DateTime?            @map("resetPasswordExpires")
+    Account                Account[]
+    Organization           Organization[]
+    OrganizationMember     OrganizationMember[]
+    Project                Project[]
+    Session                Session[]
+    ApiKey                 ApiKey[]
 }
 
 model VerificationToken {

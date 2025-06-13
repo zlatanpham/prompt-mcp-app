@@ -20,10 +20,10 @@ export const apiKeyRouter = createTRPCRouter({
         data: {
           name,
           key: apiKey,
-          userId,
+          user_id: userId,
           projects: {
             create: projectIds?.map((projectId) => ({
-              projectId,
+              project_id: projectId,
             })),
           },
         },
@@ -34,9 +34,9 @@ export const apiKeyRouter = createTRPCRouter({
 
   getAll: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.apiKey.findMany({
-      where: { userId: ctx.session.user.id },
+      where: { user_id: ctx.session.user.id },
       orderBy: {
-        createdAt: "desc",
+        created_at: "desc",
       },
       include: {
         projects: {
@@ -63,7 +63,7 @@ export const apiKeyRouter = createTRPCRouter({
       const userId = ctx.session.user.id;
 
       const apiKey = await ctx.db.apiKey.findUnique({
-        where: { id: apiKeyId, userId },
+        where: { id: apiKeyId, user_id: userId },
         select: { id: true },
       });
 
@@ -78,7 +78,7 @@ export const apiKeyRouter = createTRPCRouter({
         where: {
           ApiKeyOnProject: {
             some: {
-              apiKeyId: apiKeyId,
+              api_key_id: apiKeyId,
             },
           },
         },
@@ -109,7 +109,7 @@ export const apiKeyRouter = createTRPCRouter({
         where: { id: input.id },
       });
 
-      if (!apiKey || apiKey.userId !== ctx.session.user.id) {
+      if (!apiKey || apiKey.user_id !== ctx.session.user.id) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
@@ -127,7 +127,7 @@ export const apiKeyRouter = createTRPCRouter({
         where: { id: input.id },
       });
 
-      if (!existingApiKey || existingApiKey.userId !== ctx.session.user.id) {
+      if (!existingApiKey || existingApiKey.user_id !== ctx.session.user.id) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
@@ -157,7 +157,7 @@ export const apiKeyRouter = createTRPCRouter({
         where: { id },
       });
 
-      if (!apiKey || apiKey.userId !== userId) {
+      if (!apiKey || apiKey.user_id !== userId) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
@@ -169,14 +169,14 @@ export const apiKeyRouter = createTRPCRouter({
       if (projectIds !== undefined) {
         // Disconnect all existing projects
         await ctx.db.apiKeyOnProject.deleteMany({
-          where: { apiKeyId: id },
+          where: { api_key_id: id },
         });
 
         // Connect new projects
         await ctx.db.apiKeyOnProject.createMany({
           data: projectIds.map((projectId) => ({
-            apiKeyId: id,
-            projectId,
+            api_key_id: id,
+            project_id: projectId,
           })),
         });
       }

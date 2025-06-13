@@ -150,8 +150,8 @@ export const userRouter = createTRPCRouter({
       await ctx.db.user.update({
         where: { id: user.id },
         data: {
-          resetPasswordToken: resetToken,
-          resetPasswordExpires: resetPasswordExpires,
+          reset_password_token: resetToken,
+          reset_password_expires: resetPasswordExpires,
         },
       });
 
@@ -181,8 +181,8 @@ export const userRouter = createTRPCRouter({
 
       const user = await ctx.db.user.findFirst({
         where: {
-          resetPasswordToken: token,
-          resetPasswordExpires: {
+          reset_password_token: token,
+          reset_password_expires: {
             gt: new Date(), // Token must not be expired
           },
         },
@@ -198,8 +198,8 @@ export const userRouter = createTRPCRouter({
         where: { id: user.id },
         data: {
           password: hashedPassword,
-          resetPasswordToken: null,
-          resetPasswordExpires: null,
+          reset_password_token: null,
+          reset_password_expires: null,
         },
       });
 
