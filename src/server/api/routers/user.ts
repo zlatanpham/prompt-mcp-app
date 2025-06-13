@@ -5,6 +5,9 @@ import {
   publicProcedure,
 } from "@/server/api/trpc";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
+import { sendPasswordResetEmail } from "@/lib/email";
+import { env } from "@/env.js";
 
 export const userRouter = createTRPCRouter({
   updateName: protectedProcedure
@@ -124,6 +127,80 @@ export const userRouter = createTRPCRouter({
       await ctx.db.user.update({
         where: { id: userId },
         data: { password: hashedPassword },
+      });
+
+      return { success: true };
+    }),
+
+  requestPasswordReset: publicProcedure
+    .input(z.object({ email: z.string().email("Invalid email address") }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({
+        where: { email: input.email },
+      });
+
+      // Always return success for security reasons, even if user not found
+      if (!user) {
+        return { success: true };
+      }
+
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetPasswordExpires = new Date(Date.now() + 3600000); // 1 hour from now
+
+      await ctx.db.user.update({
+        where: { id: user.id },
+        data: {
+          resetPasswordToken: resetToken,
+          resetPasswordExpires: resetPasswordExpires,
+        },
+      });
+
+      const resetLink = `${env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
+
+      await sendPasswordResetEmail(user.email!, resetToken, resetLink);
+
+      return { success: true };
+    }),
+
+  confirmPasswordReset: publicProcedure
+    .input(
+      z.object({
+        token: z.string(),
+        newPassword: z
+          .string()
+          .min(8, "New password must be at least 8 characters long"),
+        confirmPassword: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { token, newPassword, confirmPassword } = input;
+
+      if (newPassword !== confirmPassword) {
+        throw new Error("Passwords do not match.");
+      }
+
+      const user = await ctx.db.user.findFirst({
+        where: {
+          resetPasswordToken: token,
+          resetPasswordExpires: {
+            gt: new Date(), // Token must not be expired
+          },
+        },
+      });
+
+      if (!user) {
+        throw new Error("Invalid or expired password reset token.");
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await ctx.db.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          resetPasswordToken: null,
+          resetPasswordExpires: null,
+        },
       });
 
       return { success: true };

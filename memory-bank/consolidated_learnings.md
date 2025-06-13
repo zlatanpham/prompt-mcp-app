@@ -243,3 +243,19 @@
   1. Initialize the query with `enabled: false`: `const { data, isLoading, refetch } = api.yourRouter.yourProcedure.useQuery(input, { enabled: false });`
   2. Call `await refetch()` in the event handler to trigger the data fetch.
   3. Use the `data` returned from `refetch()` (e.g., `const { data: fetchedData } = await refetch();`) for subsequent logic that depends on the fetched data.
+
+## CLI Interaction & Environment Variables
+
+### Handling Interactive CLI Commands
+
+- **Pattern:** When a CLI command (e.g., `prisma migrate dev`) prompts for interactive input, direct interaction by sending subsequent commands is not supported.
+- **Guidance:** In such cases, either:
+  1. Ask the user to manually provide the input in their terminal.
+  2. Investigate if the command offers a non-interactive flag or a way to pipe input (e.g., `echo "migration_name" | pnpm db:generate`).
+- **Benefits:** Prevents command execution failures and ensures smooth progression of tasks involving interactive prompts.
+
+### Environment Variable Type Inference
+
+- **Pattern:** Even when environment variables are defined as required strings (`z.string()`) in `src/env.js`, TypeScript might still infer them as `string | undefined` in consuming files.
+- **Guidance:** To resolve type errors in consuming files (e.g., `src/lib/email.ts`, `src/server/api/routers/user.ts`), explicitly assert the type as `string` using `as string` where the variable is used.
+- **Benefits:** Satisfies the TypeScript compiler and ensures type safety, preventing potential runtime errors due to undefined environment variables.
