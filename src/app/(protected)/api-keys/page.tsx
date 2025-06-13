@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 "use client";
 
 import { api } from "@/trpc/react";
@@ -223,7 +224,7 @@ export default function ApiKeysPage() {
               {apiKeys && apiKeys.length > 0 ? (
                 apiKeys.map((apiKey) => {
                   const totalToolCount = apiKey.projects.reduce(
-                    (sum, ap) => sum + (ap.project._count?.Tool || 0),
+                    (sum, ap) => sum + (ap.project._count?.Tool ?? 0),
                     0,
                   );
                   return (
@@ -283,10 +284,10 @@ export default function ApiKeysPage() {
                         </Button>
                       </TableCell>
                       <TableCell>
-                        {new Date(apiKey.createdAt).toLocaleDateString()}
+                        {new Date(apiKey.created_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        {new Date(apiKey.updatedAt).toLocaleDateString()}
+                        {new Date(apiKey.updated_at).toLocaleDateString()}
                       </TableCell>
                       <TableCell className="text-right">
                         <DropdownMenu>
@@ -303,12 +304,12 @@ export default function ApiKeysPage() {
                                   id: apiKey.id,
                                   name: apiKey.name,
                                   currentProjectIds: apiKey.projects.map(
-                                    (p) => p.projectId,
+                                    (p) => p.project_id,
                                   ),
                                 });
                                 setEditSelectedProjectIds(
                                   apiKey.projects
-                                    .map((p) => p.projectId)
+                                    .map((p) => p.project_id)
                                     .filter(
                                       (id): id is string => id !== undefined,
                                     ),
