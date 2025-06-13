@@ -135,7 +135,7 @@ export function MoveToolsDialog({
                             return (
                               <FormItem
                                 key={tool.id}
-                                className="flex flex-row items-start space-y-0 space-x-3"
+                                className="flex flex-row items-center space-y-0 space-x-3"
                               >
                                 <FormControl>
                                   <Checkbox
@@ -154,8 +154,8 @@ export function MoveToolsDialog({
                                     }}
                                   />
                                 </FormControl>
-                                <FormLabel className="font-normal">
-                                  {tool.name}
+                                <FormLabel className="w-5/6 max-w-[400px] font-mono text-sm font-normal">
+                                  <span className="truncate">{tool.name}</span>
                                 </FormLabel>
                               </FormItem>
                             );

@@ -12,7 +12,23 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Check } from "lucide-react";
+
+const formSchema = z.object({
+  toolIds: z.array(z.string()),
+});
 
 interface ExportToolsDialogProps {
   isOpen: boolean;
@@ -32,54 +48,45 @@ export default function ExportToolsDialog({
       { enabled: !!projectId },
     );
 
-  const [selectedToolIds, setSelectedToolIds] = useState<Set<string>>(
-    new Set(),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      toolIds: [],
+    } as z.infer<typeof formSchema>,
+  });
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const selectedToolIds = form.watch("toolIds");
+
+  const filteredTools = tools?.filter((tool) =>
+    tool.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
-  const [isSelectAll, setIsSelectAll] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedToolIds(new Set());
-      setIsSelectAll(false);
+      form.reset({ toolIds: [] });
+      setSearchTerm(""); // Reset search term when dialog opens
     }
-  }, [isOpen]);
+  }, [isOpen, form]);
 
-  useEffect(() => {
-    if (tools && selectedToolIds.size === tools.length && tools.length > 0) {
-      setIsSelectAll(true);
-    } else {
-      setIsSelectAll(false);
+  const handleSelectAll = () => {
+    if (filteredTools && selectedToolIds.length === filteredTools.length) {
+      // If all filtered tools are selected, deselect all
+      form.setValue("toolIds", []);
+    } else if (filteredTools) {
+      // Otherwise, select all filtered tools
+      form.setValue(
+        "toolIds",
+        filteredTools.map((tool) => tool.id),
+      );
     }
-  }, [selectedToolIds, tools]);
-
-  const handleSelectTool = (toolId: string, checked: boolean) => {
-    setSelectedToolIds((prev) => {
-      const newSet = new Set(prev);
-      if (checked) {
-        newSet.add(toolId);
-      } else {
-        newSet.delete(toolId);
-      }
-      return newSet;
-    });
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    setIsSelectAll(checked);
-    setSelectedToolIds(() => {
-      const newSet = new Set<string>();
-      if (checked && tools) {
-        tools.forEach((tool) => newSet.add(tool.id));
-      }
-      return newSet;
-    });
   };
 
   const handleExport = () => {
     if (!tools) return;
 
     const toolsToExport = tools
-      .filter((tool) => selectedToolIds.has(tool.id))
+      .filter((tool) => selectedToolIds.includes(tool.id))
       .map((tool) => ({
         name: tool.name,
         description: tool.description,
@@ -102,46 +109,93 @@ export default function ExportToolsDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
+      <DialogContent className="max-h-[80vh] sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Export Tools</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4">
-          {isLoadingTools ? (
-            <p>Loading tools...</p>
-          ) : tools && tools.length > 0 ? (
-            <>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="selectAll"
-                  checked={isSelectAll}
-                  onCheckedChange={(checked: boolean) =>
-                    handleSelectAll(checked)
-                  }
+        <Form {...form}>
+          <form className="space-y-2">
+            {isLoadingTools ? (
+              <p>Loading tools...</p>
+            ) : (
+              <>
+                <Input
+                  placeholder="Search tools..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="mb-2"
                 />
-                <Label htmlFor="selectAll" className="text-base font-medium">
-                  Select All
-                </Label>
-              </div>
-              <div className="grid gap-2">
-                {tools.map((tool) => (
-                  <div key={tool.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={tool.id}
-                      checked={selectedToolIds.has(tool.id)}
-                      onCheckedChange={(checked: boolean) =>
-                        handleSelectTool(tool.id, checked)
-                      }
-                    />
-                    <Label htmlFor={tool.id}>{tool.name}</Label>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : (
-            <p>No tools available to export.</p>
-          )}
-        </div>
+                {filteredTools && filteredTools.length > 0 ? (
+                  <>
+                    <ScrollArea className="mt-2 h-[300px] rounded-md border">
+                      <div className="space-y-2 p-4">
+                        {filteredTools.map((tool) => (
+                          <FormField
+                            key={tool.id}
+                            control={form.control}
+                            name="toolIds"
+                            render={({ field }) => {
+                              return (
+                                <FormItem
+                                  key={tool.id}
+                                  className="flex flex-row items-center space-y-0 space-x-3"
+                                >
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value?.includes(tool.id)}
+                                      onCheckedChange={(checked) => {
+                                        return checked
+                                          ? field.onChange([
+                                              ...field.value,
+                                              tool.id,
+                                            ])
+                                          : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== tool.id,
+                                              ),
+                                            );
+                                      }}
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="w-5/6 max-w-[400px] font-mono text-sm font-normal">
+                                    <span className="truncate">
+                                      {tool.name}
+                                    </span>
+                                  </FormLabel>
+                                </FormItem>
+                              );
+                            }}
+                          />
+                        ))}
+                      </div>
+                    </ScrollArea>
+                    <div className="flex items-center justify-between">
+                      <Button
+                        type="button"
+                        variant={
+                          selectedToolIds.length === filteredTools.length
+                            ? "secondary"
+                            : "outline"
+                        }
+                        size="sm"
+                        onClick={handleSelectAll}
+                      >
+                        {selectedToolIds.length === filteredTools.length && (
+                          <Check className="h-4 w-4" />
+                        )}
+                        <span>Select All</span>
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-muted-foreground py-5 text-center">
+                    No tools found matching your search.
+                  </p>
+                )}
+              </>
+            )}
+          </form>
+        </Form>
         <DialogFooter>
           <Button
             type="button"
@@ -155,7 +209,7 @@ export default function ExportToolsDialog({
             size="lg"
             type="button"
             onClick={handleExport}
-            disabled={selectedToolIds.size === 0}
+            disabled={selectedToolIds.length === 0}
           >
             Export Selected
           </Button>
