@@ -15,6 +15,9 @@ export const env = createEnv({
     ENCRYPTION_KEY: z.string(),
     AUTH_GITHUB_SECRET: z.string(),
     DATABASE_URL: z.string().url(),
+    RESEND_API_KEY: z.string(),
+    EMAIL_FROM: z.string(),
+    NEXTAUTH_URL: z.string().url(), // Add NEXTAUTH_URL
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -39,6 +42,9 @@ export const env = createEnv({
     AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL, // Add NEXTAUTH_URL
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

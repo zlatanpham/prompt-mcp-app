@@ -1,4 +1,5 @@
 import { ComponentIcon } from "lucide-react";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -14,7 +15,7 @@ export default function RootLayout({
           </div>
           Prompt MCP
         </a>
-        {children}
+        <Suspense fallback={null}>{children}</Suspense>
       </div>
     </div>
   );
