@@ -146,7 +146,12 @@ export function ChatMessageDisplay({
 
   if (message.role === "user") {
     return (
-      <div className="flex items-start gap-4 rounded-lg bg-gray-100 p-3">
+      <motion.div
+        initial={{ opacity: 1, y: 20, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="flex items-start gap-4 rounded-lg bg-gray-100 p-3"
+      >
         <Avatar className="h-8 w-8">
           <AvatarFallback className="bg-gray-800 text-white">
             {userAvatarFallback}
@@ -157,7 +162,7 @@ export function ChatMessageDisplay({
             {message.content}
           </ReactMarkdown>
         </div>
-      </div>
+      </motion.div>
     );
   }
 

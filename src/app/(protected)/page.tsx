@@ -5,6 +5,7 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat, type Message } from "@ai-sdk/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { ChatMessageDisplay } from "@/app/(protected)/page/_components/chat-message-display";
 import { Button } from "@/components/ui/button";
@@ -167,15 +168,15 @@ export default function ChatPage() {
         <div className="border-b px-4 py-3">
           <h2 className="text-normal font-medium">Chat playground</h2>
         </div>
-        <div className="max-h-[calc(100dvh-200px)]">
+        <div className="max-h-[calc(100dvh-180px)]">
           <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
-            <div className="mx-auto max-w-3xl">
+            <div className="mx-auto max-w-3xl py-4">
               {messages.length === 0 && !isLoading && !error ? (
                 <div className="mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
                   👋 Hello! Start chatting with your tools here.
                 </div>
               ) : (
-                <div className="space-y-3 py-4">
+                <div className="space-y-4">
                   {messages.map((message: Message, index) => (
                     <ChatMessageDisplay
                       key={message.id}
@@ -186,11 +187,18 @@ export default function ChatPage() {
                   ))}
                 </div>
               )}
-              {isThinking && (
-                <div className="loading-flash text-muted-foreground px-2 py-1 text-sm">
-                  AI is thinking...
-                </div>
-              )}
+              <AnimatePresence>
+                {isThinking && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: 0.3 }}
+                    className="loading-flash text-muted-foreground mt-3 px-2 text-sm"
+                  >
+                    AI is thinking...
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {error && (
                 <div className="text-center text-red-500">
                   Error: {error.message}
