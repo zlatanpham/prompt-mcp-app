@@ -77,7 +77,7 @@ export default function LoginPage() {
           <CardTitle className="text-xl">Welcome back</CardTitle>
           <CardDescription>Login with your email and password</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
@@ -114,25 +114,21 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isPending}>
+              <Button
+                size="lg"
+                type="submit"
+                className="w-full"
+                disabled={isPending}
+              >
                 {isPending ? "Signing in..." : "Sign in with Email"}
               </Button>
             </form>
           </Form>
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card text-muted-foreground px-2">
-                Or continue with
-              </span>
-            </div>
-          </div>
           <form action={handleGithubSignIn}>
             <Button
               type="submit"
-              variant="secondary"
+              variant="outline"
+              size="lg"
               className="w-full"
               disabled={isPending}
             >

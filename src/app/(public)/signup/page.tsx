@@ -139,7 +139,7 @@ export default function SignUpPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
+              <Button size="lg" type="submit" className="w-full">
                 Sign Up
               </Button>
             </form>
