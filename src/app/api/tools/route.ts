@@ -25,8 +25,14 @@ export async function GET(req: NextRequest) {
       return new Response("Unauthorized: Invalid API Key", { status: 401 });
     }
 
+    // Update last_used timestamp
+    await db.apiKey.update({
+      where: { id: foundApiKey.id },
+      data: { last_used: new Date() },
+    });
+
     const projectIds = foundApiKey.projects.map(
-      (p: ApiKeyOnProject) => p.projectId,
+      (p: ApiKeyOnProject) => p.project_id,
     );
 
     if (projectIds.length === 0) {

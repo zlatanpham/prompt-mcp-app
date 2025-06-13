@@ -264,3 +264,23 @@
 
 - For schema changes requiring data preservation, use `pnpm dlx prisma migrate dev` to generate and apply migrations.
 - For production deployments, use `pnpm db:migrate` to apply pending migrations.
+
+## Prisma & Database Management
+
+### Naming Conventions: `underscore_case`
+
+- **Pattern:** All new database column names and Prisma schema field names should consistently use `underscore_case`.
+- **Benefits:** Ensures consistency across the application's data layer and adheres to common SQL naming conventions.
+
+### Prisma Client & Migration Generation
+
+- **Pattern:** After any changes to `prisma/schema.prisma`, immediately run `pnpm db:generate` (or `pnpm dlx prisma migrate dev`) to:
+  1. Generate a new database migration file (if schema changes require it).
+  2. Apply the migration to the development database.
+  3. Update the Prisma Client, which regenerates TypeScript types for your models.
+- **Benefits:** Keeps the database schema, Prisma Client, and TypeScript types in sync, preventing type errors and ensuring the application interacts correctly with the database.
+
+### Common Prisma Relation Field Typo
+
+- **Pattern:** Be vigilant for typos when accessing related fields, especially between `camelCase` and `underscore_case` (e.g., `projectId` vs `project_id`). Always refer to the Prisma schema for the exact field name.
+- **Benefits:** Prevents runtime errors and TypeScript issues related to incorrect property access in Prisma queries and application logic.

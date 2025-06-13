@@ -215,7 +215,7 @@ export default function ApiKeysPage() {
                 <TableHead>Key</TableHead>
                 <TableHead>Projects</TableHead>
                 <TableHead>Tools</TableHead>
-                <TableHead>Created At</TableHead>
+                <TableHead>Last Used</TableHead>
                 <TableHead>Updated At</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -244,7 +244,7 @@ export default function ApiKeysPage() {
                             className="h-6 w-6 p-0"
                           >
                             {copiedKeyId === apiKey.id ? (
-                              <Check className="h-4 w-4 text-green-600" />
+                              <Check className="h-4 w-4" />
                             ) : (
                               <Copy className="h-4 w-4" />
                             )}
@@ -284,7 +284,9 @@ export default function ApiKeysPage() {
                         </Button>
                       </TableCell>
                       <TableCell>
-                        {new Date(apiKey.created_at).toLocaleDateString()}
+                        {apiKey.last_used
+                          ? new Date(apiKey.last_used).toLocaleDateString()
+                          : "Never"}
                       </TableCell>
                       <TableCell>
                         {new Date(apiKey.updated_at).toLocaleDateString()}

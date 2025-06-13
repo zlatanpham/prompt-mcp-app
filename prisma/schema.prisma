@@ -89,6 +89,7 @@ model ApiKey {
     user_id    String            @map("userId")
     created_at DateTime          @default(now()) @map("createdAt") @db.Timestamptz(6)
     updated_at DateTime          @default(now()) @map("updatedAt") @db.Timestamptz(6)
+    last_used  DateTime?         @default(now()) @db.Timestamptz(6)
     user       User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
     projects   ApiKeyOnProject[]
 }
