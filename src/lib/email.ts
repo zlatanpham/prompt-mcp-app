@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { Resend } from "resend";
 import { env } from "@/env.js";
 import * as React from "react";
