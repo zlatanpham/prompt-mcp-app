@@ -1,74 +1,112 @@
 "use client";
 
-import { useState } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email({ message: "Invalid email address." }),
+});
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
 
   const requestReset = api.user.requestPasswordReset.useMutation({
     onSuccess: () => {
-      setMessage(
-        "If an account with that email exists, a password reset link has been sent.",
-      );
       toast.success(
         "If an account with that email exists, a password reset link has been sent.",
       );
     },
     onError: (error) => {
-      setMessage(error.message);
       toast.error(error.message);
     },
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    requestReset.mutate({ email });
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
+    await requestReset.mutateAsync({ email: data.email });
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
-        <h2 className="mb-6 text-center text-2xl font-bold">Forgot Password</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="mt-1 block w-full"
-            />
-          </div>
-          <Button
-            type="submit"
-            className="w-full"
-            disabled={requestReset.status === "pending"}
-          >
-            {requestReset.status === "pending"
-              ? "Sending..."
-              : "Request Reset Link"}
-          </Button>
-        </form>
-        {message && (
-          <p className="mt-4 text-center text-sm text-gray-600">{message}</p>
-        )}
-        <p className="mt-4 text-center text-sm">
-          Remember your password?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline">
-            Log in
-          </Link>
-        </p>
+    <div className="flex flex-col gap-6">
+      <Card>
+        <CardHeader className="text-center">
+          <CardTitle className="text-xl">Forgot Password</CardTitle>
+          <CardDescription>
+            Enter your email address below to receive <br /> a password reset
+            link.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="your@email.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                size="lg"
+                type="submit"
+                className="w-full"
+                disabled={requestReset.status === "pending"}
+              >
+                {requestReset.status === "pending"
+                  ? "Sending..."
+                  : "Request Reset Link"}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+      <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
+        {"Remember your password? "}
+        <Link href="/login" className="text-primary">
+          Log in
+        </Link>
       </div>
     </div>
   );

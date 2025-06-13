@@ -1,46 +1,21 @@
 ---
-Date: 2025-06-12
-TaskRef: "Update dropdown menu style in API Keys page"
-
-Learnings:
-  - Successfully integrated Lucide icons (`Pencil`, `RefreshCw`, `Trash2`) into Shadcn UI `DropdownMenuItem` components.
-  - Applied Tailwind CSS classes (`text-red-600`, `focus:text-red-600`) to `DropdownMenuItem` for specific styling (e.g., red text for delete action).
-  - Confirmed the process of adding icons to Shadcn UI components involves importing the icon and placing it directly within the component's children, often with a margin utility class (`mr-2`) for spacing.
-
-Difficulties:
-  - None encountered. The task was straightforward.
-
-Successes:
-  - The dropdown menu now visually matches the provided image, enhancing the UI/UX.
-  - The changes were implemented efficiently and accurately using `replace_in_file`.
-
-Improvements_Identified_For_Consolidation:
-  - General pattern: Adding icons and specific styling to Shadcn UI dropdown menu items.
----
-
----
-
 Date: 2025-06-13
-TaskRef: "Implement Reset Password Feature with Resend"
+TaskRef: "Refactor reset-password and forgot-password pages to match login/signup UI"
 
 Learnings:
-
-- **Handling Interactive CLI Commands:** Direct interaction with running CLI prompts (like `prisma migrate dev` asking for a migration name) is not supported by sending subsequent commands. This requires user intervention or a different approach (e.g., non-interactive flags if available, or piping input).
-- **Environment Variable Schema Validation:** Even when `z.string()` is used in `src/env.js` for required environment variables, TypeScript might still infer them as `string | undefined` in other parts of the codebase, leading to type errors. Explicit type assertion (`as string`) might be necessary in consuming files (e.g., `src/lib/email.ts`) to satisfy the type checker, or a more robust way to ensure `env` types are correctly propagated.
+  - Successfully refactored `src/app/(public)/reset-password/page.tsx` and `src/app/(public)/forgot-password/page.tsx` to align with the Shadcn UI `Card` and `Form` component structure used in `login` and `signup` pages.
+  - Implemented `react-hook-form` and `zod` for form validation in both pages, replacing manual state management and validation logic.
+  - Consolidated message display to use `sonner` toasts exclusively, removing redundant `message` state and `p` tags.
+  - Adjusted overall page layout to use `flex flex-col gap-6` for consistency with other public authentication pages.
 
 Difficulties:
-
-- Misunderstanding how to provide input to an interactive `pnpm db:generate` command, leading to a failed command execution and requiring user intervention.
-- Initial type errors related to environment variables (`RESEND_API_KEY`, `EMAIL_FROM`, `NEXTAUTH_URL`) in `src/lib/email.ts` and `src/server/api/routers/user.ts` due to `env.js` type inference.
+  - Ensuring all imports and component usages were correctly updated to reflect the new form and UI structure.
+  - Adapting existing mutation calls to work with `react-hook-form`'s `onSubmit` data structure.
 
 Successes:
-
-- Successfully implemented the password reset feature end-to-end, including database schema updates, tRPC procedures, email utility, and frontend pages.
-- Successfully integrated Resend for email sending.
+  - Achieved consistent UI/UX across all public authentication pages (`login`, `signup`, `forgot-password`, `reset-password`).
+  - Improved code maintainability and adherence to T3 stack best practices by using `react-hook-form` and `zod` for form handling.
 
 Improvements_Identified_For_Consolidation:
-
-- Add a rule or guideline on handling interactive CLI commands, suggesting to ask the user for manual input or to look for non-interactive alternatives.
-- Add a guideline for environment variable handling, specifically addressing the `string | undefined` inference issue and suggesting explicit type assertions or a review of `env.js` setup for stricter type enforcement.
-
+  - General pattern: Standardize authentication-related forms across the application using Shadcn UI Card components, `react-hook-form`, and `zod` for validation.
 ---

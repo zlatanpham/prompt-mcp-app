@@ -4,7 +4,6 @@ import {
   Container,
   Head,
   Html,
-  Link,
   Preview,
   Section,
   Text,
@@ -26,12 +25,8 @@ const container = {
   padding: "20px 0 48px",
 };
 
-const logo = {
-  margin: "0 auto",
-};
-
 const paragraph = {
-  fontSize: "16px",
+  fontSize: "14px",
   lineHeight: "26px",
 };
 
@@ -40,10 +35,10 @@ const btnContainer = {
 };
 
 const button = {
-  backgroundColor: "#5F51E6",
+  backgroundColor: "#171717",
   borderRadius: "3px",
   color: "#fff",
-  fontSize: "16px",
+  fontSize: "14px",
   textDecoration: "none",
   textAlign: "center" as const,
   display: "block",
@@ -56,7 +51,7 @@ const hr = {
 };
 
 const footer = {
-  color: "#8898aa",
+  color: "#999999",
   fontSize: "12px",
 };
 
@@ -85,7 +80,7 @@ export const ResetPasswordEmail = ({ resetLink }: ResetPasswordEmailProps) => (
           <Text style={paragraph}>
             Thanks,
             <br />
-            The Your App Team
+            Thanh
           </Text>
         </Section>
         <hr style={hr} />
