@@ -12,7 +12,13 @@ import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
-import { CopyIcon, CheckIcon, ChevronDown } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { CopyIcon, CheckIcon, ChevronDown, RefreshCcw } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
 
@@ -50,13 +56,18 @@ function isAnnotationLike(value: unknown): value is AnnotationLike {
 interface ChatMessageDisplayProps {
   message: Message;
   isLoading?: boolean;
+  isThinking?: boolean;
+  isLastMessage?: boolean;
   userAvatarFallback?: string;
+  onRegenerate?: (messageId: string) => void; // New prop for regenerate action, accepts messageId
 }
 
 export function ChatMessageDisplay({
   message,
   isLoading,
+  isLastMessage,
   userAvatarFallback,
+  onRegenerate,
 }: ChatMessageDisplayProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -171,25 +182,54 @@ export function ChatMessageDisplay({
       <ReactMarkdown remarkPlugins={[remarkGfm]}>
         {message.content}
       </ReactMarkdown>
-      {isLoading ? null : (
+      {isLoading && isLastMessage ? null : (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1, backgroundColor: "transparent" }}
           transition={{ duration: 0.5 }}
-          className="flex"
+          className="flex items-center" // Added items-center for alignment
         >
-          <Button
-            onClick={handleCopy}
-            variant="link"
-            size="sm"
-            className="cursor-pointer"
-          >
-            {copied ? (
-              <CheckIcon className="!h-4 !w-4" />
-            ) : (
-              <CopyIcon className="!h-4 !w-4" />
-            )}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={handleCopy}
+                  variant="link"
+                  size="sm"
+                  className="cursor-pointer"
+                >
+                  {copied ? (
+                    <CheckIcon className="!h-4 !w-4" />
+                  ) : (
+                    <CopyIcon className="!h-4 !w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" hideArrow={true} sideOffset={10}>
+                Copy
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          {message.role === "assistant" && onRegenerate && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() => onRegenerate(message.id)} // Pass message.id
+                    variant="link"
+                    size="sm"
+                    className="cursor-pointer"
+                    disabled={isLoading} // Disable when AI is thinking
+                  >
+                    <RefreshCcw className="!h-4 !w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" hideArrow={true} sideOffset={10}>
+                  Regenerate
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </motion.div>
       )}
     </div>

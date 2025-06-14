@@ -104,6 +104,8 @@ export default function ChatPage() {
     error,
     append,
     stop, // Destructure stop from useChat
+    reload, // Destructure reload from useChat
+    setMessages, // Destructure setMessages from useChat
   } = useChat({
     api: "/api/chat",
     body: {
@@ -114,6 +116,38 @@ export default function ChatPage() {
   });
 
   const [currentProvider] = (selectedModel ?? "").split("/");
+
+  const handleRegenerateSpecificMessage = (messageId: string) => {
+    const messageIndex = messages.findIndex((msg) => msg.id === messageId);
+    if (messageIndex === -1) {
+      console.error("Message not found for regeneration:", messageId);
+      return;
+    }
+
+    // Find the preceding user message to truncate to
+    let truncateToIndex = -1;
+    for (let i = messageIndex; i >= 0; i--) {
+      if (messages[i]?.role === "user") {
+        truncateToIndex = i;
+        break;
+      }
+    }
+
+    if (truncateToIndex !== -1) {
+      const newMessages = messages.slice(0, truncateToIndex + 1);
+      setMessages(newMessages);
+      // Reload will re-send the last message in the newMessages array
+      reload();
+    } else {
+      // If no preceding user message, it means the assistant message is the first.
+      // In this case, we might clear the chat or handle it differently.
+      // For now, let's just clear the chat and let the user start over.
+      setMessages([]);
+      console.warn(
+        "No preceding user message found to regenerate from. Chat cleared.",
+      );
+    }
+  };
 
   useEffect(() => {
     if (messages.length > 0 && !isLoading) {
@@ -139,7 +173,7 @@ export default function ChatPage() {
         }
       }
     }
-  }, [messages, handleSubmit, isLoading, append]);
+  }, [messages, handleSubmit, isLoading, append, reload, setMessages]); // Added reload and setMessages to dependencies
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -182,7 +216,10 @@ export default function ChatPage() {
                       key={message.id}
                       message={message}
                       userAvatarFallback={userAvatarFallback}
-                      isLoading={index === messages.length - 1 && isLoading}
+                      isThinking={isThinking}
+                      isLastMessage={index === messages.length - 1}
+                      isLoading={isLoading}
+                      onRegenerate={handleRegenerateSpecificMessage}
                     />
                   ))}
                 </div>
