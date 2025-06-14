@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form"; // Added useFieldArray
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toolNameSchema } from "@/lib/validators/tool";
@@ -23,8 +23,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton"; // Added Skeleton import
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Tool } from "@prisma/client";
+import { api } from "@/trpc/react"; // Added import
+import { useQueryClient } from "@tanstack/react-query"; // Added import
 
 const manualToolFormSchema = z
   .object({
@@ -55,30 +57,33 @@ const manualToolFormSchema = z
 export type ManualToolFormValues = z.infer<typeof manualToolFormSchema>;
 
 // Extend Prisma's Tool type to include the 'args' field as Argument[]
-type ToolWithArguments = Tool & {
+export type ToolWithArguments = Tool & {
   args: Argument[] | null;
 };
 
 interface Props {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onSubmit: (values: ManualToolFormValues) => void;
   selectedToolId: string | null;
-  tool?: ToolWithArguments | null; // Use the extended type
-  isSubmitting: boolean;
-  isLoading: boolean; // Added isLoading prop
+  projectId: string; // Added projectId prop
 }
 
 const ManualToolDialog = (props: Props) => {
   const {
     isOpen,
     onOpenChange,
-    onSubmit: onSubmitProp,
     selectedToolId,
-    tool,
-    isSubmitting,
-    isLoading, // Destructure isLoading
+    projectId, // Destructure projectId
   } = props;
+
+  const queryClient = useQueryClient(); // Initialize queryClient
+
+  // Fetch single tool for editing
+  const { data: tool, isLoading: isLoadingSelectedTool } =
+    api.tool.getById.useQuery(
+      { id: selectedToolId ?? "" },
+      { enabled: !!selectedToolId },
+    );
 
   const form = useForm<ManualToolFormValues>({
     resolver: zodResolver(manualToolFormSchema),
@@ -94,16 +99,42 @@ const ManualToolDialog = (props: Props) => {
     name: "arguments",
   });
 
+  // Mutations
+  const createTool = api.tool.create.useMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [["tool", "getByProjectId"]],
+      });
+      onOpenChange(false);
+      form.reset(); // Reset form after successful creation
+    },
+  });
+
+  const updateTool = api.tool.update.useMutation({
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [["tool", "getByProjectId"]],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: [["tool", "getById", { id: selectedToolId }]],
+      });
+      onOpenChange(false);
+    },
+  });
+
+  const isSubmitting = createTool.isPending || updateTool.isPending;
+  const isLoading = isLoadingSelectedTool;
+
   // Reset form when tool changes
   useEffect(() => {
-    if (tool) {
+    if (tool && selectedToolId === tool.id) {
       form.reset({
         name: tool.name,
         description: tool.description ?? "",
         prompt: tool.prompt,
-        arguments: (tool.args as Argument[]) ?? [], // Cast args to Argument[]
+        arguments: (tool.args as Argument[]) ?? [],
       });
-    } else {
+    } else if (!selectedToolId) {
       form.reset({
         name: "",
         description: "",
@@ -111,15 +142,30 @@ const ManualToolDialog = (props: Props) => {
         arguments: [],
       });
     }
-  }, [tool, form]);
+  }, [tool?.id, selectedToolId, form, tool]);
 
-  function onSubmit(values: ManualToolFormValues) {
-    onSubmitProp(values);
-  }
+  const onSubmit = async (data: ManualToolFormValues) => {
+    if (selectedToolId) {
+      void updateTool.mutate({
+        id: selectedToolId,
+        name: data.name,
+        description: data.description,
+        prompt: data.prompt,
+        args: data.arguments,
+      });
+    } else {
+      void createTool.mutate({
+        project_id: projectId,
+        name: data.name,
+        description: data.description,
+        prompt: data.prompt,
+        args: data.arguments,
+      });
+    }
+  };
 
   const onDialogClose = () => {
     onOpenChange(false);
-    form.reset();
   };
 
   return (

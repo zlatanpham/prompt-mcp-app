@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch"; // Import Switch component
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton component
-import type { Argument } from "@/types/tool";
 import {
   Table,
   TableBody,
@@ -32,9 +31,7 @@ import {
 } from "@/components/ui/table";
 
 import { Highlight } from "@/components/highlight";
-import ManualToolDialog, {
-  type ManualToolFormValues,
-} from "./manual-tool-dialog";
+import ManualToolDialog from "./manual-tool-dialog";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
 
 export default function ToolComponent() {
@@ -55,32 +52,6 @@ export default function ToolComponent() {
   );
 
   const isLoading = isLoadingTools;
-  console.log("ToolComponent isLoading:", isLoading, "tools:", tools);
-
-  // Fetch single tool for editing
-  const { data: tool, isLoading: isLoadingSelectedTool } =
-    api.tool.getById.useQuery(
-      // Destructure isLoadingSelectedTool
-      { id: selectedToolId ?? "" },
-      { enabled: !!selectedToolId },
-    );
-
-  // Mutations
-  const createTool = api.tool.create.useMutation({
-    onSuccess: () => {
-      console.log("Tool created");
-      refetch();
-      setIsDialogOpen(false);
-    },
-  });
-
-  const updateTool = api.tool.update.useMutation({
-    onSuccess: () => {
-      refetch();
-      setIsDialogOpen(false);
-      setSelectedToolId(null);
-    },
-  });
 
   const deleteTool = api.tool.delete.useMutation({
     onSuccess: () => {
@@ -94,27 +65,6 @@ export default function ToolComponent() {
       refetch();
     },
   });
-
-  // Handlers
-  const onSubmit = async (data: ManualToolFormValues) => {
-    if (selectedToolId) {
-      updateTool.mutate({
-        id: selectedToolId,
-        name: data.name,
-        description: data.description,
-        prompt: data.prompt,
-        args: data.arguments, // Pass arguments to the mutation
-      });
-    } else {
-      createTool.mutate({
-        project_id: projectId!,
-        name: data.name,
-        description: data.description,
-        prompt: data.prompt,
-        args: data.arguments, // Pass arguments to the mutation
-      });
-    }
-  };
 
   const onEdit = (id: string) => {
     setSelectedToolId(id);
@@ -155,18 +105,8 @@ export default function ToolComponent() {
         <ManualToolDialog
           isOpen={isDialogOpen}
           onOpenChange={setIsDialogOpen}
-          onSubmit={onSubmit}
           selectedToolId={selectedToolId}
-          tool={
-            tool
-              ? {
-                  ...tool,
-                  args: (tool.args as Argument[]) ?? null, // Ensure args is typed correctly
-                }
-              : null
-          }
-          isSubmitting={createTool.isPending || updateTool.isPending}
-          isLoading={isLoadingSelectedTool} // Pass isLoadingSelectedTool
+          projectId={projectId!} // Pass projectId
         />
 
         <ConfirmActionDialog
