@@ -13,3 +13,18 @@ export const toolNameSchema = z
   .min(TOOL_NAME_MIN_LENGTH, TOOL_NAME_MIN_LENGTH_MESSAGE)
   .max(TOOL_NAME_MAX_LENGTH, TOOL_NAME_MAX_LENGTH_MESSAGE)
   .regex(TOOL_NAME_REGEX, TOOL_NAME_REGEX_MESSAGE);
+
+export const argumentSchema = z.object({
+  name: toolNameSchema,
+  description: z.string().min(1, "Argument description is required"),
+  type: z.enum(["string", "number", "array"], {
+    required_error: "Argument type is required",
+  }),
+});
+
+export const createToolSchema = z.object({
+  name: toolNameSchema,
+  description: z.string().min(1, "Description is required"),
+  prompt: z.string().min(1, "Prompt is required"),
+  args: z.array(argumentSchema).optional(),
+});

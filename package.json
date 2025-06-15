@@ -80,7 +80,8 @@
     "superjson": "^2.2.1",
     "tailwind-merge": "^3.2.0",
     "vaul": "^1.1.2",
-    "zod": "^3.24.3"
+    "zod": "^3.24.3",
+    "zod-to-json-schema": "^3.24.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
