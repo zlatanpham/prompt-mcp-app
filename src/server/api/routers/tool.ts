@@ -1,8 +1,11 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { db } from "@/server/db";
-import { toolNameSchema } from "@/lib/validators/tool";
+import { createToolSchema, toolNameSchema } from "@/lib/validators/tool"; // Import createToolSchema
 import { argumentSchema, type Argument } from "@/types/tool";
+import { generateObject } from "ai"; // Import generateObject
+import { getModel } from "@/utils/model"; // Import getModel
+import { zodToJsonSchema } from "zod-to-json-schema"; // Import zodToJsonSchema
 
 const toolBaseSchema = z.object({
   name: toolNameSchema,
@@ -302,6 +305,137 @@ export const toolRouter = createTRPCRouter({
 
     return parsedTools;
   }),
+
+  generateToolFromAI: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string().uuid(),
+        prompt: z.string().min(1, "Prompt is required"),
+        model: z.string().min(1, "Model is required"),
+        apiKeys: z.record(z.string(), z.string()), // Add apiKeys to input schema
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session?.user?.id;
+      if (!userId) {
+        throw new Error("Unauthorized");
+      }
+
+      // Verify user has access to the project
+      const project = await db.project.findUnique({
+        where: { id: input.projectId },
+        select: { created_by_user_id: true },
+      });
+
+      if (!project || project.created_by_user_id !== userId) {
+        throw new Error(
+          "Unauthorized: Project not found or not owned by user.",
+        );
+      }
+
+      const [provider, modelCode] = input.model.split("/");
+
+      let selectedModel;
+      let selectedApiKey;
+
+      switch (provider) {
+        case "google":
+          selectedApiKey = input.apiKeys.google;
+          if (!selectedApiKey) {
+            throw new Error("Google AI API Key is missing.");
+          }
+          selectedModel = getModel(input.model, selectedApiKey);
+          break;
+        case "deepseek":
+          selectedApiKey = input.apiKeys.deepseek;
+          if (!selectedApiKey) {
+            throw new Error("DeepSeek AI API Key is missing.");
+          }
+          selectedModel = getModel(input.model, selectedApiKey);
+          break;
+        case "openai":
+          selectedApiKey = input.apiKeys.openai;
+          if (!selectedApiKey) {
+            throw new Error("OpenAI API Key is missing.");
+          }
+          selectedModel = getModel(input.model, selectedApiKey);
+          break;
+        case "anthropic":
+          selectedApiKey = input.apiKeys.anthropic;
+          if (!selectedApiKey) {
+            throw new Error("Anthropic API Key is missing.");
+          }
+          selectedModel = getModel(input.model, selectedApiKey);
+          break;
+        default:
+          throw new Error(`Unsupported AI provider: ${provider}`);
+      }
+
+      const model = selectedModel; // Use the selectedModel
+
+      const toolSchemaJson = zodToJsonSchema(createToolSchema, {
+        target: "jsonSchema7",
+      });
+
+      const systemPrompt = `
+      Generate a concise, high-performance one-shot LLM prompt template. This template should be based on the TEMPLATE_PURPOSE defined by the user below. The generated template must instruct an LLM to achieve this purpose when an end-user provides their specific input.
+
+      Generated Template Must Include:
+
+      LLM Role & Task: Clear, direct instruction (e.g., "Act as [Role], your task is to [Task]").
+
+      Input Placeholder: A clear and distinct placeholder within the generated template for the end-user's detailed input (e.g., [USER_INPUT_HERE] or [DETAILS_FOR_TASK]).
+
+      Output Definition: Precise instructions on the expected format, style, key elements, and any constraints for the LLM's output (e.g., length, tone, specific points to cover/avoid).
+
+      Efficiency: The generated template should be optimized for single-shot success and minimal token usage. It must be unambiguous.
+
+      Deliverable: The tool definition must strictly adhere to the following JSON schema:
+
+      <JSON_SCHEMA>
+      ${JSON.stringify(toolSchemaJson, null, 2)}
+      </JSON_SCHEMA>
+
+      Output a JSON object with exactly these fields:
+      - name: snake_case function name derived from the prompt purpose
+      - description: Clear, concise description of what the function does (1-2 sentences)
+      - args: Array of parameter objects, each with name, type, and description
+      - prompt: Template string with HTML-style tag placeholders in separate blocks
+
+      Requirements:
+      - Use snake_case for function names
+      - Parameter types should be 'string', 'number', 'boolean', or 'array'
+      - Descriptions should be clear and professional
+      - Prompt templates must use HTML-style tags with parameters in separate blocks
+      - Each parameter should have its own tag block (e.g., <parameter_name>\n{parameter_name}\n</parameter_name>)
+      - Output valid JSON only, no additional text
+
+      Example:
+      User Prompt: "A tool that converts Fahrenheit to Celsius."
+      Generated Tool:
+      {
+        "name": "fahrenheit_to_celsius",
+        "description": "Converts temperature from Fahrenheit to Celsius.",
+        "prompt": "Convert {fahrenheit} degrees Fahrenheit to Celsius.",
+        "args": [
+          {
+            "name": "fahrenheit",
+            "description": "The temperature in Fahrenheit.",
+            "type": "number"
+          }
+        ]
+      }
+      `;
+
+      const { object } = await generateObject({
+        model,
+        prompt: input.prompt,
+        system: systemPrompt.trim(),
+        schema: createToolSchema,
+      });
+
+      return object;
+    }),
 
   moveTools: protectedProcedure
     .input(toolMoveSchema)

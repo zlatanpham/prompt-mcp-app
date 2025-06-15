@@ -8,6 +8,7 @@ import {
   Pencil as PencilIcon,
   Trash as TrashIcon,
   MoreHorizontal,
+  Wand2, // Import Wand2 icon
 } from "lucide-react";
 
 import { api } from "@/trpc/react";
@@ -33,6 +34,7 @@ import {
 import { Highlight } from "@/components/highlight";
 import ManualToolDialog from "./manual-tool-dialog";
 import { ConfirmActionDialog } from "@/components/confirm-action-dialog";
+import { GenerateToolDialog } from "./generate-tool-dialog"; // Import GenerateToolDialog
 
 export default function ToolComponent() {
   const params = useParams();
@@ -40,6 +42,8 @@ export default function ToolComponent() {
 
   const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isGenerateToolDialogOpen, setIsGenerateToolDialogOpen] =
+    useState(false); // New state for AI dialog
 
   // Fetch tools for the agent
   const {
@@ -91,22 +95,40 @@ export default function ToolComponent() {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h4 className="text-md font-medium">Tools</h4>
-        <Button
-          variant="outline"
-          disabled={isLoading}
-          onClick={() => {
-            setSelectedToolId(null);
-            setIsDialogOpen(true);
-          }}
-        >
-          New Tool
-        </Button>
+        <div className="flex items-center gap-2">
+          {" "}
+          {/* Add a div to group buttons */}
+          <Button
+            variant="outline"
+            disabled={isLoading}
+            onClick={() => {
+              setSelectedToolId(null);
+              setIsDialogOpen(true);
+            }}
+          >
+            New Tool
+          </Button>
+          <Button
+            variant="outline"
+            disabled={isLoading}
+            onClick={() => setIsGenerateToolDialogOpen(true)} // Open new dialog
+          >
+            <Wand2 className="mr-2 h-4 w-4" /> {/* Magic wand icon */}
+            Generate Tool
+          </Button>
+        </div>
 
         <ManualToolDialog
           isOpen={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           selectedToolId={selectedToolId}
           projectId={projectId!} // Pass projectId
+        />
+
+        <GenerateToolDialog
+          isOpen={isGenerateToolDialogOpen}
+          onOpenChange={setIsGenerateToolDialogOpen}
+          projectId={projectId!}
         />
 
         <ConfirmActionDialog
