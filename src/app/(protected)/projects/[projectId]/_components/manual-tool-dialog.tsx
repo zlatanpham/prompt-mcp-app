@@ -162,6 +162,7 @@ const ManualToolDialog = (props: Props) => {
             isLoading={isLoading}
             isSubmitting={isSubmitting}
             submitButtonText={selectedToolId ? "Update" : "Create"}
+            hideSubmitButton={true}
           />
         </div>
       </DrawerContent>

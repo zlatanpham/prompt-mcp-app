@@ -54,6 +54,7 @@ interface ManualToolFormProps {
   submitButtonText: string;
   showBackButton?: boolean;
   onBackButtonClick?: () => void;
+  hideSubmitButton?: boolean;
 }
 
 export function ManualToolForm({
@@ -64,6 +65,7 @@ export function ManualToolForm({
   submitButtonText,
   showBackButton = false,
   onBackButtonClick,
+  hideSubmitButton = false,
 }: ManualToolFormProps) {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -171,27 +173,29 @@ export function ManualToolForm({
               </div>
             </div>
 
-            <div className="flex justify-between">
-              {showBackButton && (
+            {!hideSubmitButton && (
+              <div className="flex justify-between">
+                {showBackButton && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    onClick={onBackButtonClick}
+                  >
+                    Back
+                  </Button>
+                )}
                 <Button
-                  type="button"
-                  variant="outline"
+                  type="submit"
                   size="lg"
-                  onClick={onBackButtonClick}
+                  variant="default"
+                  isLoading={isSubmitting}
+                  className={showBackButton ? "ml-auto" : "w-full"}
                 >
-                  Back
+                  {submitButtonText}
                 </Button>
-              )}
-              <Button
-                type="submit"
-                size="lg"
-                variant="default"
-                isLoading={isSubmitting}
-                className={showBackButton ? "ml-auto" : "w-full"}
-              >
-                {submitButtonText}
-              </Button>
-            </div>
+              </div>
+            )}
           </>
         )}
       </form>
