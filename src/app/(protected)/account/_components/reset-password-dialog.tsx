@@ -151,11 +151,9 @@ export function ResetPasswordDialog({ onSuccess }: ResetPasswordDialogProps) {
               <Button
                 type="submit"
                 size="lg"
-                disabled={resetPasswordMutation.status === "pending"}
+                isLoading={resetPasswordMutation.status === "pending"}
               >
-                {resetPasswordMutation.status === "pending"
-                  ? "Resetting..."
-                  : "Reset"}
+                Reset
               </Button>
             </div>
           </form>

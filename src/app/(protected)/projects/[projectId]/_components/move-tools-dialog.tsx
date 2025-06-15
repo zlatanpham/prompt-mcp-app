@@ -118,7 +118,6 @@ export function MoveToolsDialog({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid gap-4">
-              {/* Tool Selection */}
               <div>
                 <FormLabel>Select Tools</FormLabel>
                 {isLoadingTools ? (
@@ -131,6 +130,7 @@ export function MoveToolsDialog({
                           key={tool.id}
                           control={form.control}
                           name="toolIds"
+                          disabled={moveToolsMutation.status === "pending"}
                           render={({ field }) => {
                             return (
                               <FormItem
@@ -186,7 +186,8 @@ export function MoveToolsDialog({
                         disabled={
                           isLoadingProjects ||
                           !availableProjects ||
-                          availableProjects.length === 0
+                          availableProjects.length === 0 ||
+                          moveToolsMutation.status === "pending"
                         }
                       >
                         <FormControl>
@@ -221,15 +222,10 @@ export function MoveToolsDialog({
               <Button
                 size="lg"
                 type="submit"
-                disabled={
-                  moveToolsMutation.status === "pending" ||
-                  isLoadingTools ||
-                  isLoadingProjects
-                }
+                isLoading={moveToolsMutation.status === "pending"}
+                disabled={isLoadingTools || isLoadingProjects}
               >
-                {moveToolsMutation.status === "pending"
-                  ? "Moving..."
-                  : "Move Tools"}
+                Move Tools
               </Button>
             </DialogFooter>
           </form>

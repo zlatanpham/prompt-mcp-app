@@ -214,7 +214,7 @@ export function GenerateToolDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {step === 1 ? "Generate Tool from AI" : "Review & Save Tool"}
+            {step === 1 ? "Generate Tool with AI" : "Review & Save Tool"}
           </DialogTitle>
         </DialogHeader>
         {step === 1 && (
@@ -234,6 +234,7 @@ export function GenerateToolDialog({
                         placeholder="Describe how the tool should work, e.g., 'A tool that converts Fahrenheit to Celsius.'"
                         className="max-h-[calc(100vh-400px)] min-h-[100px]"
                         {...field}
+                        disabled={generateToolMutation.status === "pending"}
                       />
                     </FormControl>
                     <FormMessage />
@@ -254,6 +255,7 @@ export function GenerateToolDialog({
                             role="combobox"
                             size="lg"
                             className="w-full justify-between"
+                            disabled={generateToolMutation.status === "pending"}
                           >
                             {field.value
                               ? MODELS.find(
@@ -292,11 +294,9 @@ export function GenerateToolDialog({
                 type="submit"
                 className="w-full"
                 size="lg"
-                disabled={generateToolMutation.status === "pending"}
+                isLoading={generateToolMutation.status === "pending"}
               >
-                {generateToolMutation.status === "pending"
-                  ? "Generating..."
-                  : "Generate Tool"}
+                Generate Tool
               </Button>
             </form>
           </Form>

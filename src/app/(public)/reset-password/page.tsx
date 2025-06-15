@@ -134,11 +134,10 @@ export default function ResetPasswordPage() {
                 size="lg"
                 type="submit"
                 className="w-full"
-                disabled={confirmReset.status === "pending" || !token}
+                disabled={!token}
+                isLoading={confirmReset.status === "pending"}
               >
-                {confirmReset.status === "pending"
-                  ? "Resetting..."
-                  : "Reset Password"}
+                Reset Password
               </Button>
             </form>
           </Form>

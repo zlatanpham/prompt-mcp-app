@@ -186,7 +186,7 @@ export function ManualToolForm({
                 type="submit"
                 size="lg"
                 variant="default"
-                disabled={isSubmitting}
+                isLoading={isSubmitting}
                 className={showBackButton ? "ml-auto" : "w-full"}
               >
                 {submitButtonText}

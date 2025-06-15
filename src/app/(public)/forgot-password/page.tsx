@@ -87,11 +87,9 @@ export default function ForgotPasswordPage() {
                 size="lg"
                 type="submit"
                 className="w-full"
-                disabled={requestReset.status === "pending"}
+                isLoading={requestReset.status === "pending"}
               >
-                {requestReset.status === "pending"
-                  ? "Sending..."
-                  : "Request Reset Link"}
+                Request Reset Link
               </Button>
             </form>
           </Form>

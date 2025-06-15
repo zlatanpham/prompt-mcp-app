@@ -108,9 +108,9 @@ export function EditNameDialog({
               <Button
                 size="lg"
                 type="submit"
-                disabled={updateNameMutation.isPending}
+                isLoading={updateNameMutation.isPending}
               >
-                {updateNameMutation.isPending ? "Saving..." : "Save"}
+                Save
               </Button>
             </div>
           </form>

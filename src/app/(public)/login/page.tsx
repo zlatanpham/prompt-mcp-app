@@ -130,7 +130,7 @@ export default function LoginPage() {
                 className="w-full"
                 disabled={isPending}
               >
-                {isPending ? "Signing in..." : "Sign in with Email"}
+                Sign in with Email
               </Button>
             </form>
           </Form>
