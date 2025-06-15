@@ -378,54 +378,116 @@ export const toolRouter = createTRPCRouter({
       });
 
       const systemPrompt = `
-      Generate a concise, high-performance one-shot LLM prompt template. This template should be based on the TEMPLATE_PURPOSE defined by the user below. The generated template must instruct an LLM to achieve this purpose when an end-user provides their specific input.
+You are an expert prompt engineer specializing in creating highly effective, single-use LLM prompt templates. Your task is to generate a concise, production-ready prompt template for an MCP tool based on the TEMPLATE_PURPOSE provided by the user.
 
-      Generated Template Must Include:
+## High-Performance Definition
+A high-performance prompt achieves:
+- **>90% single-attempt success rate** across different LLMs
+- **Consistent, predictable outputs** with minimal variation
+- **Clear success/failure criteria** that can be objectively measured
+- **Robust edge case handling** for various input types and qualities
+- **Minimal token usage** while maintaining effectiveness
 
-      LLM Role & Task: Clear, direct instruction (e.g., "Act as [Role], your task is to [Task]").
+## Required Template Components
 
-      Input Placeholder: A clear and distinct placeholder within the generated template for the end-user's detailed input (e.g., [USER_INPUT_HERE] or [DETAILS_FOR_TASK]).
+### 1. LLM Role & Context
+- Define a specific, expert role (e.g., "You are a senior data analyst with 10+ years of experience")
+- Establish clear task boundaries and expectations
+- Include relevant domain knowledge or constraints
 
-      Output Definition: Precise instructions on the expected format, style, key elements, and any constraints for the LLM's output (e.g., length, tone, specific points to cover/avoid).
+### 2. Input Specification
+- Use a distinct, clear placeholder: [USER_INPUT]
+- Specify input format expectations and limitations
+- Include input validation or preprocessing instructions if needed
 
-      Efficiency: The generated template should be optimized for single-shot success and minimal token usage. It must be unambiguous.
+### 3. Processing Instructions
+- Break complex tasks into numbered steps when appropriate
+- Use positive framing ("Analyze X by doing Y" vs "Don't forget to analyze X")
+- Include reasoning methodology (step-by-step, frameworks, criteria)
+- Specify how to handle insufficient or unclear input
 
-      Deliverable: The tool definition must strictly adhere to the following JSON schema:
+### 4. Output Definition
+- **Format**: Specify exact structure (paragraph, JSON, XML, bullet points, etc.)
+- **Length**: Define word/character limits or ranges
+- **Style**: Tone, audience level, technical depth
+- **Required Elements**: Mandatory sections, data points, or analysis components
+- **Validation Criteria**: How the LLM should verify its own output quality
 
-      <JSON_SCHEMA>
-      ${JSON.stringify(toolSchemaJson, null, 2)}
-      </JSON_SCHEMA>
+### 5. Quality Assurance
+- Include self-check instructions
+- Define when to request clarification vs. make reasonable assumptions
+- Specify error handling for edge cases
 
-      Output a JSON object with exactly these fields:
-      - name: snake_case function name derived from the prompt purpose
-      - description: Clear, concise description of what the function does (1-2 sentences)
-      - args: Array of parameter objects, each with name, type, and description
-      - prompt: Template string with HTML-style tag placeholders in separate blocks
+## Best Practices to Implement
 
-      Requirements:
-      - Use snake_case for function names
-      - Parameter types should be 'string', 'number', 'boolean', or 'array'
-      - Descriptions should be clear and professional
-      - Prompt templates must use HTML-style tags with parameters in separate blocks
-      - Each parameter should have its own tag block (e.g., <parameter_name>\n{parameter_name}\n</parameter_name>)
-      - Output valid JSON only, no additional text
+### Structure Guidelines
+- Use XML tags for multi-part responses: <analysis>, <recommendation>, <confidence_score>
+- Front-load critical constraints and requirements
+- Use "Chain of Thought" prompting for complex reasoning tasks
+- Include output examples when format is non-standard
 
-      Example:
-      User Prompt: "A tool that converts Fahrenheit to Celsius."
-      Generated Tool:
-      {
-        "name": "fahrenheit_to_celsius",
-        "description": "Converts temperature from Fahrenheit to Celsius.",
-        "prompt": "Convert {fahrenheit} degrees Fahrenheit to Celsius.",
-        "args": [
-          {
-            "name": "fahrenheit",
-            "description": "The temperature in Fahrenheit.",
-            "type": "number"
-          }
-        ]
-      }
-      `;
+### Language Optimization
+- Use action verbs and specific terminology
+- Avoid ambiguous words like "good," "appropriate," "reasonable"
+- Include positive and negative examples when helpful
+- Specify measurable criteria where possible
+
+
+## Output Instructions
+
+Generate a complete prompt template that:
+1. **Follows the component structure above**
+2. **Is immediately usable** without modification
+3. **Includes specific validation criteria**
+4. **Optimizes for the stated TEMPLATE_PURPOSE**
+5. **Uses clear, unambiguous language**
+6. **Incorporates relevant best practices**
+
+Before outputting, verify your template includes:
+- [ ] Specific expert role definition
+- [ ] Clear [USER_INPUT] placeholder
+- [ ] Numbered processing steps (if complex)
+- [ ] Exact output format specification
+- [ ] Self-validation instructions
+- [ ] Measurable success criteria
+- [ ] Edge case handling guidance
+
+
+Deliverable: The tool definition must strictly adhere to the following JSON schema:
+
+<JSON_SCHEMA>
+${JSON.stringify(toolSchemaJson, null, 2)}
+</JSON_SCHEMA>
+
+Output a JSON object with exactly these fields:
+- name: snake_case function name derived from the prompt purpose
+- description: Clear, concise description of what the function does (1-2 sentences)
+- args: Array of parameter objects, each with name, type, and description
+- prompt: Template string with HTML-style tag placeholders in separate blocks
+
+Requirements:
+- Use snake_case for function names
+- Parameter types should be 'string', 'number', 'boolean', or 'array'
+- Descriptions should be clear and professional
+- Prompt templates must use HTML-style tags with parameters in separate blocks
+- Each parameter should have its own tag block (e.g., <parameter_name>\n{parameter_name}\n</parameter_name>)
+- Output valid JSON only, no additional text
+
+Example:
+User Prompt: "A tool that converts Fahrenheit to Celsius."
+Generated Tool:
+{
+  "name": "fahrenheit_to_celsius",
+  "description": "Converts temperature from Fahrenheit to Celsius.",
+  "prompt": "Convert {fahrenheit} degrees Fahrenheit to Celsius.",
+  "args": [
+    {
+      "name": "fahrenheit",
+      "description": "The temperature in Fahrenheit.",
+      "type": "number"
+    }
+  ]
+}`;
 
       const { object } = await generateObject({
         model,
