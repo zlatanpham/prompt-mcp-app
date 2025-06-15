@@ -25,6 +25,8 @@ export type ToolWithArguments = Tool & {
   args: Argument[] | null;
 };
 
+export type { ManualToolFormValues };
+
 interface Props {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;

@@ -333,7 +333,7 @@ export const toolRouter = createTRPCRouter({
         );
       }
 
-      const [provider, modelCode] = input.model.split("/");
+      const [provider] = input.model.split("/");
 
       let selectedModel;
       let selectedApiKey;
