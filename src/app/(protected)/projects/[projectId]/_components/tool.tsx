@@ -96,8 +96,6 @@ export default function ToolComponent() {
       <div className="mb-4 flex items-center justify-between">
         <h4 className="text-md font-medium">Tools</h4>
         <div className="flex items-center gap-2">
-          {" "}
-          {/* Add a div to group buttons */}
           <Button
             variant="outline"
             disabled={isLoading}
@@ -113,8 +111,7 @@ export default function ToolComponent() {
             disabled={isLoading}
             onClick={() => setIsGenerateToolDialogOpen(true)} // Open new dialog
           >
-            <Wand2 className="mr-2 h-4 w-4" /> {/* Magic wand icon */}
-            Generate Tool
+            <Wand2 className="h-4 w-4" /> {/* Magic wand icon */}
           </Button>
         </div>
 
