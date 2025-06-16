@@ -123,11 +123,18 @@ export async function POST(req: Request) {
     delete aiTools[(lastMessage as any)?.annotations?.toolName];
   }
 
-  const result = streamText({
-    model: selectedModel,
-    messages,
-    tools: aiTools,
-  });
+  try {
+    const result = streamText({
+      model: selectedModel,
+      messages,
+      tools: aiTools,
+    });
 
-  return result.toDataStreamResponse();
+    return result.toDataStreamResponse();
+  } catch (error) {
+    console.error("Error in AI response:", error);
+    return new Response("An error occurred while processing your request.", {
+      status: 500,
+    });
+  }
 }

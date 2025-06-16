@@ -33,15 +33,29 @@ const API_KEY_STORAGE_KEYS = {
 const MODELS = [
   { label: "DeepSeek Chat v3", value: "deepseek/deepseek-chat" },
   {
+    label: "Google Gemini 2.5 Pro",
+    value: "google/gemini-2.5-pro-preview-06-05",
+  },
+  {
     label: "Google Gemini 2.5 Flash",
     value: "google/gemini-2.5-flash-preview-05-20",
   },
   { label: "Google Gemini 2.0 Flash", value: "google/gemini-2.0-flash-001" },
+  { label: "OpenAI GPT 4.1", value: "openai/gpt-4.1" },
   { label: "OpenAI GPT 4.1 mini", value: "openai/gpt-4.1-mini" },
-  { label: "Anthropic Claude 4 Sonnet", value: "anthropic/claude-4-sonnet" },
+  { label: "OpenAI GPT o4 mini", value: "openai/o4-mini" },
+  { label: "OpenAI GPT o3 mini", value: "openai/o3-mini" },
+  {
+    label: "Anthropic Claude Opus 4",
+    value: "anthropic/claude-opus-4-20250514",
+  },
+  {
+    label: "Anthropic Claude 4 Sonnet",
+    value: "anthropic/claude-sonnet-4-20250514",
+  },
   {
     label: "Anthropic Claude 3.7 Sonnet",
-    value: "anthropic/claude-3.7-sonnet",
+    value: "anthropic/claude-3-7-sonnet-20250219",
   },
 ];
 
