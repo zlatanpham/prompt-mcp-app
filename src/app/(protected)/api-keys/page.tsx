@@ -37,8 +37,6 @@ import { ApiKeyToolsDrawer } from "./_components/api-key-tools-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Wrench } from "lucide-react";
 import { truncate } from "@/utils/string";
-import { toast } from "sonner";
-
 export default function ApiKeysPage() {
   const [isToolsDrawerOpen, setIsToolsDrawerOpen] = useState(false);
   const [apiKeyIdForTools, setApiKeyIdForTools] = useState<string | null>(null);
@@ -50,28 +48,6 @@ export default function ApiKeysPage() {
   const { data: apiKeys, isLoading, refetch } = api.apiKey.getAll.useQuery();
   const { data: projects } = api.project.getAll.useQuery();
 
-  const createApiKeyMutation = api.apiKey.create.useMutation({
-    onSuccess: (data: { key: string; name: string }) => {
-      void refetch();
-      setNewApiKeyName("");
-      setSelectedProjectIds([]);
-      setIsCreateDialogOpen(false);
-      const mcpConfig = {
-        mcpServers: {
-          [formatApiKeyNameForMcp(data.name)]: {
-            command: "npx",
-            args: ["-y", "@x-mcp/prompt@latest"],
-            env: {
-              API_URL: `${window.location.origin}/api/tools`,
-              API_KEY: data.key,
-            },
-          },
-        },
-      };
-      setDisplayedApiKey(JSON.stringify(mcpConfig, null, 2));
-      setIsApiKeyDisplayDialogOpen(true);
-    },
-  });
   const deleteApiKeyMutation = api.apiKey.delete.useMutation({
     onSuccess: () => void refetch(),
   });
@@ -94,12 +70,6 @@ export default function ApiKeysPage() {
       setIsApiKeyDisplayDialogOpen(true);
     },
   });
-  const updateApiKeyMutation = api.apiKey.updateApiKey.useMutation({
-    onSuccess: () => {
-      toast.success("API Key updated successfully");
-      void refetch();
-    },
-  });
 
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
     useState(false);
@@ -112,8 +82,6 @@ export default function ApiKeysPage() {
   );
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [newApiKeyName, setNewApiKeyName] = useState("");
-  const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([]);
 
   const [isApiKeyDisplayDialogOpen, setIsApiKeyDisplayDialogOpen] =
     useState(false);
@@ -127,16 +95,6 @@ export default function ApiKeysPage() {
     name: string;
     currentProjectIds: string[];
   } | null>(null);
-  const [editSelectedProjectIds, setEditSelectedProjectIds] = useState<
-    string[]
-  >([]);
-
-  const handleCreateApiKey = () => {
-    createApiKeyMutation.mutate({
-      name: newApiKeyName,
-      projectIds: selectedProjectIds,
-    });
-  };
 
   const handleDeleteApiKey = () => {
     if (apiKeyToDelete) {
@@ -159,25 +117,6 @@ export default function ApiKeysPage() {
     }
   };
 
-  const handleUpdateProjects = (newName: string) => {
-    if (apiKeyToEditProjects) {
-      updateApiKeyMutation.mutate(
-        {
-          id: apiKeyToEditProjects.id,
-          name: newName,
-          projectIds: editSelectedProjectIds,
-        },
-        {
-          onSuccess: () => {
-            setIsEditProjectsDialogOpen(false);
-            setApiKeyToEditProjects(null);
-            setEditSelectedProjectIds([]);
-          },
-        },
-      );
-    }
-  };
-
   const projectOptions =
     projects?.map((p) => ({
       value: p.id,
@@ -193,12 +132,8 @@ export default function ApiKeysPage() {
         <CreateApiKeyDialog
           isOpen={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
-          newApiKeyName={newApiKeyName}
-          setNewApiKeyName={setNewApiKeyName}
-          selectedProjectIds={selectedProjectIds}
-          setSelectedProjectIds={setSelectedProjectIds}
           projectOptions={projectOptions}
-          handleCreateApiKey={handleCreateApiKey}
+          onApiKeyCreated={() => void refetch()}
         />
       </div>
 
@@ -313,13 +248,6 @@ export default function ApiKeysPage() {
                                     (p) => p.project_id,
                                   ),
                                 });
-                                setEditSelectedProjectIds(
-                                  apiKey.projects
-                                    .map((p) => p.project_id)
-                                    .filter(
-                                      (id): id is string => id !== undefined,
-                                    ),
-                                );
                                 setIsEditProjectsDialogOpen(true);
                               }}
                             >
@@ -421,11 +349,8 @@ export default function ApiKeysPage() {
         isOpen={isEditProjectsDialogOpen}
         onOpenChange={setIsEditProjectsDialogOpen}
         apiKeyToEditProjects={apiKeyToEditProjects}
-        editSelectedProjectIds={editSelectedProjectIds}
-        setEditSelectedProjectIds={setEditSelectedProjectIds}
         projectOptions={projectOptions}
-        handleUpdateProjects={handleUpdateProjects}
-        isSaving={updateApiKeyMutation.isPending}
+        onApiKeyUpdated={() => void refetch()}
       />
 
       <ApiKeyToolsDrawer

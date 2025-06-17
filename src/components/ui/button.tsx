@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-[13px] font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-[13px] font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive cursor-pointer relative",
   {
     variants: {
       variant: {
@@ -58,7 +58,31 @@ function Button({
       {...props}
       disabled={isLoading || props.disabled}
     >
-      {isLoading ? <Loader2 className="animate-spin" /> : children}
+      {React.Children.map(children, (child) => {
+        if (typeof child === "string" || typeof child === "number") {
+          return (
+            <span className={cn(isLoading && "pointer-events-none opacity-0")}>
+              {child}
+            </span>
+          );
+        }
+        if (React.isValidElement(child)) {
+          const childProps = child.props as Record<string, unknown>;
+          return React.cloneElement(child, {
+            ...childProps,
+            className: cn(
+              (childProps as { className?: string })?.className,
+              isLoading && "pointer-events-none opacity-0",
+            ),
+          } as React.HTMLAttributes<HTMLElement>);
+        }
+        return child;
+      })}
+      {isLoading && (
+        <span className="absolute inset-0 flex items-center justify-center">
+          <Loader2 className="animate-spin" />
+        </span>
+      )}
     </Comp>
   );
 }

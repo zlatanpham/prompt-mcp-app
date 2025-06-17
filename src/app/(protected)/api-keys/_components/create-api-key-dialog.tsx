@@ -1,7 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { type z } from "zod";
+
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -10,41 +15,56 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
+import { createApiKeySchema } from "@/lib/validators/api-key";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 interface CreateApiKeyDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  newApiKeyName: string;
-  setNewApiKeyName: (name: string) => void;
-  selectedProjectIds: string[];
-  setSelectedProjectIds: (ids: string[]) => void;
   projectOptions: { value: string; label: string }[];
-  handleCreateApiKey: () => void;
+  onApiKeyCreated: () => void;
 }
 
 export function CreateApiKeyDialog({
   isOpen,
   onOpenChange,
-  newApiKeyName,
-  setNewApiKeyName,
-  selectedProjectIds,
-  setSelectedProjectIds,
   projectOptions,
-  handleCreateApiKey,
+  onApiKeyCreated,
 }: CreateApiKeyDialogProps) {
-  const handleCheckboxChange = (checked: boolean, projectId: string) => {
-    let newSelectedProjectIds: string[];
-    if (checked) {
-      newSelectedProjectIds = [...selectedProjectIds, projectId];
-    } else {
-      newSelectedProjectIds = selectedProjectIds.filter(
-        (id) => id !== projectId,
-      );
-    }
-    setSelectedProjectIds(newSelectedProjectIds);
+  const form = useForm<z.infer<typeof createApiKeySchema>>({
+    resolver: zodResolver(createApiKeySchema),
+    defaultValues: {
+      name: "",
+      projectIds: [],
+    },
+  });
+
+  const createApiKey = api.apiKey.create.useMutation({
+    onSuccess: () => {
+      toast.success("API Key created successfully!");
+      form.reset();
+      onOpenChange(false);
+      onApiKeyCreated();
+    },
+    onError: (error) => {
+      toast.error("Failed to create API Key", {
+        description: error.message,
+      });
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof createApiKeySchema>) => {
+    createApiKey.mutate(values);
   };
 
   return (
@@ -52,58 +72,89 @@ export function CreateApiKeyDialog({
       <DialogTrigger asChild>
         <Button variant="outline">New API Key</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>New API Key</DialogTitle>
           <DialogDescription>
             Generate a new API key and select projects it can access.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input
-              id="name"
-              value={newApiKeyName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewApiKeyName(e.target.value)
-              }
-              className="col-span-3"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="name">Name</FormLabel>
+                  <FormControl>
+                    <Input id="name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="projects" className="pt-2 text-right">
-              Projects
-            </Label>
-            <div className="col-span-3 flex flex-col gap-2 rounded-md border p-3">
-              {projectOptions.map((project) => (
-                <div
-                  key={project.value}
-                  className="flex items-center space-x-2"
-                >
-                  <Checkbox
-                    id={`create-project-${project.value}`}
-                    checked={selectedProjectIds.includes(project.value)}
-                    onCheckedChange={(checked: boolean) =>
-                      handleCheckboxChange(checked, project.value)
-                    }
-                  />
-                  <Label
-                    className="cursor-pointer font-normal"
-                    htmlFor={`create-project-${project.value}`}
-                  >
-                    {project.label}
-                  </Label>
-                </div>
-              ))}
+            <FormField
+              control={form.control}
+              name="projectIds"
+              render={({}) => (
+                <FormItem>
+                  <FormLabel htmlFor="projects">Projects</FormLabel>
+                  <div className="col-span-3 flex flex-col gap-2 rounded-md border p-3">
+                    {projectOptions.map((project) => (
+                      <FormField
+                        key={project.value}
+                        control={form.control}
+                        name="projectIds"
+                        render={({ field: projectField }) => {
+                          return (
+                            <FormItem
+                              key={project.value}
+                              className="flex flex-row items-start space-y-0 space-x-3"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={projectField.value?.includes(
+                                    project.value,
+                                  )}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? projectField.onChange([
+                                          ...(projectField.value || []),
+                                          project.value,
+                                        ])
+                                      : projectField.onChange(
+                                          projectField.value?.filter(
+                                            (value) => value !== project.value,
+                                          ),
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="cursor-pointer font-normal">
+                                {project.label}
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                size="lg"
+                isLoading={createApiKey.isPending}
+              >
+                Create API Key
+              </Button>
             </div>
-          </div>
-        </div>
-        <Button size="lg" onClick={handleCreateApiKey}>
-          Create API Key
-        </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

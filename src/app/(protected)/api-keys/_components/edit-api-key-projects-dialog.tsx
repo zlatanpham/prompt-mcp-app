@@ -1,7 +1,10 @@
-"use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { type z } from "zod";
 
-import React from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -9,11 +12,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-
-import { useState, useEffect } from "react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { editApiKeySchema } from "@/lib/validators/api-key";
+import { api } from "@/trpc/react";
 
 interface EditApiKeyProjectsDialogProps {
   isOpen: boolean;
@@ -23,99 +33,141 @@ interface EditApiKeyProjectsDialogProps {
     name: string;
     currentProjectIds: string[];
   } | null;
-  editSelectedProjectIds: string[];
-  setEditSelectedProjectIds: (ids: string[]) => void;
   projectOptions: { value: string; label: string }[];
-  handleUpdateProjects: (newName: string) => void;
-  isSaving: boolean;
+  onApiKeyUpdated: () => void;
 }
 
 export function EditApiKeyProjectsDialog({
   isOpen,
   onOpenChange,
   apiKeyToEditProjects,
-  editSelectedProjectIds,
-  setEditSelectedProjectIds,
   projectOptions,
-  handleUpdateProjects,
-  isSaving,
+  onApiKeyUpdated,
 }: EditApiKeyProjectsDialogProps) {
-  const [apiName, setApiName] = useState(apiKeyToEditProjects?.name ?? "");
+  const form = useForm<z.infer<typeof editApiKeySchema>>({
+    resolver: zodResolver(editApiKeySchema),
+    defaultValues: {
+      name: "",
+      projectIds: [],
+    },
+  });
 
   useEffect(() => {
     if (apiKeyToEditProjects) {
-      setApiName(apiKeyToEditProjects.name);
+      form.reset({
+        name: apiKeyToEditProjects.name,
+        projectIds: apiKeyToEditProjects.currentProjectIds,
+      });
     }
-  }, [apiKeyToEditProjects]);
+  }, [apiKeyToEditProjects, form]);
 
-  const handleEditCheckboxChange = (checked: boolean, projectId: string) => {
-    let newEditSelectedProjectIds: string[];
-    if (checked) {
-      newEditSelectedProjectIds = [...editSelectedProjectIds, projectId];
-    } else {
-      newEditSelectedProjectIds = editSelectedProjectIds.filter(
-        (id) => id !== projectId,
-      );
-    }
-    setEditSelectedProjectIds(newEditSelectedProjectIds);
+  const updateApiKey = api.apiKey.updateApiKey.useMutation({
+    onSuccess: () => {
+      toast.success("API Key updated successfully!");
+      onOpenChange(false);
+      onApiKeyUpdated();
+    },
+    onError: (error) => {
+      toast.error("Failed to update API Key", {
+        description: error.message,
+      });
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof editApiKeySchema>) => {
+    if (!apiKeyToEditProjects) return;
+    updateApiKey.mutate({ id: apiKeyToEditProjects.id, ...values });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit API Key</DialogTitle>
           <DialogDescription>
             Update the API key name and select projects it can access.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="api-key-name" className="text-right">
-              API Key Name
-            </Label>
-            <Input
-              id="api-key-name"
-              value={apiName}
-              onChange={(e) => setApiName(e.target.value)}
-              className="col-span-3"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="api-key-name">Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="api-key-name"
+                      className="col-span-3"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid grid-cols-4 items-start gap-4">
-            <Label htmlFor="edit-projects" className="pt-2 text-right">
-              Projects
-            </Label>
-            <div className="col-span-3 flex flex-col gap-2 rounded-md border p-3">
-              {projectOptions.map((project) => (
-                <div
-                  key={project.value}
-                  className="flex items-center space-x-2"
-                >
-                  <Checkbox
-                    id={`edit-project-${project.value}`}
-                    checked={editSelectedProjectIds.includes(project.value)}
-                    onCheckedChange={(checked: boolean) =>
-                      handleEditCheckboxChange(checked, project.value)
-                    }
-                  />
-                  <Label
-                    className="cursor-pointer font-normal"
-                    htmlFor={`edit-project-${project.value}`}
-                  >
-                    {project.label}
-                  </Label>
-                </div>
-              ))}
+            <FormField
+              control={form.control}
+              name="projectIds"
+              render={() => (
+                <FormItem>
+                  <FormLabel htmlFor="edit-projects">Projects</FormLabel>
+                  <div className="col-span-3 flex flex-col gap-2 rounded-md border p-3">
+                    {projectOptions.map((project) => (
+                      <FormField
+                        key={project.value}
+                        control={form.control}
+                        name="projectIds"
+                        render={({ field: projectField }) => {
+                          return (
+                            <FormItem
+                              key={project.value}
+                              className="flex flex-row items-start space-y-0 space-x-3"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={projectField.value?.includes(
+                                    project.value,
+                                  )}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? projectField.onChange([
+                                          ...(projectField.value || []),
+                                          project.value,
+                                        ])
+                                      : projectField.onChange(
+                                          projectField.value?.filter(
+                                            (value) => value !== project.value,
+                                          ),
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="cursor-pointer font-normal">
+                                {project.label}
+                              </FormLabel>
+                            </FormItem>
+                          );
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                size="lg"
+                isLoading={updateApiKey.isPending}
+              >
+                Save Changes
+              </Button>
             </div>
-          </div>
-        </div>
-        <Button
-          size="lg"
-          onClick={() => handleUpdateProjects(apiName)}
-          isLoading={isSaving}
-        >
-          Save Changes
-        </Button>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
