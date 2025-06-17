@@ -83,94 +83,80 @@ export default function ProjectDetailPage() {
         },
       ]}
     >
-      {isLoading || !project ? (
-        <div className="flex flex-col gap-4 py-4">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-6 w-1/4" />
-            <div className="flex items-center gap-2">
-              <Skeleton className="h-6 w-24" />
-              <Skeleton className="h-6 w-28" />
-              <Skeleton className="h-6 w-28" />
-            </div>
-          </div>
-          <div className="space-y-4">
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
+      <>
+        <div className="-mx-4 flex items-center justify-between border-b px-4 py-2">
+          <h1 className="text-md font-medium">
+            {isLoading || !project ? (
+              <Skeleton className="h-5 w-20" />
+            ) : (
+              project.name
+            )}
+          </h1>
+          <div className="flex items-center gap-2">
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
+              <DialogTrigger asChild>
+                <Button disabled={isLoading || !project} variant="outline">
+                  Edit Project
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Edit Project</DialogTitle>
+                </DialogHeader>
+                <ProjectForm
+                  defaultValues={{
+                    name: project?.name,
+                    description: project?.description ?? "",
+                  }}
+                  onSubmit={onSubmit}
+                  isPending={updateProjectMutation.status === "pending"}
+                  onCancel={() => setIsEditing(false)}
+                />
+              </DialogContent>
+            </Dialog>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={isLoading || !project}>
+                  Tools
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onSelect={() => setIsExportDialogOpen(true)}>
+                  <Download className="h-4 w-4" />
+                  Export Tools
+                </DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setIsImportDialogOpen(true)}>
+                  <Upload className="h-4 w-4" />
+                  Import Tools
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() => setIsMoveToolsDialogOpen(true)}
+                >
+                  <SendToBackIcon className="h-4 w-4" />
+                  Move Tools
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <ExportToolsDialog
+              isOpen={isExportDialogOpen}
+              onOpenChange={setIsExportDialogOpen}
+            />
+            <ImportToolsDialog
+              projectId={projectId!}
+              open={isImportDialogOpen}
+              onOpenChange={setIsImportDialogOpen}
+            />
+            <MoveToolsDialog
+              isOpen={isMoveToolsDialogOpen}
+              onOpenChange={setIsMoveToolsDialogOpen}
+              currentProjectId={projectId!}
+            />
           </div>
         </div>
-      ) : (
-        <>
-          <div className="-mx-4 flex items-center justify-between border-b px-4 py-2">
-            <h1 className="text-md font-medium">{project.name}</h1>
-            <div className="flex items-center gap-2">
-              <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                <DialogTrigger asChild>
-                  <Button variant="outline">Edit Project</Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Edit Project</DialogTitle>
-                  </DialogHeader>
-                  <ProjectForm
-                    defaultValues={{
-                      name: project.name,
-                      description: project.description ?? "",
-                    }}
-                    onSubmit={onSubmit}
-                    isPending={updateProjectMutation.status === "pending"}
-                    onCancel={() => setIsEditing(false)}
-                  />
-                </DialogContent>
-              </Dialog>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline">
-                    Tools
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onSelect={() => setIsExportDialogOpen(true)}
-                  >
-                    <Download className="h-4 w-4" />
-                    Export Tools
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => setIsImportDialogOpen(true)}
-                  >
-                    <Upload className="h-4 w-4" />
-                    Import Tools
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={() => setIsMoveToolsDialogOpen(true)}
-                  >
-                    <SendToBackIcon className="h-4 w-4" />
-                    Move Tools
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <ExportToolsDialog
-                isOpen={isExportDialogOpen}
-                onOpenChange={setIsExportDialogOpen}
-              />
-              <ImportToolsDialog
-                projectId={projectId!}
-                open={isImportDialogOpen}
-                onOpenChange={setIsImportDialogOpen}
-              />
-              <MoveToolsDialog
-                isOpen={isMoveToolsDialogOpen}
-                onOpenChange={setIsMoveToolsDialogOpen}
-                currentProjectId={projectId!}
-              />
-            </div>
-          </div>
-          <Tool />
-        </>
-      )}
+        <Tool />
+      </>
     </DashboardLayout>
   );
 }
