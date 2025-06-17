@@ -25,3 +25,27 @@ Improvements_Identified_For_Consolidation:
 - General pattern: Using `framer-motion` for slide-down/up animations with `height: "auto"` and `overflow-hidden`.
 - General pattern: Using `framer-motion` for "move from bottom to top" animations with `y` and `opacity` for new elements.
 ---
+
+---
+
+Date: 2025-06-17
+TaskRef: "Add toast.success notifications for project creation and update"
+
+Learnings:
+
+- Integrated `toast.success` from `sonner` to provide user feedback on successful project creation and update operations.
+- Confirmed that `toast` notifications are a good way to provide non-intrusive, temporary feedback to the user.
+
+Difficulties:
+
+- None encountered.
+
+Successes:
+
+- Successfully added toast notifications as requested, improving user experience by confirming actions.
+
+Improvements_Identified_For_Consolidation:
+
+- General pattern: Using `sonner` for success notifications after data mutations.
+
+---

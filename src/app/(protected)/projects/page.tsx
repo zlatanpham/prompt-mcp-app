@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import { api } from "@/trpc/react";
 import { useOrganization } from "../_context/organization";
 import DashboardLayout from "@/components/dashboard-layout";
@@ -90,6 +91,7 @@ export default function ProjectPage() {
       });
       setIsCreateOpen(false);
       form.reset();
+      toast.success("Project created successfully!");
     },
   });
 
@@ -100,6 +102,7 @@ export default function ProjectPage() {
       });
       setIsEditOpen(false);
       setSelectedProject(null);
+      toast.success("Project updated successfully!");
     },
   });
 

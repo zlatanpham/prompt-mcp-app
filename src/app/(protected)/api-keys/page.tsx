@@ -37,6 +37,7 @@ import { ApiKeyToolsDrawer } from "./_components/api-key-tools-drawer";
 import { Badge } from "@/components/ui/badge";
 import { Wrench } from "lucide-react";
 import { truncate } from "@/utils/string";
+import { toast } from "sonner";
 
 export default function ApiKeysPage() {
   const [isToolsDrawerOpen, setIsToolsDrawerOpen] = useState(false);
@@ -94,7 +95,10 @@ export default function ApiKeysPage() {
     },
   });
   const updateApiKeyMutation = api.apiKey.updateApiKey.useMutation({
-    onSuccess: () => void refetch(),
+    onSuccess: () => {
+      toast.success("API Key updated successfully");
+      void refetch();
+    },
   });
 
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] =
@@ -421,6 +425,7 @@ export default function ApiKeysPage() {
         setEditSelectedProjectIds={setEditSelectedProjectIds}
         projectOptions={projectOptions}
         handleUpdateProjects={handleUpdateProjects}
+        isSaving={updateApiKeyMutation.isPending}
       />
 
       <ApiKeyToolsDrawer

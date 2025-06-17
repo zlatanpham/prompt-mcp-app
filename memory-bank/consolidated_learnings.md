@@ -124,6 +124,14 @@
   7. Handle loading states using `mutation.status === "pending"` to disable submit buttons.
   8. Provide `onSuccess` and `onError` callbacks for toast notifications and form reset.
 
+### Toast Notifications
+
+- **Pattern:** Use `toast.success` from `sonner` to provide non-intrusive, temporary feedback to the user after successful data mutations or actions.
+- **Benefits:** Improves user experience by confirming actions and providing immediate visual feedback without interrupting the user's workflow.
+- **Implementation Steps:**
+  1. Import `toast` from `sonner` (e.g., `import { toast } from "sonner";`).
+  2. Call `toast.success("Your message here!");` within the `onSuccess` callback of relevant mutations or after successful operations.
+
 ## Data Fetching & Aggregation
 
 ### Handling Nested Counts and Aggregations (tRPC/Prisma)

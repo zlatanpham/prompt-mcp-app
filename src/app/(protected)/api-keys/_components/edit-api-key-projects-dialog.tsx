@@ -27,6 +27,7 @@ interface EditApiKeyProjectsDialogProps {
   setEditSelectedProjectIds: (ids: string[]) => void;
   projectOptions: { value: string; label: string }[];
   handleUpdateProjects: (newName: string) => void;
+  isSaving: boolean;
 }
 
 export function EditApiKeyProjectsDialog({
@@ -37,6 +38,7 @@ export function EditApiKeyProjectsDialog({
   setEditSelectedProjectIds,
   projectOptions,
   handleUpdateProjects,
+  isSaving,
 }: EditApiKeyProjectsDialogProps) {
   const [apiName, setApiName] = useState(apiKeyToEditProjects?.name ?? "");
 
@@ -83,7 +85,7 @@ export function EditApiKeyProjectsDialog({
             <Label htmlFor="edit-projects" className="pt-2 text-right">
               Projects
             </Label>
-            <div className="col-span-3 flex flex-col gap-2">
+            <div className="col-span-3 flex flex-col gap-2 rounded-md border p-3">
               {projectOptions.map((project) => (
                 <div
                   key={project.value}
@@ -96,7 +98,10 @@ export function EditApiKeyProjectsDialog({
                       handleEditCheckboxChange(checked, project.value)
                     }
                   />
-                  <Label htmlFor={`edit-project-${project.value}`}>
+                  <Label
+                    className="cursor-pointer font-normal"
+                    htmlFor={`edit-project-${project.value}`}
+                  >
                     {project.label}
                   </Label>
                 </div>
@@ -104,7 +109,11 @@ export function EditApiKeyProjectsDialog({
             </div>
           </div>
         </div>
-        <Button size="lg" onClick={() => handleUpdateProjects(apiName)}>
+        <Button
+          size="lg"
+          onClick={() => handleUpdateProjects(apiName)}
+          isLoading={isSaving}
+        >
           Save Changes
         </Button>
       </DialogContent>

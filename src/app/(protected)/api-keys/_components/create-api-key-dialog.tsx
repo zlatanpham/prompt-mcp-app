@@ -77,7 +77,7 @@ export function CreateApiKeyDialog({
             <Label htmlFor="projects" className="pt-2 text-right">
               Projects
             </Label>
-            <div className="col-span-3 flex flex-col gap-2">
+            <div className="col-span-3 flex flex-col gap-2 rounded-md border p-3">
               {projectOptions.map((project) => (
                 <div
                   key={project.value}
@@ -90,7 +90,10 @@ export function CreateApiKeyDialog({
                       handleCheckboxChange(checked, project.value)
                     }
                   />
-                  <Label htmlFor={`create-project-${project.value}`}>
+                  <Label
+                    className="cursor-pointer font-normal"
+                    htmlFor={`create-project-${project.value}`}
+                  >
                     {project.label}
                   </Label>
                 </div>

@@ -75,7 +75,7 @@ export function ProjectForm({
           )}
         />
         <div className="flex justify-end space-x-2">
-          <Button size="lg" type="submit" disabled={isPending}>
+          <Button size="lg" type="submit" isLoading={isPending}>
             Save
           </Button>
           {onCancel && (
