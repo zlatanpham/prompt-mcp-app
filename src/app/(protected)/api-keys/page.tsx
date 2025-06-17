@@ -396,10 +396,11 @@ export default function ApiKeysPage() {
         isOpen={isConfirmDeleteDialogOpen}
         onOpenChange={setIsConfirmDeleteDialogOpen}
         onConfirm={handleDeleteApiKey}
-        title="Are you absolutely sure?"
+        title="Delete API key?"
         description="This action cannot be undone. This will permanently delete your API Key."
         confirmText="Continue"
         cancelText="Cancel"
+        isDanger
       />
 
       <ConfirmActionDialog

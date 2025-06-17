@@ -280,7 +280,7 @@ export function GenerateToolDialog({
                           </Button>
                         </FormControl>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+                      <DropdownMenuContent>
                         {MODELS.map((model) => (
                           <DropdownMenuItem
                             key={model.value}

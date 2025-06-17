@@ -30,6 +30,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { Highlight } from "@/components/highlight";
 import ManualToolDialog from "./manual-tool-dialog";
@@ -106,13 +112,22 @@ export default function ToolComponent() {
           >
             New Tool
           </Button>
-          <Button
-            variant="outline"
-            disabled={isLoading}
-            onClick={() => setIsGenerateToolDialogOpen(true)} // Open new dialog
-          >
-            <Wand2 className="h-4 w-4" /> {/* Magic wand icon */}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  disabled={isLoading}
+                  onClick={() => setIsGenerateToolDialogOpen(true)} // Open new dialog
+                >
+                  <Wand2 className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent hideArrow sideOffset={8}>
+                <p>Generate Tool with AI</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
 
         <ManualToolDialog
@@ -132,10 +147,11 @@ export default function ToolComponent() {
           isOpen={isConfirmDialogOpen}
           onOpenChange={setIsConfirmDialogOpen}
           onConfirm={confirmDelete}
-          title="Are you absolutely sure?"
+          title="Delete tool?"
           description="This action cannot be undone. This will permanently delete your tool."
           confirmText="Continue"
           cancelText="Cancel"
+          isDanger
         />
       </div>
 

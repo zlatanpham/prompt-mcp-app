@@ -223,7 +223,7 @@ export default function ProjectPage() {
                 <Card className="flex h-full w-full flex-col justify-between p-3 transition-all">
                   <div>
                     <div className="flex items-center justify-between">
-                      <h2 className="mb-2 text-base font-normal">
+                      <h2 className="mb-2 text-base font-medium">
                         {project.name}
                       </h2>
                       <DropdownMenu>
@@ -262,7 +262,7 @@ export default function ProjectPage() {
                               e.stopPropagation();
                               handleDeleteClick(project.id);
                             }}
-                            className="text-red-700 focus:bg-red-50 focus:text-red-700 data-[state=open]:bg-red-50 data-[state=open]:text-red-700"
+                            className="text-red-600 hover:bg-red-50 focus:bg-red-50 focus:text-red-600"
                           >
                             <Trash2 className="mr-2 h-4 w-4 text-inherit" />
                             Delete
@@ -315,10 +315,11 @@ export default function ProjectPage() {
         isOpen={isConfirmDeleteDialogOpen}
         onOpenChange={setIsConfirmDeleteDialogOpen}
         onConfirm={confirmDelete}
-        title="Are you absolutely sure?"
-        description="This action cannot be undone. This will permanently delete your project and remove its data from our servers."
+        title="Delete project?"
+        description="This action cannot be undone. This will permanently delete your project and all associated tools."
         confirmText="Continue"
         cancelText="Cancel"
+        isDanger
       />
     </DashboardLayout>
   );

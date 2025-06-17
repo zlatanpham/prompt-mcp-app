@@ -20,6 +20,7 @@ interface ConfirmActionDialogProps {
   description: string;
   confirmText: string;
   cancelText: string;
+  isDanger?: boolean;
 }
 
 export function ConfirmActionDialog({
@@ -30,6 +31,7 @@ export function ConfirmActionDialog({
   description,
   confirmText,
   cancelText,
+  isDanger = true,
 }: ConfirmActionDialogProps) {
   return (
     <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
@@ -40,7 +42,10 @@ export function ConfirmActionDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>
+          <AlertDialogAction
+            onClick={onConfirm}
+            variant={isDanger ? "destructive" : "default"}
+          >
             {confirmText}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -56,6 +61,7 @@ interface ConfirmActionState {
   confirmText: string;
   cancelText: string;
   onConfirm: () => void;
+  isDanger: boolean;
 }
 
 export function useConfirmAction() {
@@ -66,6 +72,7 @@ export function useConfirmAction() {
     confirmText: "",
     cancelText: "",
     onConfirm: () => void 0,
+    isDanger: true,
   });
 
   const confirm = (
@@ -73,6 +80,7 @@ export function useConfirmAction() {
     description: string,
     confirmText = "Confirm",
     cancelText = "Cancel",
+    isDanger = true,
   ): Promise<boolean> => {
     return new Promise((resolve) => {
       setDialogState({
@@ -85,6 +93,7 @@ export function useConfirmAction() {
         },
         confirmText,
         cancelText,
+        isDanger,
       });
     });
   };
