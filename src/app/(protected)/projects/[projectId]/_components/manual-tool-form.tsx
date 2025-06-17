@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export const manualToolFormSchema = z
   .object({
@@ -101,7 +102,12 @@ export function ManualToolForm({
           </div>
         ) : (
           <>
-            <div className="-mx-6 max-h-[calc(100dvh-200px)] space-y-4 overflow-y-auto px-6 sm:max-w-[600px]">
+            <div
+              className={cn("space-y-4", {
+                "-mx-6 max-h-[calc(100dvh-200px)] overflow-y-auto px-6 sm:max-w-[600px]":
+                  !hideSubmitButton,
+              })}
+            >
               <FormField
                 control={form.control}
                 name="name"

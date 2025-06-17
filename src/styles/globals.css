@@ -131,6 +131,8 @@
  */
 body {
   pointer-events: auto !important;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 .prose {

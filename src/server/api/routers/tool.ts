@@ -421,7 +421,7 @@ A high-performance prompt achieves:
 ## Best Practices to Implement
 
 ### Structure Guidelines
-- Use XML tags for multi-part responses: <analysis>, <recommendation>, <confidence_score>
+- Use clear heading for multi-part responses: ## Analysis, ### recommendation, ### summary, etc
 - Front-load critical constraints and requirements
 - Use "Chain of Thought" prompting for complex reasoning tasks
 - Include output examples when format is non-standard
@@ -469,6 +469,7 @@ Requirements:
 - Use snake_case for function names
 - Parameter types should be 'string', 'number', 'boolean', or 'array'
 - Descriptions should be clear and professional
+- Prompt templates must be in markdown format
 - Prompt templates must use HTML-style tags with parameters in separate blocks
 - Each parameter should have its own tag block (e.g., <parameter_name>\n{parameter_name}\n</parameter_name>)
 - Output valid JSON only, no additional text
