@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { API_KEY_STORAGE_KEYS } from "@/lib/constants"; // Import from constants
+import { SquareArrowOutUpRightIcon } from "lucide-react"; // Import Link icon
 
 interface ApiKeyDialogProps {
   onSave: (keys: Record<string, string>) => void;
@@ -32,7 +33,8 @@ export function ApiKeyDialog({
       const loadedKeys: Record<string, string> = {};
       for (const provider in API_KEY_STORAGE_KEYS) {
         const key = localStorage.getItem(
-          API_KEY_STORAGE_KEYS[provider as keyof typeof API_KEY_STORAGE_KEYS],
+          API_KEY_STORAGE_KEYS[provider as keyof typeof API_KEY_STORAGE_KEYS]
+            .localStorageKey,
         );
         if (key) {
           loadedKeys[provider] = key;
@@ -65,17 +67,30 @@ export function ApiKeyDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4">
-          {Object.entries(API_KEY_STORAGE_KEYS).map(([provider]) => (
-            <div className="grid grid-cols-4 items-center gap-4" key={provider}>
-              <Label htmlFor={provider} className="text-right capitalize">
-                {provider} API Key
+          {Object.entries(API_KEY_STORAGE_KEYS).map(([provider, { link }]) => (
+            <div className="grid grid-cols-5 items-center gap-4" key={provider}>
+              <Label
+                htmlFor={provider}
+                className="flex items-center gap-1 text-right capitalize"
+              >
+                {provider}
+                {link && (
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    <SquareArrowOutUpRightIcon className="inline h-3 w-3" />
+                  </a>
+                )}
               </Label>
               <Input
                 id={provider}
                 type="password"
                 value={apiKeys[provider] ?? ""}
                 onChange={(e) => handleInputChange(provider, e.target.value)}
-                className="col-span-3"
+                className="col-span-4"
               />
             </div>
           ))}

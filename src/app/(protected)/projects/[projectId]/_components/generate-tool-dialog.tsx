@@ -65,11 +65,16 @@ export function GenerateToolDialog({
       };
     }
     return {
-      google: localStorage.getItem(API_KEY_STORAGE_KEYS.google ?? "") ?? "",
-      openai: localStorage.getItem(API_KEY_STORAGE_KEYS.openai ?? "") ?? "",
-      deepseek: localStorage.getItem(API_KEY_STORAGE_KEYS.deepseek ?? "") ?? "",
+      google:
+        localStorage.getItem(API_KEY_STORAGE_KEYS.google.localStorageKey) ?? "",
+      openai:
+        localStorage.getItem(API_KEY_STORAGE_KEYS.openai.localStorageKey) ?? "",
+      deepseek:
+        localStorage.getItem(API_KEY_STORAGE_KEYS.deepseek.localStorageKey) ??
+        "",
       anthropic:
-        localStorage.getItem(API_KEY_STORAGE_KEYS.anthropic ?? "") ?? "",
+        localStorage.getItem(API_KEY_STORAGE_KEYS.anthropic.localStorageKey) ??
+        "",
     };
   });
 
@@ -78,7 +83,8 @@ export function GenerateToolDialog({
   const handleSaveApiKey = (keys: Record<string, string>) => {
     for (const provider in keys) {
       localStorage.setItem(
-        API_KEY_STORAGE_KEYS[provider as keyof typeof API_KEY_STORAGE_KEYS],
+        API_KEY_STORAGE_KEYS[provider as keyof typeof API_KEY_STORAGE_KEYS]
+          .localStorageKey,
         keys[provider] ?? "",
       );
     }
