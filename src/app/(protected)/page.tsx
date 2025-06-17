@@ -10,54 +10,12 @@ import { Input } from "@/components/ui/input";
 import { ChatMessageDisplay } from "@/app/(protected)/page/_components/chat-message-display";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
 import { ToolSelectorPopover } from "@/components/tool-selector-popover";
 import { type Tool } from "@/types/tool";
-import { ArrowUpIcon, CircleDotIcon, KeyRoundIcon } from "lucide-react";
-import { ChevronDown } from "lucide-react"; // For dropdown indicator
-
-const API_KEY_STORAGE_KEYS = {
-  google: "google_ai_api_key",
-  openai: "openai_api_key",
-  deepseek: "deepseek_api_key",
-  anthropic: "anthropic_api_key",
-};
-
-const MODELS = [
-  { label: "DeepSeek Chat v3", value: "deepseek/deepseek-chat" },
-  {
-    label: "Google Gemini 2.5 Pro",
-    value: "google/gemini-2.5-pro-preview-06-05",
-  },
-  {
-    label: "Google Gemini 2.5 Flash",
-    value: "google/gemini-2.5-flash-preview-05-20",
-  },
-  { label: "Google Gemini 2.0 Flash", value: "google/gemini-2.0-flash-001" },
-  { label: "OpenAI GPT 4.1", value: "openai/gpt-4.1" },
-  { label: "OpenAI GPT 4.1 mini", value: "openai/gpt-4.1-mini" },
-  { label: "OpenAI GPT o4 mini", value: "openai/o4-mini" },
-  { label: "OpenAI GPT o3 mini", value: "openai/o3-mini" },
-  {
-    label: "Anthropic Claude Opus 4",
-    value: "anthropic/claude-opus-4-20250514",
-  },
-  {
-    label: "Anthropic Claude 4 Sonnet",
-    value: "anthropic/claude-sonnet-4-20250514",
-  },
-  {
-    label: "Anthropic Claude 3.7 Sonnet",
-    value: "anthropic/claude-3-7-sonnet-20250219",
-  },
-];
+import { ArrowUpIcon, CircleDotIcon } from "lucide-react"; // KeyRoundIcon and ChevronDown are now in ModelSelector
+import { ModelSelector } from "@/components/model-selector";
+import { API_KEY_STORAGE_KEYS } from "@/lib/constants"; // Import from constants
 
 export default function ChatPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -94,7 +52,7 @@ export default function ChatPage() {
     };
   });
 
-  const [selectedModel, setSelectedModel] = useState(MODELS[0]?.value);
+  const [selectedModel, setSelectedModel] = useState(""); // State managed by ModelSelector
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
 
   const handleSaveApiKey = (keys: Record<string, string>) => {
@@ -286,36 +244,12 @@ export default function ChatPage() {
               <ToolSelectorPopover onToolsChange={setEnabledTools} />
             </div>
             <div className="flex items-center space-x-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-[180px] justify-between rounded-full"
-                  >
-                    <span className="truncate">
-                      {MODELS.find((model) => model.value === selectedModel)
-                        ?.label ?? "Select a model"}
-                    </span>
-                    <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[240px]">
-                  {MODELS.map((model) => (
-                    <DropdownMenuItem
-                      key={model.value}
-                      onSelect={() => setSelectedModel(model.value)}
-                    >
-                      {model.label}
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onSelect={() => setIsApiKeyDialogOpen(true)}
-                  >
-                    <KeyRoundIcon /> Config API Keys
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <ModelSelector
+                onModelSelect={setSelectedModel}
+                onConfigApiKeys={() => setIsApiKeyDialogOpen(true)}
+                buttonClassName="w-[180px] rounded-full"
+                localStorageKey="chat_page_selected_model"
+              />
               <Button
                 type="submit"
                 variant={isLoading ? "secondary" : "default"}

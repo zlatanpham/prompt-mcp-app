@@ -21,15 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, KeyRoundIcon } from "lucide-react";
 import { api } from "@/trpc/react";
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
 import {
@@ -39,47 +31,13 @@ import {
 } from "./manual-tool-form";
 import { type Argument } from "@/types/tool";
 import { useQueryClient } from "@tanstack/react-query";
+import { ModelSelector } from "@/components/model-selector"; // Import ModelSelector
+import { API_KEY_STORAGE_KEYS } from "@/lib/constants"; // Import from constants
 
 const generatePromptFormSchema = z.object({
   prompt: z.string().min(10, "Prompt must be at least 10 characters."),
   model: z.string().min(1, "Please select a model."),
 });
-
-const API_KEY_STORAGE_KEYS = {
-  google: "google_ai_api_key",
-  openai: "openai_api_key",
-  deepseek: "deepseek_api_key",
-  anthropic: "anthropic_api_key",
-};
-
-const MODELS = [
-  { label: "DeepSeek Chat v3", value: "deepseek/deepseek-chat" },
-  {
-    label: "Google Gemini 2.5 Pro",
-    value: "google/gemini-2.5-pro-preview-06-05",
-  },
-  {
-    label: "Google Gemini 2.5 Flash",
-    value: "google/gemini-2.5-flash-preview-05-20",
-  },
-  { label: "Google Gemini 2.0 Flash", value: "google/gemini-2.0-flash-001" },
-  { label: "OpenAI GPT 4.1", value: "openai/gpt-4.1" },
-  { label: "OpenAI GPT 4.1 mini", value: "openai/gpt-4.1-mini" },
-  { label: "OpenAI GPT o4 mini", value: "openai/o4-mini" },
-  { label: "OpenAI GPT o3 mini", value: "openai/o3-mini" },
-  {
-    label: "Anthropic Claude Opus 4",
-    value: "anthropic/claude-opus-4-20250514",
-  },
-  {
-    label: "Anthropic Claude 4 Sonnet",
-    value: "anthropic/claude-sonnet-4-20250514",
-  },
-  {
-    label: "Anthropic Claude 3.7 Sonnet",
-    value: "anthropic/claude-3-7-sonnet-20250219",
-  },
-];
 
 type GeneratePromptFormValues = z.infer<typeof generatePromptFormSchema>;
 
@@ -131,7 +89,7 @@ export function GenerateToolDialog({
     resolver: zodResolver(generatePromptFormSchema),
     defaultValues: {
       prompt: "",
-      model: MODELS[0]?.value ?? "",
+      model: "", // Model will be set by ModelSelector's onModelSelect
     },
   });
 
@@ -188,7 +146,7 @@ export function GenerateToolDialog({
       // Reset forms and step when dialog opens
       promptForm.reset({
         prompt: "",
-        model: MODELS[0]?.value ?? "",
+        model: "", // Model will be set by ModelSelector's onModelSelect
       });
       manualToolForm.reset({
         name: "",
@@ -261,45 +219,14 @@ export function GenerateToolDialog({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Model</FormLabel>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            size="lg"
-                            className="w-full justify-between"
-                            disabled={generateToolMutation.status === "pending"}
-                          >
-                            {field.value
-                              ? MODELS.find(
-                                  (model) => model.value === field.value,
-                                )?.label
-                              : "Select a model"}
-                            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                          </Button>
-                        </FormControl>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        {MODELS.map((model) => (
-                          <DropdownMenuItem
-                            key={model.value}
-                            onSelect={() => field.onChange(model.value)}
-                            className="cursor-pointer"
-                          >
-                            {model.label}
-                          </DropdownMenuItem>
-                        ))}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onSelect={() => setIsApiKeyDialogOpen(true)}
-                          className="cursor-pointer"
-                        >
-                          <KeyRoundIcon className="mr-2 h-4 w-4" /> Config API
-                          Keys
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <FormControl>
+                      <ModelSelector
+                        onModelSelect={field.onChange}
+                        onConfigApiKeys={() => setIsApiKeyDialogOpen(true)}
+                        localStorageKey="generate_tool_selected_model"
+                        buttonClassName="w-full"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
