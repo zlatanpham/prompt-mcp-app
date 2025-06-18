@@ -110,12 +110,16 @@ export const projectRouter = createTRPCRouter({
       const { project_id } = input;
 
       // Optional: Add authorization check here to ensure only the project owner or an admin can delete
+      // Optional: Add authorization check here to ensure only the project owner or an admin can delete
       // For example:
       // const project = await db.project.findUnique({ where: { id: project_id } });
       // if (project?.created_by_user_id !== userId) {
       //   throw new Error("Not authorized to delete this project");
       // }
 
+      // Prisma is configured for cascade delete:
+      // - Associated Tools will be automatically deleted due to `onDelete: Cascade` in Tool model.
+      // - Associations in ApiKeyOnProject will be automatically removed due to `onDelete: Cascade` in ApiKeyOnProject model.
       await db.project.delete({
         where: { id: project_id },
       });
