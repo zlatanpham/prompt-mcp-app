@@ -6,20 +6,17 @@ import { useSession } from "next-auth/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat, type Message } from "@ai-sdk/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Input } from "@/components/ui/input";
 import { ChatMessageDisplay } from "@/app/(protected)/page/_components/chat-message-display";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ApiKeyDialog } from "@/app/(protected)/_components/api-key-dialog";
 import { ToolSelectorPopover } from "@/components/tool-selector-popover";
 import { type Tool } from "@/types/tool";
 import { ArrowUpIcon, CircleDotIcon } from "lucide-react"; // KeyRoundIcon and ChevronDown are now in ModelSelector
+import { Textarea } from "@/components/ui/textarea";
 import { ModelSelector } from "@/components/model-selector";
 import { API_KEY_STORAGE_KEYS } from "@/lib/constants"; // Import from constants
 
 export default function ChatPage() {
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-
   const { data: session } = useSession();
 
   const userAvatarFallback = useMemo(() => {
@@ -59,6 +56,8 @@ export default function ChatPage() {
 
   const [selectedModel, setSelectedModel] = useState(""); // State managed by ModelSelector
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleSaveApiKey = (keys: Record<string, string>) => {
     for (const provider in keys) {
@@ -130,7 +129,6 @@ export default function ChatPage() {
   useEffect(() => {
     if (messages.length > 0 && !isLoading) {
       const lastMessage = messages[messages.length - 1];
-      console.log(lastMessage);
       if (
         Array.isArray(lastMessage?.toolInvocations) &&
         lastMessage?.toolInvocations[0]
@@ -153,20 +151,6 @@ export default function ChatPage() {
     }
   }, [messages, handleSubmit, isLoading, append, reload, setMessages]); // Added reload and setMessages to dependencies
 
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-      const viewport = scrollAreaRef.current.querySelector(
-        "[data-radix-scroll-area-viewport]",
-      ) as HTMLDivElement | null;
-
-      if (viewport) {
-        viewport.scrollTop = viewport.scrollHeight; // Scroll to the very bottom
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages[messages.length - 1]?.content]);
-
   const isThinking =
     isLoading &&
     (!messages[messages.length - 1] ||
@@ -174,32 +158,69 @@ export default function ChatPage() {
       (messages[messages.length - 1]?.role === "assistant" &&
         messages[messages.length - 1]?.content === ""));
 
+  const minHeight = useMemo(() => {
+    if (chatContainerRef.current) {
+      const containerHeight = chatContainerRef.current.offsetHeight;
+      const computedStyle = window.getComputedStyle(chatContainerRef.current);
+      const containerPaddingTop = parseFloat(computedStyle.paddingTop);
+      const lastMessageHeight =
+        messageRefs.current[messages.length - 1]?.offsetHeight ?? 0;
+      return Math.max(
+        containerHeight - lastMessageHeight - containerPaddingTop,
+        0,
+      ); // Adjust as needed
+    }
+    return 0;
+  }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > 0 && chatContainerRef.current) {
+      const lastMessageElement = messageRefs.current[messages.length - 1];
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessageElement && lastMessage?.role === "user") {
+        chatContainerRef.current.scrollTo({
+          top: lastMessageElement.offsetTop + 5, // Adjust for padding
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [messages]);
+
   return (
-    <div className="flex h-[calc(100dvh-16px)] flex-col items-center pb-4">
+    <div className="flex h-[calc(100dvh-16px)] flex-col items-center overflow-hidden">
       <div className="flex w-full flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
         <div className="border-b px-4 py-3">
           <h2 className="text-normal font-medium">Chat playground</h2>
         </div>
-        <div className="max-h-[calc(100dvh-180px)]">
-          <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
-            <div className="mx-auto max-w-3xl py-4">
+        <div
+          className="relative flex h-screen max-h-[calc(100dvh-64px)] flex-1 overflow-x-hidden overflow-y-scroll pt-6"
+          ref={chatContainerRef}
+        >
+          <div className="relative mx-auto flex h-full w-full max-w-3xl flex-1 flex-col md:px-2">
+            <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-3 px-4 pt-1 pb-4">
               {messages.length === 0 && !isLoading && !error ? (
-                <div className="mx-auto flex h-[calc(100dvh-240px)] max-w-2xl items-center justify-center text-center text-2xl">
+                <div className="absolute inset-0 mx-auto flex h-full max-w-2xl items-center justify-center pb-20 text-center text-2xl">
                   👋 Hello! Start chatting with your tools here.
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {messages.map((message: Message, index) => (
-                    <ChatMessageDisplay
-                      key={message.id}
-                      message={message}
-                      userAvatarFallback={userAvatarFallback}
-                      isThinking={isThinking}
-                      isLastMessage={index === messages.length - 1}
-                      isLoading={isLoading}
-                      onRegenerate={handleRegenerateSpecificMessage}
-                    />
-                  ))}
+                  {messages.map((message: Message, index) => {
+                    const isLast = index === messages.length - 1;
+                    return (
+                      <ChatMessageDisplay
+                        key={message.id}
+                        message={message}
+                        userAvatarFallback={userAvatarFallback}
+                        isThinking={isThinking}
+                        isLastMessage={isLast}
+                        isLoading={isLoading}
+                        onRegenerate={handleRegenerateSpecificMessage}
+                        ref={(el) => {
+                          messageRefs.current[index] = el;
+                        }}
+                      />
+                    );
+                  })}
                 </div>
               )}
               <AnimatePresence>
@@ -208,7 +229,7 @@ export default function ChatPage() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2, delay: 0.3 }}
-                    className="loading-flash text-muted-foreground mt-3 px-2 text-sm"
+                    className="loading-flash text-muted-foreground px-2 text-sm"
                   >
                     AI is thinking...
                   </motion.div>
@@ -219,70 +240,92 @@ export default function ChatPage() {
                   Error: {error.message}
                 </div>
               )}
+              {messages.length > 0 && (
+                <div
+                  style={{
+                    minHeight,
+                  }}
+                />
+              )}
             </div>
-          </ScrollArea>
+            <div className="bg-background sticky bottom-0 z-[5] mx-auto w-full pb-2">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!apiKeys[currentProvider ?? ""]) {
+                    setIsApiKeyDialogOpen(true);
+                    return;
+                  }
+                  handleSubmit(e);
+                }}
+                className="flex w-full flex-col space-y-2 rounded-xl border p-2 shadow-2xl"
+              >
+                <div>
+                  <Textarea
+                    placeholder="Type your message here..."
+                    value={input}
+                    onChange={handleInputChange}
+                    className="!text-md min-h-10 flex-grow resize-none border-none shadow-none !ring-0"
+                    disabled={isLoading}
+                    rows={0}
+                    style={{ maxHeight: "300px", overflowY: "auto" }}
+                    onKeyDown={(e) => {
+                      if (
+                        e.key === "Enter" &&
+                        (e.metaKey || e.ctrlKey || !e.shiftKey)
+                      ) {
+                        e.preventDefault();
+                        if (!apiKeys[currentProvider ?? ""]) {
+                          setIsApiKeyDialogOpen(true);
+                          return;
+                        }
+                        handleSubmit(e);
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <ToolSelectorPopover onToolsChange={setEnabledTools} />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <ModelSelector
+                      onModelSelect={setSelectedModel}
+                      onConfigApiKeys={() => setIsApiKeyDialogOpen(true)}
+                      buttonClassName="w-[180px] rounded-full"
+                      localStorageKey="chat_page_selected_model"
+                    />
+                    <Button
+                      type="submit"
+                      variant={isLoading ? "secondary" : "default"}
+                      className="h-9 w-9 cursor-pointer rounded-full"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (isLoading) {
+                          stop();
+                        } else {
+                          if (!apiKeys[currentProvider ?? ""]) {
+                            setIsApiKeyDialogOpen(true);
+                            return;
+                          }
+                          handleSubmit(e);
+                        }
+                      }}
+                    >
+                      {isLoading ? (
+                        <CircleDotIcon className="h-4 w-4" />
+                      ) : (
+                        <ArrowUpIcon className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="flex w-full max-w-3xl items-center px-2">
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            if (!apiKeys[currentProvider ?? ""]) {
-              setIsApiKeyDialogOpen(true);
-              return;
-            }
-            handleSubmit(e);
-          }}
-          className="flex w-full flex-col space-y-2 rounded-xl border p-2 shadow-2xl"
-        >
-          <div>
-            <Input
-              placeholder="Type your message here..."
-              value={input}
-              onChange={handleInputChange}
-              className="flex-grow border-none shadow-none"
-              disabled={isLoading}
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <ToolSelectorPopover onToolsChange={setEnabledTools} />
-            </div>
-            <div className="flex items-center space-x-2">
-              <ModelSelector
-                onModelSelect={setSelectedModel}
-                onConfigApiKeys={() => setIsApiKeyDialogOpen(true)}
-                buttonClassName="w-[180px] rounded-full"
-                localStorageKey="chat_page_selected_model"
-              />
-              <Button
-                type="submit"
-                variant={isLoading ? "secondary" : "default"}
-                className="h-9 w-9 cursor-pointer rounded-full"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (isLoading) {
-                    stop();
-                  } else {
-                    if (!apiKeys[currentProvider ?? ""]) {
-                      setIsApiKeyDialogOpen(true);
-                      return;
-                    }
-                    handleSubmit(e);
-                  }
-                }}
-              >
-                {isLoading ? (
-                  <CircleDotIcon className="h-4 w-4" />
-                ) : (
-                  <ArrowUpIcon className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </div>
-        </form>
-      </div>
       <ApiKeyDialog
         onSave={handleSaveApiKey}
         isOpen={isApiKeyDialogOpen}

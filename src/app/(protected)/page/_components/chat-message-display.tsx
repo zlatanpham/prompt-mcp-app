@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { forwardRef, useState, type ForwardedRef } from "react";
 import { type Message } from "@ai-sdk/react";
 import { type ToolInvocation as ToolInvocationType } from "ai";
 import {
@@ -62,13 +62,16 @@ interface ChatMessageDisplayProps {
   onRegenerate?: (messageId: string) => void; // New prop for regenerate action, accepts messageId
 }
 
-export function ChatMessageDisplay({
-  message,
-  isLoading,
-  isLastMessage,
-  userAvatarFallback,
-  onRegenerate,
-}: ChatMessageDisplayProps) {
+export const ChatMessageDisplay = forwardRef(function ChatMessageDisplay(
+  {
+    message,
+    isLoading,
+    isLastMessage,
+    userAvatarFallback,
+    onRegenerate,
+  }: ChatMessageDisplayProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -158,6 +161,7 @@ export function ChatMessageDisplay({
   if (message.role === "user") {
     return (
       <motion.div
+        ref={ref} // Apply ref here
         initial={{ opacity: 1, y: 20, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
@@ -178,7 +182,7 @@ export function ChatMessageDisplay({
   }
 
   return (
-    <div key={message.id} className="prose px-3">
+    <div key={message.id} className="prose px-3" ref={ref}>
       <ReactMarkdown remarkPlugins={[remarkGfm]}>
         {message.content}
       </ReactMarkdown>
@@ -234,4 +238,4 @@ export function ChatMessageDisplay({
       )}
     </div>
   );
-}
+});
