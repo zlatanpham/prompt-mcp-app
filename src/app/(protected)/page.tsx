@@ -57,6 +57,8 @@ export default function ChatPage() {
   const [selectedModel, setSelectedModel] = useState(""); // State managed by ModelSelector
   const [isApiKeyDialogOpen, setIsApiKeyDialogOpen] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputHolderRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const messageRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const handleSaveApiKey = (keys: Record<string, string>) => {
@@ -158,38 +160,76 @@ export default function ChatPage() {
       (messages[messages.length - 1]?.role === "assistant" &&
         messages[messages.length - 1]?.content === ""));
 
-  const minHeight = useMemo(() => {
-    if (chatContainerRef.current) {
-      const containerHeight = chatContainerRef.current.offsetHeight;
-      const computedStyle = window.getComputedStyle(chatContainerRef.current);
-      const containerPaddingTop = parseFloat(computedStyle.paddingTop);
-      const lastMessageHeight =
-        messageRefs.current[messages.length - 1]?.offsetHeight ?? 0;
-      return Math.max(
-        containerHeight - lastMessageHeight - containerPaddingTop,
-        0,
-      ); // Adjust as needed
-    }
-    return 0;
-  }, [messages]);
+  const [minHeight, setMinHeight] = useState(0);
 
   useEffect(() => {
-    if (messages.length > 0 && chatContainerRef.current) {
-      const lastMessageElement = messageRefs.current[messages.length - 1];
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessageElement && lastMessage?.role === "user") {
-        chatContainerRef.current.scrollTo({
-          top: lastMessageElement.offsetTop + 5, // Adjust for padding
-          behavior: "smooth",
-        });
-      }
+    if (messages.length > 1 && chatContainerRef.current) {
+      const currentChatContainer = chatContainerRef.current; // Capture current value
+
+      const updateMinHeight = () => {
+        // Add setTimeout(0) here for an additional delay
+        setTimeout(() => {
+          const lastUserMessageIndex = messages.reduce(
+            (acc, message, index) => (message.role === "user" ? index : acc),
+            -1,
+          );
+          const messageRefsToConsider = messageRefs.current.slice(
+            lastUserMessageIndex,
+            messages.length,
+          );
+          const containerHeight = currentChatContainer.offsetHeight; // Use the captured value
+
+          const accumulatedMessageHeight = messageRefsToConsider.reduce(
+            (acc, ref) => {
+              if (ref) {
+                const style = window.getComputedStyle(ref);
+                const marginTop = parseFloat(style.marginTop);
+                const marginBottom = parseFloat(style.marginBottom);
+                return acc + ref.offsetHeight + marginTop + marginBottom;
+              }
+              return acc;
+            },
+            0,
+          );
+
+          setMinHeight(
+            Math.max(
+              containerHeight -
+                accumulatedMessageHeight -
+                (inputHolderRef.current?.offsetHeight ?? 0) -
+                (headerRef.current?.offsetHeight ?? 0) +
+                2,
+              0,
+            ),
+          ); // Adjust as needed
+
+          // Move scrolling logic here
+          setTimeout(() => {
+            const lastMessageElement = messageRefs.current[messages.length - 1];
+            const lastMessage = messages[messages.length - 1];
+            if (lastMessageElement && lastMessage?.role === "user") {
+              currentChatContainer.scrollTo({
+                top: lastMessageElement.offsetTop + 5, // Adjust for padding
+                behavior: "smooth",
+              });
+            }
+          }, 50);
+        }, 50); // Delay by 0ms
+      };
+
+      // Use requestAnimationFrame to ensure DOM is updated before reading styles
+      const animationFrameId = requestAnimationFrame(updateMinHeight);
+
+      return () => cancelAnimationFrame(animationFrameId);
+    } else {
+      setMinHeight(0); // Reset when conditions are not met
     }
   }, [messages]);
 
   return (
     <div className="flex h-[calc(100dvh-16px)] flex-col items-center overflow-hidden">
       <div className="flex w-full flex-grow flex-col rounded-b-none border-b-0 border-none shadow-none">
-        <div className="border-b px-4 py-3">
+        <div className="border-b px-4 py-3" ref={headerRef}>
           <h2 className="text-normal font-medium">Chat playground</h2>
         </div>
         <div
@@ -248,7 +288,10 @@ export default function ChatPage() {
                 />
               )}
             </div>
-            <div className="bg-background sticky bottom-0 z-[5] mx-auto w-full pb-2">
+            <div
+              ref={inputHolderRef}
+              className="bg-background sticky bottom-0 z-[5] mx-auto w-full pb-2"
+            >
               <form
                 onSubmit={(e) => {
                   e.preventDefault();

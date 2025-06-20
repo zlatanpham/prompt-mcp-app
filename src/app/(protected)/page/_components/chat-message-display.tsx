@@ -114,6 +114,7 @@ export const ChatMessageDisplay = forwardRef(function ChatMessageDisplay(
         exit={{ opacity: 0, height: 0 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         className="overflow-hidden"
+        ref={ref}
       >
         <Collapsible
           open={isOpen}
