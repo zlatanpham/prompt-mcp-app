@@ -1,18 +1,24 @@
 # Prompt MCP
 
-An open-source application for managing AI prompts and tools.
+An open-source application for managing AI prompts as MCP tools.
 
 ## About
 
-This application helps you manage and organize your AI prompts and tools. It provides a structured way to define, store, and utilize various AI-powered functionalities.
+This application helps to generate one-shot prompts and convert them to tools that can be used by an MCP client like Claude desktop, Cursor or Cline.
 
 ## Features
 
-- **Prompt Management:** Define and manage AI prompts for various tasks.
-- **Tool Integration:** Integrate and manage custom AI tools.
-- **API Key Management:** Securely manage API keys for different services.
-- **Project Organization:** Organize prompts and tools within projects.
-- **User Management:** Handle user accounts and permissions.
+- **Prompt to Tool Conversion:** Create (or generate) one-shot prompts and convert them into reusable tools.
+- **Testing Tools:** Test tools with a clean Chat interface.
+- **MCP Export & Integration:** Export tools grouped under projects for integration with MCP clients (e.g., Claude desktop, Cursor, Cline).
+
+![](assets/project.webp)
+
+![](assets/tool.webp)
+
+![](assets/chat.webp)
+
+![](assets/api-key.webp)
 
 ## Built with T3 Stack
 
@@ -39,7 +45,7 @@ To get started with development, follow these steps:
 
 ### Setup
 
-1.  **Environment Variables:** Create a `.env` file from `.env.example` and configure necessary environment variables (e.g., `NEXTAUTH_SECRET`, `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`).
+1.  **Environment Variables:** Create a `.env` file from `.env.example` and configure necessary environment variables.
 2.  **Database:**
     ```bash
     ./start-database
@@ -59,3 +65,13 @@ pnpm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
+
+## Contributing
+
+Contributions, suggestions, bug reports and fixes are welcome!
+
+For new features or components, please open an issue and discuss before sending a PR.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
